@@ -550,11 +550,6 @@ ENGINE = InnoDB;
 USE `db_ledger` ;
 
 -- -----------------------------------------------------
--- Placeholder table for view `db_ledger`.`UsdCashTotalView`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `db_ledger`.`UsdCashTotalView` (`totalUSD` INT, `totalMXN` INT);
-
--- -----------------------------------------------------
 -- Placeholder table for view `db_ledger`.`tarjetaCreditoView`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `db_ledger`.`tarjetaCreditoView` (`idTarjetaCredito` INT, `Tarjeta` INT, `Banco` INT, `FechaCorte` INT, `PeriodoInicialCobro` INT, `PeriodoFinalCobro` INT, `FechaLimitePago` INT, `LimiteCredito` INT, `CreditoDisponible` INT, `SaldoActual` INT);
@@ -643,20 +638,6 @@ CREATE TABLE IF NOT EXISTS `db_ledger`.`VW_Monthly_With_No_Interest_Summary` (`i
 -- Placeholder table for view `db_ledger`.`VW_Monthly_With_No_Interest_Summary`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `db_ledger`.`VW_Monthly_With_No_Interest_Summary` (`id` INT);
-
--- -----------------------------------------------------
--- View `db_ledger`.`UsdCashTotalView`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `db_ledger`.`UsdCashTotalView`;
-USE `db_ledger`;
-CREATE  OR REPLACE VIEW `UsdCashTotalView` AS
-SELECT 
-usd.*, 
-usd.dollarBill*usd.totalBills totalUSD,
-usd.dollarBill*usd.totalBills*divisa.mxnValue totalMXN
-FROM 
-`usdcash` usd, `divisa` divisa 
-WHERE divisa.description = 'USD';
 
 -- -----------------------------------------------------
 -- View `db_ledger`.`tarjetaCreditoView`

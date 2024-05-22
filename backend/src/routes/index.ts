@@ -1,22 +1,21 @@
-import { Router, json } from 'express';
-import cors from 'cors';
+import { Router, json } from "express";
+import cors from "cors";
 
-import {
-    errorHandler,
-	unhandledRoutesHandler,
-} from '../middlewares';
+import { errorHandler, unhandledRoutesHandler } from "../middlewares";
+import swaggerMiddleware from "../middlewares/swaggerMiddleware";
 
 const router = Router();
 
-router.use(cors({ origin: '*' }));
+router.use(cors({ origin: "*" }));
 
 // API Routes
-/** 
+/**
  * Add here the routes handlers
  * **/
+router.use("/api-docs", swaggerMiddleware);
 
 // Routes error handlers
-router.all('*', unhandledRoutesHandler);
+router.all("*", unhandledRoutesHandler);
 router.use(errorHandler);
 
 export default router;
