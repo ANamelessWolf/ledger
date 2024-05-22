@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql:
+    build: ./database
+    container_name: ledger-mysql
+    ports:
+      - "3307:3307"
+    environment:
+      MYSQL_ROOT_PASSWORD: S4s2k3s@ma!
+      MYSQL_DATABASE: db_ledger
+
+  backend:
+    build: ./backend
+    container_name: ledger-backend
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: S4s2k3s@ma!
+      DB_NAME: db_ledger
+      PORT: 3002
+
+  frontend:
+    build: ./frontend
+    container_name: ledger-frontend
+    ports:
+      - "4202:4202"
+    depends_on:
+      - backend
