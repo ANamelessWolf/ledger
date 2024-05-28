@@ -6,7 +6,9 @@
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "outDir": "./dist"
+      "outDir": "./dist",
+      "experimentalDecorators": true,
+      "strictPropertyInitialization": false,
     },
     "include": ["src"],
     "exclude": ["node_modules"]

@@ -20,6 +20,7 @@ npm install express
 npm install --save-dev typescript @types/node @types/express ts-node-dev
 npm install --save dotenv
 npm install swagger-ui-express swagger-jsdoc @types/swagger-ui-express @types/swagger-jsdoc
+npm install typeorm mysql
 
 ```
 
