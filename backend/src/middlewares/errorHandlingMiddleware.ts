@@ -31,6 +31,7 @@ export const errorHandler = (
             message: errorMessage,
         })
     );
+    next();
 };
 
 /**

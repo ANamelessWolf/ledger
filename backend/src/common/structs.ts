@@ -25,11 +25,11 @@ export class Exception extends Error {
  * Represents an HTTP response with optional data, error code, and message.
  * @typeparam T The type of data contained in the response.
  */
-export class HttpResponse<T = any> {
+export class HttpResponse {
     /**
      * The data contained in the response.
      */
-    data?: T;
+    data?: any;
     
     /**
      * The error code associated with the response.

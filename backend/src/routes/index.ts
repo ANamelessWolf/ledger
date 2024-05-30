@@ -1,4 +1,4 @@
-import { Router, json } from "express";
+import { Router } from "express";
 import cors from "cors";
 
 import { errorHandler, unhandledRoutesHandler } from "../middlewares";
