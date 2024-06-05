@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { AppDataSource } from "../../index";
 import { FinancingEntity } from "../banking/financingEntity";
 import { Wallet } from "./wallet";
+import { CreditcardPayment } from "./creditcardPayment";
 
 @Entity("Credit_Card", { database: process.env.DB_NAME })
 export class Creditcard {
@@ -52,4 +53,14 @@ export class Creditcard {
     return AppDataSource.manager.find(Wallet, options);
   }
 
+  get payments(): Promise<CreditcardPayment[]> {
+    const options: any = {
+      order: {
+        paymentDate: "DESC",
+      },
+      take: 5,
+      where: [{ creditcardId: this.id }],
+    };
+    return AppDataSource.manager.find(CreditcardPayment, options);
+  }
 }

@@ -14,13 +14,13 @@ export class CreditcardPayment {
   paymentTotal: number;
 
   @Column({ type: "date", name: "payment_date" })
-  paymentDate: Date;
+  paymentDate: string;
 
   @Column({ type: "date", name: "period_cut_date" })
-  paymentCutDate: Date;
+  paymentCutDate: string;
 
   @Column({ type: "date", name: "period_due_date" })
-  paymentDueDate: Date;
+  paymentDueDate: string;
 
   get creditcard(): Promise<Creditcard[]> {
     const options = {
