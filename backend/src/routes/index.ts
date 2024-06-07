@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, json } from "express";
 import cors from "cors";
 
 import { errorHandler, unhandledRoutesHandler } from "../middlewares";
@@ -8,7 +8,7 @@ import creditcardRoutes from './creditcardRoutes';
 const router = Router();
 
 router.use(cors({ origin: "*" }));
-
+router.use(json());
 // API Routes
 /**
  * Add here the routes handlers

@@ -69,9 +69,31 @@
  *         color:
  *           type: string
  *           description: The color of the credit card
+ *     CreditcardPayment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           description: The auto-generated id of the credit card payment
+ *         creditcardId:
+ *           type: number
+ *           description: The credit card id
+ *         paymentTotal:
+ *           type: number
+ *           description: The payment total in decimal value
+ *         paymentDate:
+ *           type: string
+ *           description: The date of payment
+ *         paymentCutDate:
+ *           type: string
+ *           description: The date payment cut date
+ *         paymentDueDate:
+ *           type: string
+ *           format: date
+ *           description: The date payment due date
  */
 import { Router } from "express";
-import { getCreditcardSummary } from "../controllers/creditcardController";
+import { addCreditcardPayment, getCreditcardSummary } from "../controllers/creditcardController";
 
 const router = Router();
 
@@ -101,8 +123,53 @@ router.route('/:id')
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/CreditCardSummary'
+ * /creditcard/payCreditcard/{id}:
+ *   put:
+ *     summary: Add a payment to a credit card
+ *     description: Adds a payment to a given Credit Card via it credit card id
+ *     tags: [Creditcard]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The credit card ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               total:
+ *                 type: number
+ *                 description: The payment total in decimal value
+ *               payDate:
+ *                 type: string
+ *                 format: date
+ *                 description: The date of payment
+ *               cutDate:
+ *                 type: string
+ *                 format: date
+ *                 example: Credit card cut date period
+ *               dueDate:
+ *                 type: string
+ *                 format: date
+ *                 example: Credit card due date
+ *     responses:
+ *       200:
+ *         description: Successfully added payment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CreditcardPayment'
  */
+
 router.route('/summary').get(getCreditcardSummary);
+router.route('/payCreditcard/:id').put(addCreditcardPayment);
 
 export default router;
 
