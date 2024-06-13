@@ -2,3 +2,12 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+hr {
+  display: block;
+  margin: 10px 0 10px 0;
+  border-top: 1px solid rgba(156, 156, 156, 0.12);
+  width: 100%;
+}
+.divider-pad{
+  padding: 16px;
+}
