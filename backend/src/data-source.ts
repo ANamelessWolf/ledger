@@ -5,6 +5,7 @@ import {
   WalletType,
   FinancingType,
   Vendor,
+  CardItem
 } from "./models/catalogs";
 import { Credit, Expense } from "./models/expenses";
 import {
@@ -41,6 +42,7 @@ export const createConnection = (): DataSource => {
       WalletType,
       FinancingType,
       Vendor,
+      CardItem,
       Credit,
       Expense,
       Cash,

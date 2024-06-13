@@ -2,6 +2,7 @@ import { PaymentMap } from "../common";
 import { PAYMENT_STATUS } from "../common/enums";
 import { FinancingEntity } from "../models/banking";
 import { CreditcardPayment, Wallet } from "../models/ledger";
+import { CardListFilter } from "../types/filter/cardListFilter";
 import { PaymentStatus } from "../types/paymentStatus";
 import { formatDate, getPeriodName, parseDate } from "./dateUtils";
 import { formatMoney } from "./formatUtils";
@@ -97,6 +98,32 @@ export const filterCard = (
   } else {
     return true;
   }
+};
+
+/**
+ * Creates a filter object for querying the card list based on the provided criteria.
+ * 
+ * @param {any} entityId - The entity ID to filter by.
+ * @param {any} isCreditCard - Indicates whether to filter by credit card (1) or debit card (0).
+ * @param {any} active - Indicates whether to filter by active status (1 for active, 0 for inactive).
+ * @returns {CardListFilter} The filter object to be used in the query.
+ */
+export const getCardListFilter = (
+  entityId: any,
+  isCreditCard: any,
+  active: any
+): CardListFilter => {
+  const where: any = {};
+  if (entityId) {
+    where.entityId = entityId;
+  }
+  if (isCreditCard) {
+    where.isCreditCard = isCreditCard;
+  }
+  if (active) {
+    where.active = active;
+  }
+  return where;
 };
 
 const createPaymentMap = (payments: CreditcardPayment[]) => {
