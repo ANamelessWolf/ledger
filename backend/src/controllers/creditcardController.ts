@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
-import { Creditcard, Wallet } from "../models/ledger";
+import { Creditcard, CreditcardPayment, Wallet } from "../models/ledger";
 import { AppDataSource } from "..";
 import { filterCard, getCreditCardStatus } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
@@ -12,7 +12,6 @@ import { CreditCardSummary } from "../types/response/CreditCardSummaryResponse";
  * Retrieves a summary of credit cards, including their current status and details.
  * @summary Retrieves a summary of credit cards.
  * @operationId getCreditcardSummary
- * @async
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  * @param {NextFunction} next - The Express next middleware function.
@@ -66,4 +65,44 @@ export const getCreditcardSummary = asyncErrorHandler(
   }
 );
 
+/**
+ * Submit a new payment to a credit card
+ * @summary Handles adding a new payment to a credit card
+ * @route PUT /payCreditcard/:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const addCreditcardPayment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const { total, payDate, cutDate, dueDate } = req.body;
+      // Create a new instance of CreditcardPayment
+      const payment = new CreditcardPayment();
+      payment.creditcardId = id;
+      payment.paymentTotal = total;
+      payment.paymentDate = payDate; 
+      payment.paymentCutDate = cutDate; 
+      payment.paymentDueDate = dueDate; 
 
+      // Save the insert record
+      const result = await AppDataSource.manager.save(payment);
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
