@@ -1,0 +1,24 @@
+$color-black-fill: #211313;
+
+.nav-container {
+  height: 100%;
+  width: auto;
+
+}
+
+mat-sidenav {
+  min-width: 250px;
+  background-color: $color-black-fill;
+}
+
+mat-sidenav-content {
+  padding: 16px;
+}
+
+.content {
+  padding: 16px;
+}
+
+button {
+  margin: 16px;
+}

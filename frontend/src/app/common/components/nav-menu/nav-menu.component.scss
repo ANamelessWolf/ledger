@@ -1,0 +1,23 @@
+.menu-header {
+  display: inline-flex;
+  width: 90%;
+  align-content: center;
+  padding-left: 8px;
+  margin-top: 20px;
+  mat-icon {
+    font-size: 54px;
+    width: auto;
+    height: auto;
+    color: white;
+  }
+  p {
+    font-size: xx-large;
+    margin-top: 16px;
+    margin-left: 4px;
+    color: white;
+  }
+}
+
+.list-offset {
+  margin-top: 40px;
+}

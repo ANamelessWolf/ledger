@@ -1,0 +1,18 @@
+<div>
+  <div class="menu-header">
+    <mat-icon>account_balance_wallet</mat-icon>
+    <p>Ledger</p>
+  </div>
+  <div class="list-offset">
+    <mat-nav-list>
+      <ng-container *ngFor="let link of menu_links">
+        <app-nav-menu-link
+          [header]="link.header"
+          [route]="link.route"
+          [icon]="link.icon"
+        ></app-nav-menu-link>
+      </ng-container>
+    </mat-nav-list>
+  </div>
+  <app-nav-menu-footer></app-nav-menu-footer>
+</div>
