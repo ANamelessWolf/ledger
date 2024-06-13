@@ -1,0 +1,27 @@
+.menu-header {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+
+  .position {
+    display: inherit;
+  }
+
+  mat-icon {
+    font-size: 54px;
+    width: auto;
+    height: auto;
+    color: white;
+  }
+  p {
+    font-size: xx-large;
+    margin-top: 16px;
+    margin-left: 4px;
+    color: white;
+  }
+}
