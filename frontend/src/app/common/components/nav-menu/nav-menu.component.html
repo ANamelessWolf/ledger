@@ -1,9 +1,11 @@
 <div>
   <div class="menu-header">
-    <mat-icon>account_balance_wallet</mat-icon>
-    <p>Ledger</p>
+    <div class="position">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <p>Ledger</p>
+    </div>
   </div>
-  <div class="list-offset">
+  <div>
     <mat-nav-list>
       <ng-container *ngFor="let link of menu_links">
         <app-nav-menu-link

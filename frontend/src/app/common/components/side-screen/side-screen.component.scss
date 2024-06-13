@@ -1,9 +1,8 @@
-$color-black-fill: #211313;
+$color-black-fill: #091228;
 
 .nav-container {
   height: 100%;
   width: auto;
-
 }
 
 mat-sidenav {
@@ -11,14 +10,13 @@ mat-sidenav {
   background-color: $color-black-fill;
 }
 
-mat-sidenav-content {
-  padding: 16px;
-}
-
 .content {
   padding: 16px;
+  height: calc(100% - 32px);
 }
 
 button {
-  margin: 16px;
+  position: absolute;
+  left: 20px;
+  top: 20px;
 }

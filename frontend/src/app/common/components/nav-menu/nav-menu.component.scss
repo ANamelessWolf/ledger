@@ -1,9 +1,17 @@
 .menu-header {
-  display: inline-flex;
-  width: 90%;
-  align-content: center;
-  padding-left: 8px;
-  margin-top: 20px;
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+
+  .position {
+    display: inherit;
+  }
+
   mat-icon {
     font-size: 54px;
     width: auto;
@@ -16,8 +24,4 @@
     margin-left: 4px;
     color: white;
   }
-}
-
-.list-offset {
-  margin-top: 40px;
 }
