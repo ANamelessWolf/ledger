@@ -23,9 +23,18 @@
  *         active:
  *           type: number
  *           description: A flag to check if the card is active, 1 for active
+ *     CatalogItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           description: Catalog item  id
+ *         name:
+ *           type: string
+ *           description: Catalog item name
  */
 import { Router } from "express";
-import { getCardList } from "../controllers/catalogController";
+import { getCardList, getFinancingEnityList } from "../controllers/catalogController";
 
 const router = Router();
 /**
@@ -65,7 +74,23 @@ const router = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/CardItem'
+ * /catalog/financing_entities:
+ *   get:
+ *     summary: The list of financing entities
+ *     description: Returns a list of entities
+ *     tags: [Catalogs]
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the financing list.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CatalogItem'
  */ 
 router.route('/cards').get(getCardList);
+router.route('/financing_entities').get(getFinancingEnityList);
+
 
 export default router;
