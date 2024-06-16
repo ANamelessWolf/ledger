@@ -66,9 +66,9 @@ export const getCreditcardSummary = asyncErrorHandler(
 );
 
 /**
- * Retrieves a summary of credit cards, including their current status and details.
- * @summary Retrieves a summary of credit cards.
- * @operationId getCreditcardSummary
+ * Retrieve credit card summary, including their current status and details.
+ * @summary Retrieve credit card summary.
+ * @operationId getCreditcardSummarybyId
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  * @param {NextFunction} next - The Express next middleware function.

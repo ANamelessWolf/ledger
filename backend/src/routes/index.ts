@@ -4,6 +4,7 @@ import cors from "cors";
 import { errorHandler, unhandledRoutesHandler } from "../middlewares";
 import swaggerMiddleware from "../middlewares/swaggerMiddleware";
 import creditcardRoutes from './creditcardRoutes';
+import debitcardRoutes from './debitcardRoutes';
 import catalogRoutes from './catalogRoutes';
 
 const router = Router();
@@ -16,6 +17,7 @@ router.use(json());
  * **/
 router.use("/api-docs", swaggerMiddleware);
 router.use('/creditcard', creditcardRoutes);
+router.use('/debitcard', debitcardRoutes);
 router.use('/catalog', catalogRoutes);
 
 // Routes error handlers
