@@ -1,0 +1,136 @@
+.card-overview {
+  position: relative;
+  padding-left: 20px;
+  height: 240px;
+  h1 {
+    font-size: x-large;
+    font-weight: bold;
+  }
+}
+
+.balance-area {
+  position: absolute;
+  width: 300px;
+  height: 72px;
+}
+
+.credit-details {
+  position: absolute;
+  width: 300px;
+  top: 140px;
+  display: inline-flex;
+}
+
+.credit-card {
+  position: absolute;
+  left: 300px;
+  width: 360px;
+  top: 0px;
+  border: black 4px solid;
+  border-radius: 32px;
+  height: 218px;
+
+  .header {
+    position: absolute;
+    top: 28px;
+    font-size: 30px;
+    font-weight: bold;
+    left: 24px;
+  }
+
+  .rect {
+    position: absolute;
+    width: 360px;
+    height: 16px;
+    background-color: rgba(0, 0, 0, 0.2196078431);
+    top: 64px;
+  }
+
+  .exp {
+    position: absolute;
+    bottom: 52px;
+    font-size: large;
+    left: 24px;
+
+    .label {
+      margin: 0px;
+      font-weight: bold;
+    }
+  }
+
+  .card-number {
+    position: absolute;
+    bottom: 20px;
+    font-size: 28px;
+    font-weight: normal;
+    left: 24px;
+  }
+}
+
+.col-width {
+  width: 100px;
+}
+
+.offset {
+  margin-left: 50px;
+  width: 100px;
+}
+
+.p-header {
+  color: darkgray;
+  font-size: large;
+  margin: 0px;
+}
+
+.p-quantity {
+  color: black;
+  font-size: large;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.balance {
+  margin-top: 20px;
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.blue {
+  background-color: #007991;
+  color: #bcd8c1;
+}
+
+.lightblue {
+  background-color: #b8e1ff;
+  color: black;
+}
+
+.tangerine {
+  background-color: #d4a0a7;
+  color: #e3e3e3;
+}
+
+.platinum {
+  background-color: #636363;
+  color: #dbdbdb;
+}
+
+.red {
+  background-color: #f22b29;
+  color: #f0f0f1;
+}
+
+.yellow {
+  background-color: #fcba04;
+  color: black;
+}
+
+.gold {
+  background-color: #eedc38;
+  color: black;
+}
+
+.black {
+  background-color: #171219;
+  color: #dbdbdb;
+}

@@ -18,6 +18,7 @@ export type CreditCardSummary = {
   banking: string;
   credit: string;
   usedCredit: string;
+  available:string;
   status: PaymentStatus;
   expiration: string;
   cardType: number;
@@ -41,13 +42,14 @@ export const EMPTY_CREDIT_CARD_SUMMARY: CreditCardSummary = {
   id: 0,
   walletId: 0,
   entityId: 0,
-  card: 'string',
-  banking: 'string',
-  credit: 'string',
-  usedCredit: 'string',
+  card: '',
+  banking: '',
+  credit: '',
+  usedCredit: '',
+  available: '',
   status: EMPTY_PAYMENT_STATUS,
-  expiration: 'string',
+  expiration: '',
   cardType: 0,
-  ending: 'string',
-  color: 'string',
+  ending: '',
+  color: '',
 };

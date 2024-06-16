@@ -42,7 +42,7 @@ export class CardIndexPageComponent implements OnInit {
     this.selectedCard = card;
     if (card.id > 0 && card.isCreditCard) {
       this.getCreditCardSummary(card.id);
-    } else if (card.id > 0 && card.isCreditCard) {
+    } else if (card.id > 0 && !card.isCreditCard) {
       this.getDebitCardSummary(card.id);
     } else {
       this.cardSummary = null;

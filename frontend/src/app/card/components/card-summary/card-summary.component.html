@@ -1,5 +1,33 @@
 <div *ngIf="card.id > 0; else noSelection">
-  <h1>{{ summary?.card }}</h1>
+  <div class="list-header">
+    <div class="position">
+      <p>Summary</p>
+      <div class="btn-group">
+        <button
+          mat-icon-button
+          aria-label="Change visibility"
+          (click)="changeVisibility()"
+        >
+          <mat-icon *ngIf="visibility === true">visibility_off</mat-icon>
+          <mat-icon *ngIf="visibility === false">visibility</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="divider-pad">
+    <hr />
+  </div>
+  <app-credit-card-overview
+    [summary]="creditCardSummary"
+    *ngIf="card.isCreditCard"
+  />
+  <app-debit-card-overview
+    [summary]="debitCardSummary"
+    *ngIf="!card.isCreditCard"
+  />
+  <div class="divider-pad">
+    <hr />
+  </div>
 </div>
 <ng-template #noSelection>
   <p>No card selected</p>
