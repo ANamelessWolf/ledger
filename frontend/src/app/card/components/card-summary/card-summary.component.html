@@ -1,0 +1,6 @@
+<div *ngIf="card.id > 0; else noSelection">
+  <h1>{{ card.name }}</h1>
+</div>
+<ng-template #noSelection>
+  <p>No card selected</p>
+</ng-template>

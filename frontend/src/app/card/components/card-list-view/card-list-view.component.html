@@ -1,0 +1,27 @@
+<div class="list-header">
+  <div class="position">
+    <p>Cards</p>
+    <div class="btn-group">
+      <button mat-icon-button aria-label="Open filter window">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Add new window">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="divider-pad">
+  <hr />
+</div>
+<mat-nav-list *ngIf="!isLoading">
+  <mat-list-item *ngFor="let card of cards" (click)="onCardClick(card)">
+    <app-card-list-item
+      [isSelected]="card.isSelected"
+      [data]="card"
+    ></app-card-list-item>
+  </mat-list-item>
+</mat-nav-list>
+<div class="spinner-container" *ngIf="isLoading">
+  <app-spinner></app-spinner>
+</div>
