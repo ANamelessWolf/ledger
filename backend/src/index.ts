@@ -21,9 +21,7 @@ const init = async () => {
 
     // Manage unhandled promise rejections
     process.on("unhandledRejection", (err: Error) => {
-      console.log(
-        `Exit with code 1 due to Unhadled Promise Rejection: ${err.message}`
-      );
+      console.log(`Exit with code 1 due to Unhadled Promise Rejection: ${err.message}`);
       server.close(() => process.exit(1));
     });
 
