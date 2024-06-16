@@ -66,6 +66,68 @@ export const getCreditcardSummary = asyncErrorHandler(
 );
 
 /**
+ * Retrieves a summary of credit cards, including their current status and details.
+ * @summary Retrieves a summary of credit cards.
+ * @operationId getCreditcardSummary
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getCreditcardSummarybyId = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const where: any = { id: id };
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+        where,
+      });
+
+      // Validate id
+      if (cards.length === 0) {
+        return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
+      }
+
+      // Get summary
+      const today = new Date();
+      const cc: Creditcard = cards[0];
+      const payments = await cc.payments;
+      const status = getCreditCardStatus(today, payments, cc.cutDay);
+      const wallet: Wallet = (await cc.wallet)[0];
+      const banking: FinancingEntity = (await cc.financingEntity)[0];
+      const result = {
+        id: cc.id,
+        walletId: cc.walletId,
+        entityId: cc.entityId,
+        card: wallet.name,
+        banking: banking.name,
+        credit: formatMoney(cc.credit),
+        usedCredit: formatMoney(cc.usedCredit),
+        status: status,
+        expiration: cc.expiration,
+        cardType: cc.cardType,
+        ending: cc.ending,
+        color: cc.color,
+      };
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
  * Submit a new payment to a credit card
  * @summary Handles adding a new payment to a credit card
  * @route PUT /payCreditcard/:id
@@ -83,9 +145,9 @@ export const addCreditcardPayment = asyncErrorHandler(
       const payment = new CreditcardPayment();
       payment.creditcardId = id;
       payment.paymentTotal = total;
-      payment.paymentDate = payDate; 
-      payment.paymentCutDate = cutDate; 
-      payment.paymentDueDate = dueDate; 
+      payment.paymentDate = payDate;
+      payment.paymentCutDate = cutDate;
+      payment.paymentDueDate = dueDate;
 
       // Save the insert record
       const result = await AppDataSource.manager.save(payment);

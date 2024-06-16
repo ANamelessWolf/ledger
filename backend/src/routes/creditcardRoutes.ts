@@ -93,7 +93,7 @@
  *           description: The date payment due date
  */
 import { Router } from "express";
-import { addCreditcardPayment, getCreditcardSummary } from "../controllers/creditcardController";
+import { addCreditcardPayment, getCreditcardSummary, getCreditcardSummarybyId } from "../controllers/creditcardController";
 
 const router = Router();
 
@@ -123,6 +123,25 @@ router.route('/:id')
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/CreditCardSummary'
+ * /creditcard/summary/{id}:
+ *   get:
+ *     summary: Credit card summary
+ *     description: Returns a summary for a credit card id filter by id
+ *     tags: [Creditcard]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The credit card ID
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the credit card summary.
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/CreditCardSummary'
  * /creditcard/payCreditcard/{id}:
  *   put:
  *     summary: Add a payment to a credit card
@@ -163,12 +182,11 @@ router.route('/:id')
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/CreditcardPayment'
+ *               $ref: '#/components/schemas/CreditcardPayment'
  */
 
 router.route('/summary').get(getCreditcardSummary);
+router.route('/summary/:id').get(getCreditcardSummarybyId);
 router.route('/payCreditcard/:id').put(addCreditcardPayment);
 
 export default router;
