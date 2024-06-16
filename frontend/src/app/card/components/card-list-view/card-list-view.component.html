@@ -14,14 +14,16 @@
 <div class="divider-pad">
   <hr />
 </div>
-<mat-nav-list *ngIf="!isLoading">
-  <mat-list-item *ngFor="let card of cards" (click)="onCardClick(card)">
-    <app-card-list-item
-      [isSelected]="card.isSelected"
-      [data]="card"
-    ></app-card-list-item>
-  </mat-list-item>
-</mat-nav-list>
+<div class="scrollable-container">
+  <mat-nav-list *ngIf="!isLoading">
+    <mat-list-item *ngFor="let card of cards" (click)="onCardClick(card)">
+      <app-card-list-item
+        [isSelected]="card.isSelected"
+        [data]="card"
+      ></app-card-list-item>
+    </mat-list-item>
+  </mat-nav-list>
+</div>
 <div class="spinner-container" *ngIf="isLoading">
   <app-spinner></app-spinner>
 </div>

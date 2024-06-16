@@ -34,8 +34,16 @@
   background-color: #0003;
 }
 
+.scrollable-container {
+  max-height: 82vh;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
+
 mat-nav-list {
   padding: 0px;
+  scroll-behavior: auto;
 }
 
 mat-list-item {
