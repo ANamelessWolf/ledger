@@ -8,6 +8,7 @@ export type CreditCardSummary = {
     banking: string,
     credit: string,
     usedCredit: string,
+    available: string,
     status: PaymentStatus,
     expiration: string,
     cardType: number,

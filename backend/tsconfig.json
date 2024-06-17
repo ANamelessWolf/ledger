@@ -10,6 +10,14 @@
       "experimentalDecorators": true,
       "strictPropertyInitialization": false,
     },
+    "baseUrl": "src",
+    "paths": {
+      "@controller/*": ["controllers/*"],
+      "@model/*": ["models/*"],
+      "@utils/*": ["utils/*"],
+      "@common/*": ["common/*"],
+      "@route/*": ["routes/*"],
+    },
     "include": ["src"],
     "exclude": ["node_modules"],
   }

@@ -15,6 +15,9 @@ export class CardItem {
   isCreditCard: number;
 
   @ViewColumn()
+  name: string;
+
+  @ViewColumn()
   entity: string;
 
   @ViewColumn()

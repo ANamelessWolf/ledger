@@ -17,7 +17,7 @@ export class Saving {
   @Column({ type: 'varchar', length: 40 })
   name: string;
 
-  @Column({ type: "double", name: "interest_rate" })
+  @Column({ type: "double", name: "interes_rate" })
   interestRate: number;
 
   @Column({ type: "double" })
@@ -30,7 +30,7 @@ export class Saving {
     return AppDataSource.manager.find(Wallet, options);
   }
 
-  get financyEntity(): Promise<FinancingEntity[]> {
+  get financingEntity(): Promise<FinancingEntity[]> {
     const options = {
       where: [{ id: this.entityId }],
     };

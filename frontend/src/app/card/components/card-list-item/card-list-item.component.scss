@@ -1,0 +1,160 @@
+$color-black-fill: #091228;
+$color-gray-fill: #848484;
+$color-selected: #087e8b;
+$color-not-selected: #d6e4f0;
+
+.container {
+  position: relative;
+}
+
+.selected {
+  background-color: $color-selected;
+  height: 160px;
+}
+
+.not-selected {
+  background-color: $color-not-selected;
+  height: 98px;
+  border-bottom: $color-gray-fill 2px solid;
+}
+
+rect {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.selected-item {
+  position: relative;
+  left: 20px;
+  top: 40px;
+  width: 180px;
+  color: white;
+
+  h3 {
+    display: relative;
+    font-size: large;
+    font-weight: bold;
+    margin: 0px;
+  }
+  p {
+    margin: 0px;
+  }
+  div {
+    display: flex;
+  }
+
+  .active-icon {
+    color: greenyellow;
+    font-size: 20px;
+  }
+  .inactive-icon {
+    color: red;
+    font-size: 20px;
+  }
+}
+
+.card-info {
+  position: relative;
+  left: 220px;
+  border-top-left-radius: 30px;
+  border: #f3dfbf 4px solid;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 180px;
+  height: 80px;
+  background-color: #62989e;
+  color: white;
+  filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
+  h3 {
+    position: relative;
+    font-size: large;
+    font-weight: bold;
+    word-wrap: break-word;
+    white-space: normal;
+    width: 160px;
+    left: 16px;
+    top: 10px;
+    line-height: 1em;
+    margin: 0px;
+  }
+  p {
+    position: absolute;
+    font-size: small;
+    font-weight: 100;
+    right: 0px;
+    bottom: -12px;
+    text-align: right;
+    right: 8px;
+  }
+  div {
+    position: absolute;
+    background-color: #ffffff84;
+    height: 12px;
+    width: 180px;
+    top: 48px;
+  }
+}
+
+.card-info-gray {
+  position: absolute;
+  left: 280px;
+  border-top-left-radius: 30px;
+  border: lightgray 4px solid;
+  border-bottom: 2px;
+  border-right: 0px;
+  width: 116px;
+  height: 54px;
+  background-color: #d6e4f0;
+  color: #a9a9a9;
+  filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
+  top: 40px;
+  p {
+    position: absolute;
+    font-size: small;
+    font-weight: 100;
+    right: 0px;
+    bottom: -2px;
+    text-align: right;
+    right: 6px;
+    margin: 0px;
+  }
+  div {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.5176470588);
+    height: 12px;
+    width: 118px;
+    top: 20px;
+  }
+}
+
+.not-selected-item {
+  position: relative;
+  left: 20px;
+  top: 10px;
+  color: darkgray;
+
+  h3 {
+    display: relative;
+    font-size: large;
+    font-weight: bold;
+    margin: 0px;
+    color: rgb(31, 31, 31);
+  }
+  p {
+    margin: 0px;
+  }
+  div {
+    display: flex;
+    font-size: 16px;
+  }
+
+  .active-icon {
+    color: greenyellow;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+  .inactive-icon {
+    color: red;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+}

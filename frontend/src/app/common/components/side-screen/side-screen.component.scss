@@ -11,11 +11,12 @@ mat-sidenav {
 }
 
 .content {
-  padding: 16px;
+  padding: 0px;
   height: calc(100% - 32px);
 }
 
 button {
+  z-index: 500;
   position: absolute;
   left: 20px;
   top: 20px;

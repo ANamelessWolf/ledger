@@ -14,6 +14,9 @@
  *         isCreditCard:
  *           type: number
  *           description: A flag, 1 the card is credit card, 0 for a debit card
+ *         name:
+ *           type: string
+ *           description: Card name
  *         entity:
  *           type: string
  *           description: The financing entity or bank name

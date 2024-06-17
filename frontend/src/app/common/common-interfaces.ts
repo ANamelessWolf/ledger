@@ -3,3 +3,5 @@ export type MenuLinkType = {
   route: string;
   icon: string;
 };
+
+export type NotificationTypes = 'error' | 'success' | 'info';

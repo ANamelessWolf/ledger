@@ -1,1 +1,11 @@
-<p>card-index-page works!</p>
+<div class="page-container">
+  <div class="card-list-area">
+    <app-card-list-view
+      [selectedCard]="selectedCard"
+      (cardSelected)="onCardSelected($event)">
+    </app-card-list-view>
+  </div>
+  <div class="card-main-area">
+    <app-card-summary [card]="selectedCard" [summary]="cardSummary"></app-card-summary>
+  </div>
+</div>

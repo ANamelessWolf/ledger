@@ -1,0 +1,19 @@
+$color-black-fill: #091228;
+
+.center  {
+  margin: 0;
+  position: relative;
+  top: calc(50% - 50px);
+  left: calc(50% - 50px);
+  width: calc(50% - 50px);
+}
+
+p {
+  margin-top: 34px;
+  padding: 0px;
+  font-size: x-large;
+  width: 140px;
+  word-wrap: break-word;
+  white-space: normal;
+}
+

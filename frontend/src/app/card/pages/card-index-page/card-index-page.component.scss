@@ -1,0 +1,16 @@
+.page-container {
+  display: flex;
+  padding: 0px;
+  height: 100%;
+}
+
+.card-list-area {
+  min-width: 400px;
+  width: 400px;
+  border-right: 1px solid #ccc;
+}
+
+.card-main-area {
+  flex: 1;
+  padding: 16px;
+}
