@@ -1,3 +1,4 @@
+import { AppDataSource } from "..";
 import { PaymentMap } from "../common";
 import { PAYMENT_STATUS } from "../common/enums";
 import { FinancingEntity } from "../models/banking";
@@ -102,7 +103,7 @@ export const filterCard = (
 
 /**
  * Creates a filter object for querying the card list based on the provided criteria.
- * 
+ *
  * @param {any} entityId - The entity ID to filter by.
  * @param {any} isCreditCard - Indicates whether to filter by credit card (1) or debit card (0).
  * @param {any} active - Indicates whether to filter by active status (1 for active, 0 for inactive).
@@ -133,4 +134,17 @@ const createPaymentMap = (payments: CreditcardPayment[]) => {
     acc[key] = { date: paymentDate, total: payment.paymentTotal };
     return acc;
   }, {});
+};
+
+export const getPayments = (
+  creditcardId: number
+): Promise<CreditcardPayment[]> => {
+  const options: any = {
+    order: {
+      paymentDate: "DESC",
+    },
+    take: 5,
+    where: [{ creditcardId: creditcardId }],
+  };
+  return AppDataSource.manager.find(CreditcardPayment, options);
 };

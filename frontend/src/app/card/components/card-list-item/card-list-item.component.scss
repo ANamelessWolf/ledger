@@ -10,12 +10,30 @@ $color-not-selected: #d6e4f0;
 .selected {
   background-color: $color-selected;
   height: 160px;
+  .chip {
+    position: absolute;
+    padding: 4px 8px;
+    border-radius: 8px;
+    right: 3px;
+    top: 40px;
+  }
 }
 
 .not-selected {
   background-color: $color-not-selected;
   height: 98px;
   border-bottom: $color-gray-fill 2px solid;
+  .chip {
+    position: absolute;
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-bottom: 4px;
+    border-radius: 6px;
+    right: 2px;
+    top: 8px;
+    height: 20px;
+    font-size: small;
+  }
 }
 
 rect {
@@ -157,4 +175,20 @@ rect {
     font-size: 16px;
     margin-top: 4px;
   }
+}
+
+.status-warning {
+  background-color: gold;
+}
+
+.status-error {
+  background-color: #ff3c3c;
+}
+
+.status-ok {
+  background-color: greenyellow;
+}
+
+.status-other {
+  background-color: rgb(190, 185, 239);
 }

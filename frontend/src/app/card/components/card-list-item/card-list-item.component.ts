@@ -1,16 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
+import { MatChipsModule } from '@angular/material/chips';
+import {
+  CardItem,
+  EMPTY_CARD_ITEM,
+  PAYMENT_STATUS,
+} from '@common/types/cardItem';
 import { HEADERS } from '@config/messages';
 
 @Component({
   selector: 'app-card-list-item',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, MatIconModule, MatChipsModule],
   templateUrl: './card-list-item.component.html',
   styleUrl: './card-list-item.component.scss',
 })
@@ -33,7 +35,18 @@ export class CardListItemComponent {
   }
 
   get cardEnding() {
-    return `**** ${this.data.ending}`
+    return `**** ${this.data.ending}`;
   }
 
+  get statusStyle() {
+    if (PAYMENT_STATUS.OVERDUE === this.data.status) {
+      return 'status-error';
+    } else if (PAYMENT_STATUS.PENDING === this.data.status) {
+      return 'status-warning';
+    } else if (PAYMENT_STATUS.PAID === this.data.status) {
+      return 'status-ok';
+    } else {
+      return 'status-other';
+    }
+  }
 }

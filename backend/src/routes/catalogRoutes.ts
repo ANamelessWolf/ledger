@@ -2,7 +2,7 @@
  * @swagger
  * components:
  *   schemas:
- *     CardItem:
+ *     CardItemResponse:
  *       type: object
  *       properties:
  *         id:
@@ -26,6 +26,9 @@
  *         active:
  *           type: number
  *           description: A flag to check if the card is active, 1 for active
+ *         status:
+ *           type: string
+ *           description: Card paid status
  *     CatalogItem:
  *       type: object
  *       properties:
@@ -76,7 +79,7 @@ const router = Router();
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/CardItem'
+ *                 $ref: '#/components/schemas/CardItemResponse'
  * /catalog/financing_entities:
  *   get:
  *     summary: The list of financing entities

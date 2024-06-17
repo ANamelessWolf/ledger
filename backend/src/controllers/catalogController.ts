@@ -3,9 +3,16 @@ import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
 import { CardItem } from "../models/catalogs";
-import { getCardListFilter } from "../utils/creditCardUtils";
+import {
+  getCardListFilter,
+  getCreditCardStatus,
+  getPayments,
+} from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { CatalogItem } from "../types/response/CatalogItemResponse";
+import { Creditcard } from "../models/ledger";
+import { PAYMENT_STATUS } from "../common/enums";
+import { CardItemResponse } from "../types/response/CardItemResponse";
 
 const NAME_FILTER: any = {
   order: {
@@ -29,14 +36,32 @@ export const getCardList = asyncErrorHandler(
     try {
       const { entityId, isCreditCard, active } = req.query;
       const where = getCardListFilter(entityId, isCreditCard, active);
+      const today = new Date();
+      const cc_cards: Creditcard[] = await AppDataSource.manager.find(
+        Creditcard
+      );
       const cards: CardItem[] = await AppDataSource.manager.find(CardItem, {
         where,
       });
+      const response: CardItemResponse[] = [];
+      for (let index = 0; index < cards.length; index++) {
+        const card = cards[index];
+        const cc = getCreditCard(card, cc_cards);
+        let status: string = PAYMENT_STATUS.UNDEFINED;
+        if (cc !== null) {
+          const payments = await getPayments(card.id);
+          status = getCreditCardStatus(today, payments, cc.cutDay).status;
+        }
+        response.push({
+          ...card,
+          status: status,
+        });
+      }
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
-          data: cards,
+          data: response,
         })
       );
     } catch (error) {
@@ -89,3 +114,16 @@ export const getFinancingEnityList = asyncErrorHandler(
     }
   }
 );
+
+const getCreditCard = (
+  card: CardItem,
+  cc_cards: Creditcard[]
+): Creditcard | null => {
+  if (card.isCreditCard) {
+    const result: Creditcard[] = cc_cards.filter((x) => x.id === card.id);
+    if (result.length > 0) {
+      return result[0];
+    }
+  }
+  return null;
+};
