@@ -20,9 +20,12 @@
  *         banking:
  *           type: string
  *           description: Banking details associated with the debit card
- *         saving_rate:
+ *         investmentRate:
  *           type: string
- *           description: Saving account saving rate in percentage
+ *           description: Saving account investment rate in percentage
+ *         yearlyGain:
+ *           type: string
+ *           description: Yearly gain based in investment rate percentage
  *         total:
  *           type: string
  *           description: The amount of total cash on the account

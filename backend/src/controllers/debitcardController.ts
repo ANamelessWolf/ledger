@@ -35,7 +35,10 @@ export const getDebitcardSummary = asyncErrorHandler(
             entityId: saving.entityId,
             card: wallet.name,
             banking: banking.name,
-            saving_rate: formatPercent(saving.interestRate),
+            investmentRate: formatPercent(saving.interestRate),
+            yearlyGain: formatPercent(
+              (saving.interestRate / 100) * saving.total
+            ),
             total: formatMoney(saving.total),
             expiration: dc.expiration,
             cardType: dc.cardType,
@@ -96,7 +99,10 @@ export const getDebitcardSummarybyId = asyncErrorHandler(
         entityId: saving.entityId,
         card: wallet.name,
         banking: banking.name,
-        saving_rate: formatPercent(saving.interestRate),
+        investmentRate: formatPercent(saving.interestRate),
+        yearlyGain: formatMoney(
+          (saving.interestRate / 100) * saving.total
+        ),
         total: formatMoney(saving.total),
         expiration: dc.expiration,
         cardType: dc.cardType,

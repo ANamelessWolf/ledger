@@ -4,7 +4,8 @@ export type DebitCardSummary = {
   entityId: number;
   card: string;
   banking: string;
-  interest_rate: string;
+  investmentRate: string;
+  yearlyGain:string;
   total: string;
   expiration: string;
   cardType: number;
@@ -19,7 +20,8 @@ export const EMPTY_DEBIT_CARD_SUMMARY: DebitCardSummary = {
   entityId: 0,
   card: '',
   banking: '',
-  interest_rate: '',
+  investmentRate: '',
+  yearlyGain: '',
   total: '',
   expiration: '',
   cardType: 0,

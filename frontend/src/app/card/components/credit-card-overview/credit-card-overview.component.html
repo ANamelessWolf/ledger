@@ -1,26 +1,21 @@
 <div class="card-overview">
   <h1>Overview</h1>
-  <div class="balance-area">
-    <p class="p-header">Available Balance</p>
-    <p class="balance">{{ summary.available }}</p>
+  <div class="card-balance">
+    <h2>Available Balance</h2>
+    <p>{{ summary.available }}</p>
   </div>
-  <div class="credit-details">
-    <div class="col-width">
-      <p class="p-header">Credit Limit</p>
-      <p class="p-quantity">{{ summary.credit }}</p>
-    </div>
-    <div class="offset">
-      <p class="p-header">Expense</p>
-      <p class="p-quantity">{{ summary.usedCredit }}</p>
-    </div>
+  <div class="card-details">
+    <mat-grid-list cols="2" rowHeight="28px">
+      <mat-grid-tile class="column"> Credit Limit </mat-grid-tile>
+      <mat-grid-tile class="column"> Expense </mat-grid-tile>
+      <mat-grid-tile class="value">{{ summary.credit }}</mat-grid-tile>
+      <mat-grid-tile class="value">{{ summary.usedCredit }}</mat-grid-tile>
+    </mat-grid-list>
   </div>
-  <div class="credit-card {{ summary.color }}">
-    <p class="header">{{ summary.banking }}</p>
-    <div class="rect"></div>
-    <div class="exp">
-      <p class="label">Exp</p>
-      <p>{{ summary.expiration }}</p>
-    </div>
-    <p class="card-number">{{ endingCard }}</p>
-  </div>
+  <app-card-miniature
+    color="{{ summary.color }}"
+    banking="{{ summary.banking }}"
+    expiration="{{ summary.expiration }}"
+    ending="{{ summary.ending }}"
+  />
 </div>
