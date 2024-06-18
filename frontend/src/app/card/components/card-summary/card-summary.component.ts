@@ -16,7 +16,7 @@ import { DebitCardOverviewComponent } from '../debit-card-overview/debit-card-ov
     MatIconModule,
     MatButtonModule,
     CreditCardOverviewComponent,
-    DebitCardOverviewComponent,
+    DebitCardOverviewComponent
   ],
   templateUrl: './card-summary.component.html',
   styleUrl: './card-summary.component.scss',
@@ -29,6 +29,8 @@ export class CardSummaryComponent {
   changeVisibility() {
     this.visibility = !this.visibility;
   }
+
+  addCardPayment() {}
 
   get creditCardSummary(): CreditCardSummary {
     return this.summary as CreditCardSummary;

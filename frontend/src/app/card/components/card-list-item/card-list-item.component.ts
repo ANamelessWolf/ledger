@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import {
+  CARD_STATUS,
   CardItem,
   EMPTY_CARD_ITEM,
   PAYMENT_STATUS,
@@ -27,9 +28,15 @@ export class CardListItemComponent {
     return HEADERS.D_CARD;
   }
 
+  get isActive() {
+    return this.data.active === CARD_STATUS.ACTIVE;
+  }
+
   get cardStatus() {
-    if (this.data.active) {
+    if (this.data.active === CARD_STATUS.ACTIVE) {
       return HEADERS.ACT;
+    } else if (this.data.active === CARD_STATUS.CANCELED) {
+      return HEADERS.CANCELED;
     }
     return HEADERS.N_ACT;
   }

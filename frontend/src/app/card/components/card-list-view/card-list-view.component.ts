@@ -7,7 +7,7 @@ import { CardListItemComponent } from '../card-list-item/card-list-item.componen
 import { CatalogService } from '@common/services/catalog.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NotificationService } from '@common/services/notification.service';
-import { CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
+import { CARD_STATUS, CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
 import { SpinnerComponent } from '@common/components/spinner/spinner.component';
 
 @Component({
@@ -59,7 +59,7 @@ export class CardListViewComponent implements OnInit {
         this.cards = response.data.map((row: any) => {
           return {
             ...row,
-            active: row.active === 1,
+            active: row.active as CARD_STATUS,
             isCreditCard: row.isCreditCard === 1,
           };
         });

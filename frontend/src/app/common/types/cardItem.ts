@@ -1,12 +1,19 @@
+export enum CARD_STATUS {
+  ACTIVE = 1,
+  CANCELED = 2,
+  INACTIVE = 0,
+  OTHER = 99
+}
+
 export type CardItem = {
   id: number;
   entityId: number;
   isCreditCard: boolean;
   name: string;
   entity: string;
-  status:string;
+  status: string;
   ending: string;
-  active: boolean;
+  active: CARD_STATUS;
   isSelected: boolean;
 };
 
@@ -18,14 +25,14 @@ export const EMPTY_CARD_ITEM: CardItem = {
   status: '',
   name: '',
   ending: '',
-  active: false,
+  active: CARD_STATUS.OTHER,
   isSelected: false,
 };
 
 export enum PAYMENT_STATUS {
-  UNDEFINED = "Not defined",
-  PENDING = "Pending",
-  PAID = "Paid",
-  OVERDUE = "Overdue",
-  NOT_REQUIRED = "Not required",
+  UNDEFINED = 'Not defined',
+  PENDING = 'Pending',
+  PAID = 'Paid',
+  OVERDUE = 'Overdue',
+  NOT_REQUIRED = 'Not required',
 }

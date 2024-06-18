@@ -6,6 +6,13 @@
         <button
           mat-icon-button
           aria-label="Change visibility"
+          (click)="addCardPayment()"
+        >
+          <mat-icon>payments</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          aria-label="Change visibility"
           (click)="changeVisibility()"
         >
           <mat-icon *ngIf="visibility === true">visibility_off</mat-icon>

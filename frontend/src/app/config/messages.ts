@@ -11,6 +11,7 @@ const HEADERS_EN = {
   D_CARD: 'Debit Card',
   ACT: 'ACTIVE',
   N_ACT: 'INACTIVE',
+  CANCELED: 'CANCELLED',
   LOAD: 'Loading...'
 };
 
@@ -19,6 +20,7 @@ const HEADERS_ES = {
   D_CARD: 'Tarjeta de debito',
   ACT: 'ACTIVA',
   N_ACT: 'DESACTIVADA',
+  CANCELED: 'CANCELADA',
   LOAD: 'Cargando...'
 };
 

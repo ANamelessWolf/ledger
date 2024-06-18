@@ -3,7 +3,7 @@
     <h3>{{ data.name }}</h3>
     <p>{{ cardType }}</p>
     <div>
-      <mat-icon [ngClass]="data.active ? 'active-icon' : 'inactive-icon'">
+      <mat-icon [ngClass]="isActive  ? 'active-icon' : 'inactive-icon'">
         circle
       </mat-icon>
       {{ cardStatus }}
