@@ -44,19 +44,32 @@ export const getCardList = asyncErrorHandler(
         where,
       });
       const response: CardItemResponse[] = [];
+      const cancelled: CardItemResponse[] = [];
       for (let index = 0; index < cards.length; index++) {
         const card = cards[index];
         const cc = getCreditCard(card, cc_cards);
         let status: string = PAYMENT_STATUS.UNDEFINED;
         if (cc !== null) {
           const payments = await getPayments(card.id);
-          status = getCreditCardStatus(today, payments, cc.cutDay).status;
+          if (cc.active === 2) {
+            status = PAYMENT_STATUS.NOT_REQUIRED;
+          } else {
+            status = getCreditCardStatus(today, payments, cc.cutDay).status;
+          }
         }
-        response.push({
-          ...card,
-          status: status,
-        });
+        if (card.active === 2) {
+          cancelled.push({
+            ...card,
+            status: status,
+          });
+        } else {
+          response.push({
+            ...card,
+            status: status,
+          });
+        }
       }
+      cancelled.forEach((card) => response.push(card));
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(

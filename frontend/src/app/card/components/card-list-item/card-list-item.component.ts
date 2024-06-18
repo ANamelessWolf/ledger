@@ -32,10 +32,14 @@ export class CardListItemComponent {
     return this.data.active === CARD_STATUS.ACTIVE;
   }
 
+  get isCancelled() {
+    return this.data.active === CARD_STATUS.CANCELLED;
+  }
+
   get cardStatus() {
     if (this.data.active === CARD_STATUS.ACTIVE) {
       return HEADERS.ACT;
-    } else if (this.data.active === CARD_STATUS.CANCELED) {
+    } else if (this.data.active === CARD_STATUS.CANCELLED) {
       return HEADERS.CANCELED;
     }
     return HEADERS.N_ACT;

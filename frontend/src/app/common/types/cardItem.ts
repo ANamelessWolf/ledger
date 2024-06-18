@@ -1,6 +1,6 @@
 export enum CARD_STATUS {
   ACTIVE = 1,
-  CANCELED = 2,
+  CANCELLED = 2,
   INACTIVE = 0,
   OTHER = 99
 }
