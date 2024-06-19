@@ -24,5 +24,22 @@ const HEADERS_ES = {
   LOAD: 'Cargando...'
 };
 
+const BTN_EN = {
+  OK : 'OK',
+  CANCEL : 'CANCEL',
+  SUBMIT : 'SUBMIT',
+  YES : 'YES',
+  NO : 'NO'
+}
+
+const BTN_ES = {
+  OK : 'OK',
+  CANCEL : 'CANCELAR',
+  SUBMIT : 'ENVIAR',
+  YES : 'SI',
+  NO : 'NO'
+}
+
 export const ERROR_MSG = ERROR_MSG_EN;
 export const HEADERS = HEADERS_EN;
+export const BTN = BTN_EN;

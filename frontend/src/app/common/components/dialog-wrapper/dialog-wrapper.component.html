@@ -1,0 +1,17 @@
+<div class="dialog-container">
+  <div class="header">
+    {{ dialogData.header }}
+  </div>
+  <div class="content" #content>
+  </div>
+  <div class="footer">
+    <button
+      mat-stroked-button
+      *ngFor="let button of dialogData.buttons"
+      class="{{ getButtonStyle(button) }}"
+      (click)="onButtonClick(button)"
+    >
+      {{ getButtonHeader(button) }}
+    </button>
+  </div>
+</div>

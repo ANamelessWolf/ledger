@@ -1,0 +1,50 @@
+$color-black-fill: #091228;
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  flex: 0 0 auto;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1 1 auto;
+  padding: 16px;
+}
+
+.footer {
+  flex: 0 0 auto;
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin-left: 8px;
+  }
+}
+
+.other-btn {
+  background-color: #d0cccc;
+  color: black !important;
+}
+
+.danger-btn {
+  color: black !important;
+  background-color: #ff2222c4;
+}
+
+.secondary-btn {
+  background-color: whitesmoke;
+  color: black !important;
+}
+
+.primary-btn {
+  background-color: $color-black-fill;
+  color: white !important;
+}
