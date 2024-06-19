@@ -1,5 +1,3 @@
-$color-black-fill: #091228;
-
 .dialog-container {
   display: flex;
   flex-direction: column;
@@ -27,24 +25,4 @@ $color-black-fill: #091228;
   button {
     margin-left: 8px;
   }
-}
-
-.other-btn {
-  background-color: #d0cccc;
-  color: black !important;
-}
-
-.danger-btn {
-  color: black !important;
-  background-color: #ff2222c4;
-}
-
-.secondary-btn {
-  background-color: whitesmoke;
-  color: black !important;
-}
-
-.primary-btn {
-  background-color: $color-black-fill;
-  color: white !important;
 }

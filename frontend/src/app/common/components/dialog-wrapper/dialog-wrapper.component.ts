@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   Inject,
   OnInit,
@@ -34,6 +35,7 @@ export class DialogWrapperComponent implements OnInit, AfterViewInit {
   constructor(
     public dialogRef: MatDialogRef<DialogWrapperComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: DialogData,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
@@ -41,10 +43,11 @@ export class DialogWrapperComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.loadComponent();
+    this.cdr.detectChanges();
   }
 
   onButtonClick(button: DialogButton): void {
-    if (this.dialogData.validate()) {
+    if (this.dialogData.validate(this.dialogData.validationData)) {
       this.dialogRef.close({ data: this.dialogData.data, button });
     }
   }

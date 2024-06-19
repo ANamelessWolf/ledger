@@ -6,6 +6,14 @@ const ERROR_MSG_ES = {
   UNKNOWN_ERROR: 'Algo salio mal, intenta más tarde',
 };
 
+const INFO_MSG_EN = {
+  PAY_N_REQ: 'Payment not required',
+};
+
+const INFO_MSG_ES = {
+  PAY_N_REQ: 'El pago no es requerido',
+};
+
 const HEADERS_EN = {
   C_CARD: 'Credit Card',
   D_CARD: 'Debit Card',
@@ -41,5 +49,6 @@ const BTN_ES = {
 }
 
 export const ERROR_MSG = ERROR_MSG_EN;
+export const INFO_MSG = INFO_MSG_EN;
 export const HEADERS = HEADERS_EN;
 export const BTN = BTN_EN;

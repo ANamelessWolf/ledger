@@ -16,7 +16,7 @@ export class CommonDialogService {
     data: any,
     buttons: DialogButton[],
     size: 'small' | 'medium' | 'large',
-    validate: () => boolean
+    validate: (data:any) => boolean
   ) {
     let width: string;
     switch (size) {
