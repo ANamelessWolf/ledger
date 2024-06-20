@@ -128,6 +128,20 @@
             },
             "description": "Billing details including period, start date, and end date"
           },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "startDate": {
+                "type": "date",
+                "description": "The start date of the payment period"
+              },
+              "dueDate": {
+                "type": "date",
+                "description": "The payment due date"
+              }
+            },
+            "description": "Billing details including period, start date, and end date"
+          },
           "status": {
             "type": "string",
             "description": "The current payment status"

@@ -4,9 +4,13 @@
       <p>Summary</p>
       <div class="btn-group">
         <button
+          matTooltip="Add payment to the credit card"
+          [matTooltipPosition]="position.value!"
+          matTooltipHideDelay="100000"
           mat-icon-button
-          aria-label="Change visibility"
+          aria-label="Add credit card payment"
           (click)="addCardPayment()"
+          *ngIf="card.isCreditCard"
         >
           <mat-icon>payments</mat-icon>
         </button>

@@ -64,9 +64,17 @@ export const getCreditCardStatus = (
     status = PAYMENT_STATUS.PENDING;
   }
 
+  //Payment
+  const endDate = new Date(billingPeriod[0].getTime());
+  endDate.setDate(endDate.getDate() + 50);
+
   return {
     cutDate: formatDate(cutDate),
     dueDate: formatDate(dueDate),
+    payment: {
+      startDate: billingPeriod[0],
+      dueDate: endDate,
+    },
     billing: {
       period: periodName,
       start: formatDate(billingPeriod[0]),

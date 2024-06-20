@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CardListViewComponent } from '@card/components/card-list-view/card-list-view.component';
 import { CardSummaryComponent } from '@card/components/card-summary/card-summary.component';
 import { CardService } from '@card/services/card.service';
@@ -24,18 +25,22 @@ import {
   providers: [CardService, NotificationService],
 })
 export class CardIndexPageComponent implements OnInit {
+  cardId!: number;
   selectedCard: CardItem = EMPTY_CARD_ITEM;
   cardSummary: CreditCardSummary | DebitCardSummary | null = null;
   isLoading = true;
   error = false;
 
   constructor(
+    private route: ActivatedRoute,
     private cardService: CardService,
     private notifService: NotificationService
   ) {}
 
   ngOnInit() {
-    // Any initial logic if needed
+    this.route.paramMap.forEach((p) => {
+      this.cardId = +(p.get('id') || '');
+    });
   }
 
   onCardSelected(card: CardItem) {

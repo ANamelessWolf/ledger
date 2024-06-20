@@ -17,5 +17,5 @@ export class NavMenuLinkComponent {
   @Input() header: string = '';
   @Input() route: string = '';
   @Input() icon: string = '';
-
+  @Input() exact: boolean = true;
 }

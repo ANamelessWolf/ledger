@@ -1,6 +1,10 @@
 export type PaymentStatus = {
   cutDate: string;
   dueDate: string;
+  payment: {
+    startDate: Date;
+    dueDate: Date;
+  };
   billing: {
     period: string;
     start: string;
@@ -29,6 +33,10 @@ export type CreditCardSummary = {
 export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
   cutDate: '',
   dueDate: '',
+  payment: {
+    startDate: new Date(),
+    dueDate: new Date(),
+  },
   billing: {
     period: '',
     start: '',

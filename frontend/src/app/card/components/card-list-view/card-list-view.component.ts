@@ -9,6 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NotificationService } from '@common/services/notification.service';
 import { CARD_STATUS, CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
 import { SpinnerComponent } from '@common/components/spinner/spinner.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-card-list-view',
@@ -19,7 +20,7 @@ import { SpinnerComponent } from '@common/components/spinner/spinner.component';
     MatIconModule,
     MatButtonModule,
     CardListItemComponent,
-    SpinnerComponent
+    SpinnerComponent,
   ],
   templateUrl: './card-list-view.component.html',
   styleUrl: './card-list-view.component.scss',
@@ -28,6 +29,7 @@ import { SpinnerComponent } from '@common/components/spinner/spinner.component';
 export class CardListViewComponent implements OnInit {
   // Component variables
   @Input() selectedCard: CardItem = EMPTY_CARD_ITEM;
+  @Input() cardId!: number;
   @Output() cardSelected = new EventEmitter<CardItem>();
   isLoading = true;
   error = false;
@@ -35,7 +37,8 @@ export class CardListViewComponent implements OnInit {
 
   constructor(
     private catalogService: CatalogService,
-    private notifService: NotificationService
+    private notifService: NotificationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +56,28 @@ export class CardListViewComponent implements OnInit {
     }
   }
 
+  private pickCard(){
+    let card = this.cards[0];
+    const cardType = this.router.url.split('/')[2];
+    if (cardType === 'cc' && this.cardId) {
+      const filtered = this.cards.filter(
+        (c: CardItem) => c.isCreditCard && c.id === this.cardId
+      );
+      if (filtered.length > 0) {
+        card = filtered[0];
+      }
+    }
+    else if (cardType === 'dc' && this.cardId) {
+      const filtered = this.cards.filter(
+        (c: CardItem) => !c.isCreditCard && c.id === this.cardId
+      );
+      if (filtered.length > 0) {
+        card = filtered[0];
+      }
+    }
+    return card;
+  }
+
   private getCatalogs() {
     this.catalogService.getCards().subscribe(
       (response) => {
@@ -64,7 +89,7 @@ export class CardListViewComponent implements OnInit {
           };
         });
         if (this.cards.length > 0) {
-          const card = this.cards[0];
+          const card = this.pickCard();
           card.isSelected = true;
           this.cardSelected.emit(card);
         }

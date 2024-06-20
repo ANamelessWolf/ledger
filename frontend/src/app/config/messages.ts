@@ -8,10 +8,12 @@ const ERROR_MSG_ES = {
 
 const INFO_MSG_EN = {
   PAY_N_REQ: 'Payment not required',
+  PAY_ADDED: 'Payment added succesfully'
 };
 
 const INFO_MSG_ES = {
   PAY_N_REQ: 'El pago no es requerido',
+  PAY_ADDED: 'El pago se registro de manera correcta'
 };
 
 const HEADERS_EN = {
