@@ -14,6 +14,7 @@ import {
   CardFilterOptions,
   CardItem,
   EMPTY_CARD_ITEM,
+  PAYMENT_STATUS,
 } from '@common/types/cardItem';
 import { SpinnerComponent } from '@common/components/spinner/spinner.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,6 +44,7 @@ export class CardListViewComponent implements OnInit {
   isLoading = true;
   error = false;
   cards: CardItem[] = [];
+  hasFilter: boolean = false;
 
   options: CardFilterOptions = {
     entities: [],
@@ -87,7 +89,17 @@ export class CardListViewComponent implements OnInit {
   }
 
   applyFilter(filter: CardFilter) {
-    this.options.filter = filter;
+    if (
+      filter.entityId === 0 &&
+      filter.crediCardType === 2 &&
+      filter.active === CARD_STATUS.ANY
+    ) {
+      this.options.filter = undefined;
+      this.hasFilter = false;
+    } else {
+      this.options.filter = filter;
+      this.hasFilter = true;
+    }
     this.getCards();
   }
 
