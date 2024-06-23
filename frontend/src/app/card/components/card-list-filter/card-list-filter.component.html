@@ -5,14 +5,21 @@
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Financing Entity</mat-label>
-        <mat-select formControlName="entityId">
+        <input
+          placeholder="Pick a financing entity"
+          type="text"
+          matInput
+          formControlName="entityName"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayEntity">
           <mat-option
-            *ngFor="let entity of data.options.entities"
-            [value]="entity.id"
+            *ngFor="let entity of filteredEntities | async"
+            [value]="entity"
           >
             {{ entity.name }}
           </mat-option>
-        </mat-select>
+        </mat-autocomplete>
       </mat-form-field>
     </div>
     <div>
