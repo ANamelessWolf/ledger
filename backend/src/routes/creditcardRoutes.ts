@@ -51,7 +51,7 @@
  *         credit:
  *           type: string
  *           description: The total credit limit of the credit card
- *         available
+ *         available:
  *           type: string
  *           description: The credit available balance
  *         usedCredit:

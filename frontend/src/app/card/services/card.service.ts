@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { CardListFilterComponent } from '@card/components/card-list-filter/card-list-filter.component';
 import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
+import { CardFilter, CardFilterOptions } from '@common/types/cardItem';
 import { CreditCardPaymentRequest } from '@common/types/cardPayment';
 import { CreditCardSummary } from '@common/types/creditCardSummary';
 import { LEDGER_API } from '@config/constants';
@@ -22,10 +24,29 @@ export class CardService {
   }
 
   addPaymetToCreditCard(req: CreditCardPaymentRequest): Observable<any> {
-    return this.http.put(`${LEDGER_API.CREDIT_CARD}/payCreditcard/${req.id}`, req.body);
+    return this.http.put(
+      `${LEDGER_API.CREDIT_CARD}/payCreditcard/${req.id}`,
+      req.body
+    );
   }
 
   // Dialogs
+  showCardFilterDialog(
+    options: CardFilterOptions,
+    filterSelected: (filter: CardFilter) => void
+  ) {
+    const header: string = 'Card Filters';
+    const dialogRef = this.dialog.open(CardListFilterComponent, {
+      width: '600px',
+      data: {
+        header: header,
+        options: options,
+        filterSelected: filterSelected,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
   showAddCreditCardPayDialog(
     summary: CreditCardSummary,
     formSubmitted: (request: CreditCardPaymentRequest) => void

@@ -2,7 +2,7 @@
   {{ dialogData.header }}
 </div>
 <hr />
-<form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+<form class="dialog-form" [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
   <div class="form-group">
     <mat-form-field appearance="fill">
       <mat-label>Total to Pay</mat-label>
@@ -47,11 +47,7 @@
   </div>
   <div class="form-actions">
     <div>
-      <button
-        mat-raised-button
-        type="submit"
-        [disabled]="paymentForm.invalid"
-      >
+      <button mat-raised-button type="submit" [disabled]="paymentForm.invalid">
         Submit
       </button>
       <button

@@ -16,7 +16,7 @@ import { CardPaymentFormComponent } from '../card-payment-form/card-payment-form
 import { CommonDialogService } from '@common/services/common-dialog.service';
 import { CardService } from '@card/services/card.service';
 import { NotificationService } from '@common/services/notification.service';
-import { INFO_MSG } from '@config/messages';
+import { INFO_MSG, TOOL_TIP } from '@config/messages';
 import { CreditCardPaymentRequest } from '@common/types/cardPayment';
 import { Router } from '@angular/router';
 import { CARD_BASE } from '@card/card.routes';
@@ -46,7 +46,12 @@ export class CardSummaryComponent {
 
   //Toolbox
   positionOptions: TooltipPosition = 'below';
-  position = new FormControl(this.positionOptions);
+  tool_tip_position= new FormControl(this.positionOptions);
+  tool_tip_delay:string='3000';
+  tooltips = {
+    add_pay: TOOL_TIP.ADD_PAY,
+    edit: TOOL_TIP.EDIT_CARD
+  };
 
   constructor(
     private cardService: CardService,
@@ -79,6 +84,10 @@ export class CardSummaryComponent {
         .showAddCreditCardPayDialog(ccSumary, this.sumbitPayment.bind(this))
         .subscribe();
     }
+  }
+
+  editCard(){
+
   }
 
   get creditCardSummary(): CreditCardSummary {

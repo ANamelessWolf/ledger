@@ -1,10 +1,12 @@
-form {
+.filter-form {
   padding: 20px 10px;
+  margin-top: 0px;
 }
 
 .form-actions {
   display: flex;
   justify-content: end;
+  padding: 20px;
 
   div {
     width: 180px;
@@ -16,7 +18,7 @@ form {
   }
 }
 .form-group {
-  display: flex;
+  display: block;
   justify-content: space-between;
   margin: 0px 40px;
 }
@@ -28,5 +30,6 @@ hr {
 
 .header {
   padding: 16px;
+  margin-bottom: 0px;
   font-size: x-large;
 }

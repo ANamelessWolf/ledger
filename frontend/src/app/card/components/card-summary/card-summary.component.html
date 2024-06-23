@@ -4,9 +4,20 @@
       <p>Summary</p>
       <div class="btn-group">
         <button
-          matTooltip="Add payment to the credit card"
-          [matTooltipPosition]="position.value!"
-          matTooltipHideDelay="100000"
+          matTooltip="{{ tooltips.edit }}"
+          [matTooltipPosition]="tool_tip_position.value!"
+          matTooltipHideDelay="{{ tool_tip_delay }}"
+          mat-icon-button
+          aria-label="Edit card data"
+          (click)="editCard()"
+          *ngIf="card.isCreditCard"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          matTooltip="{{ tooltips.add_pay }}"
+          [matTooltipPosition]="tool_tip_position.value!"
+          matTooltipHideDelay="{{ tool_tip_delay }}"
           mat-icon-button
           aria-label="Add credit card payment"
           (click)="addCardPayment()"

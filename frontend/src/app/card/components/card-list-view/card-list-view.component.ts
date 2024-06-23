@@ -7,9 +7,18 @@ import { CardListItemComponent } from '../card-list-item/card-list-item.componen
 import { CatalogService } from '@common/services/catalog.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NotificationService } from '@common/services/notification.service';
-import { CARD_STATUS, CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
+import {
+  CARD_STATUS,
+  CARD_STATUS_KEYS,
+  CardFilter,
+  CardFilterOptions,
+  CardItem,
+  EMPTY_CARD_ITEM,
+} from '@common/types/cardItem';
 import { SpinnerComponent } from '@common/components/spinner/spinner.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CardService } from '@card/services/card.service';
+import { HEADERS } from '@config/messages';
 
 @Component({
   selector: 'app-card-list-view',
@@ -35,14 +44,29 @@ export class CardListViewComponent implements OnInit {
   error = false;
   cards: CardItem[] = [];
 
+  options: CardFilterOptions = {
+    entities: [],
+    filter: undefined,
+    cardStatus: [
+      CARD_STATUS.ANY,
+      CARD_STATUS.ACTIVE,
+      CARD_STATUS.INACTIVE,
+      CARD_STATUS.CANCELLED,
+    ].map((st: CARD_STATUS) => {
+      return { value: st, description: CARD_STATUS_KEYS[st] };
+    }),
+  };
+
   constructor(
     private catalogService: CatalogService,
+    private cardService: CardService,
     private notifService: NotificationService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.getCatalogs();
+    this.getCards();
+    this.getFinancingEntities();
   }
 
   onCardClick(card: CardItem) {
@@ -56,7 +80,18 @@ export class CardListViewComponent implements OnInit {
     }
   }
 
-  private pickCard(){
+  openFilter() {
+    this.cardService
+      .showCardFilterDialog(this.options, this.applyFilter.bind(this))
+      .subscribe();
+  }
+
+  applyFilter(filter: CardFilter) {
+    this.options.filter = filter;
+    this.getCards();
+  }
+
+  private pickCard() {
     let card = this.cards[0];
     const cardType = this.router.url.split('/')[2];
     if (cardType === 'cc' && this.cardId) {
@@ -66,8 +101,7 @@ export class CardListViewComponent implements OnInit {
       if (filtered.length > 0) {
         card = filtered[0];
       }
-    }
-    else if (cardType === 'dc' && this.cardId) {
+    } else if (cardType === 'dc' && this.cardId) {
       const filtered = this.cards.filter(
         (c: CardItem) => !c.isCreditCard && c.id === this.cardId
       );
@@ -78,8 +112,8 @@ export class CardListViewComponent implements OnInit {
     return card;
   }
 
-  private getCatalogs() {
-    this.catalogService.getCards().subscribe(
+  private getCards() {
+    this.catalogService.getCards(this.options.filter).subscribe(
       (response) => {
         this.cards = response.data.map((row: any) => {
           return {
@@ -101,6 +135,19 @@ export class CardListViewComponent implements OnInit {
       //Complete
       () => {
         this.isLoading = false;
+      }
+    );
+  }
+
+  private getFinancingEntities() {
+    this.catalogService.getFinancingEntities().subscribe(
+      (response) => {
+        this.options.entities = response.data;
+        this.options.entities.unshift({ id: 0, name: HEADERS.ANY });
+      },
+      (err: HttpErrorResponse) => {
+        this.error = true;
+        this.notifService.showError(err);
       }
     );
   }

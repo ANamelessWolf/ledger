@@ -1,9 +1,21 @@
+import { CatalogItem, SelectItem } from '@common/types/catalogTypes';
+import { HEADERS } from '@config/messages';
+
 export enum CARD_STATUS {
   ACTIVE = 1,
   CANCELLED = 2,
   INACTIVE = 0,
-  OTHER = 99
+  ANY = 98,
+  OTHER = 99,
 }
+
+export const CARD_STATUS_KEYS = {
+  1: HEADERS.ACT,
+  2: HEADERS.CANCELED,
+  0: HEADERS.N_ACT,
+  98: HEADERS.ANY,
+  99: HEADERS.OTHER,
+};
 
 export type CardItem = {
   id: number;
@@ -36,3 +48,17 @@ export enum PAYMENT_STATUS {
   OVERDUE = 'Overdue',
   NOT_REQUIRED = 'Not required',
 }
+
+export type CardFilter = {
+  entityId: number;
+  crediCardType: number;
+  active: number;
+};
+
+export type CardFilterOptions = {
+  entities: CatalogItem[];
+  filter?: CardFilter;
+  cardStatus: SelectItem[];
+};
+
+
