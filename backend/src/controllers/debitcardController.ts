@@ -41,7 +41,7 @@ export const getDebitcardSummary = asyncErrorHandler(
             ),
             total: formatMoney(saving.total),
             expiration: dc.expiration,
-            cardType: dc.cardType,
+            type: dc.cardType,
             ending: dc.ending,
             color: dc.color,
           });
@@ -105,7 +105,7 @@ export const getDebitcardSummarybyId = asyncErrorHandler(
         ),
         total: formatMoney(saving.total),
         expiration: dc.expiration,
-        cardType: dc.cardType,
+        type: dc.cardType,
         ending: dc.ending,
         color: dc.color,
       };

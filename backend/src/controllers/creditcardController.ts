@@ -45,6 +45,7 @@ export const getCreditcardSummary = asyncErrorHandler(
             cardType: cc.cardType,
             ending: cc.ending,
             color: cc.color,
+            type: cc.cardType
           });
         }
       }
@@ -96,7 +97,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       const status = getCreditCardStatus(today, payments, cc.cutDay);
       const wallet: Wallet = (await cc.wallet)[0];
       const banking: FinancingEntity = (await cc.financingEntity)[0];
-      const result = {
+      const result:CreditCardSummary = {
         id: cc.id,
         walletId: cc.walletId,
         entityId: cc.entityId,
@@ -110,6 +111,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         cardType: cc.cardType,
         ending: cc.ending,
         color: cc.color,
+        type: cc.cardType
       };
 
       // Ok Response

@@ -1,3 +1,5 @@
+import { CardType } from "./cardItem";
+
 export type PaymentStatus = {
   cutDate: string;
   dueDate: string;
@@ -25,7 +27,7 @@ export type CreditCardSummary = {
   available:string;
   status: PaymentStatus;
   expiration: string;
-  cardType: number;
+  type: CardType;
   ending: string;
   color: string;
 };
@@ -57,7 +59,7 @@ export const EMPTY_CREDIT_CARD_SUMMARY: CreditCardSummary = {
   available: '',
   status: EMPTY_PAYMENT_STATUS,
   expiration: '',
-  cardType: 0,
+  type: CardType.OTHER,
   ending: '',
   color: '',
 };

@@ -14,12 +14,11 @@
       <mat-grid-tile class="column"> Due date </mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.status.cutDate }}</mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.status.dueDate }}</mat-grid-tile>
-
     </mat-grid-list>
   </div>
 
   <div class="card-percentage">
-    <app-credit-card-chart [summary]="summary" [size]="chartSize"/>
+    <app-credit-card-chart [summary]="summary" [size]="chartSize" />
   </div>
 
   <app-card-miniature
@@ -27,5 +26,6 @@
     banking="{{ summary.banking }}"
     expiration="{{ summary.expiration }}"
     ending="{{ summary.ending }}"
+    [cardType]="summary.type"
   />
 </div>

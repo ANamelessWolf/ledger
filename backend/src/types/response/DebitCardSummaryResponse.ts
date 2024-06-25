@@ -4,11 +4,11 @@ export type DebitCardSummary = {
   entityId: number;
   card: string;
   banking: string;
-  investmentRate: string,
-  yearlyGain: string,
+  investmentRate: string;
+  yearlyGain: string;
   total: string;
   expiration: string;
-  cardType: number;
   ending: string;
   color: string;
+  type: number;
 };

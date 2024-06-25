@@ -21,7 +21,7 @@ import {
 } from '@common/types/creditCardSummary';
 import { toNumber } from '@common/utils/formatUtils';
 import { CardMiniatureComponent } from '../card-miniature/card-miniature.component';
-import { CardItem } from '@common/types/cardItem';
+import { CardItem, CardType } from '@common/types/cardItem';
 
 const NUM_REG = /^\d+(\.\d{1,2})?$/;
 
@@ -50,6 +50,7 @@ export class CreditCardEditFormComponent {
   item: CardItem;
   header: string = '';
   options: any;
+  cardType: CardType = CardType.OTHER;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -60,6 +61,7 @@ export class CreditCardEditFormComponent {
     this.item = this.dialogData.item;
     this.header = this.dialogData.header;
     this.options = this.dialogData.options;
+    // this.cardType
 
     const cutDay = this.card.status.cutDate.split(' ')[1].replace(',', '');
     const dueDay = this.card.status.dueDate.split(' ')[1].replace(',', '');
