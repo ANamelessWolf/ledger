@@ -170,3 +170,69 @@ export const addCreditcardPayment = asyncErrorHandler(
     }
   }
 );
+
+/**
+ * Updates a credit card
+ * @summary Handles adding a new payment to a credit card
+ * @route POST /:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const updateCreditcard = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const where: any = { id: id };
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+        where,
+      });
+
+      // Validate id
+      if (cards.length === 0) {
+        return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
+      }
+
+      // Get the current Creditcard
+      const creditcard: Creditcard = cards[0];
+      const {
+        active,
+        color,
+        credit,
+        cutDay,
+        dueDay,
+        ending,
+        expiration,
+        usedCredit,
+      } = req.body;
+
+      // Update data
+      creditcard.active = active;
+      creditcard.color = color;
+      creditcard.credit = credit;
+      creditcard.cutDay = cutDay;
+      creditcard.dueDay = dueDay;
+      creditcard.ending = ending;
+      creditcard.expiration = expiration;
+      creditcard.usedCredit = usedCredit;
+
+      // Save the record
+      const result = await AppDataSource.manager.save(creditcard);
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
