@@ -9,11 +9,13 @@ const ERROR_MSG_ES = {
 const INFO_MSG_EN = {
   PAY_N_REQ: 'Payment not required',
   PAY_ADDED: 'Payment added succesfully',
+  CREDIT_CARD_UPD: 'Credit card updated, succesfully'
 };
 
 const INFO_MSG_ES = {
   PAY_N_REQ: 'El pago no es requerido',
   PAY_ADDED: 'El pago se registro de manera correcta',
+  CREDIT_CARD_UPD: 'La tarjeta de credito ha sido actualizada de manera correcta'
 };
 
 const HEADERS_EN = {

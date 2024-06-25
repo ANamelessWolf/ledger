@@ -17,6 +17,22 @@ export const CARD_STATUS_KEYS = {
   99: HEADERS.OTHER,
 };
 
+export enum CardType {
+  AMEX = 1,
+  MASTER_CARD = 2,
+  VISA = 3,
+  DISCOVERY = 4,
+  OTHER = 99,
+}
+
+export const CARD_TYPE_KEYS = {
+  1: 'American Express',
+  2: 'Mastercard',
+  3: 'Visa',
+  4: 'Discovery',
+  99: 'Other',
+};
+
 export type CardItem = {
   id: number;
   entityId: number;
@@ -60,5 +76,3 @@ export type CardFilterOptions = {
   filter?: CardFilter;
   cardStatus: SelectItem[];
 };
-
-

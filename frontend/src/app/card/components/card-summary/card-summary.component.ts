@@ -17,7 +17,10 @@ import { CommonDialogService } from '@common/services/common-dialog.service';
 import { CardService } from '@card/services/card.service';
 import { NotificationService } from '@common/services/notification.service';
 import { INFO_MSG, TOOL_TIP } from '@config/messages';
-import { CreditCardPaymentRequest } from '@common/types/cardPayment';
+import {
+  CreditCardPaymentRequest,
+  CreditCardRequest,
+} from '@common/types/cardPayment';
 import { Router } from '@angular/router';
 import { CARD_BASE } from '@card/card.routes';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -46,11 +49,11 @@ export class CardSummaryComponent {
 
   //Toolbox
   positionOptions: TooltipPosition = 'below';
-  tool_tip_position= new FormControl(this.positionOptions);
-  tool_tip_delay:string='3000';
+  tool_tip_position = new FormControl(this.positionOptions);
+  tool_tip_delay: string = '3000';
   tooltips = {
     add_pay: TOOL_TIP.ADD_PAY,
-    edit: TOOL_TIP.EDIT_CARD
+    edit: TOOL_TIP.EDIT_CARD,
   };
 
   constructor(
@@ -86,8 +89,16 @@ export class CardSummaryComponent {
     }
   }
 
-  editCard(){
-
+  sumbitPayment(request: CreditCardPaymentRequest) {
+    this.cardService.addPaymetToCreditCard(request).subscribe(
+      (response) => {
+        this.notifService.showNotification(INFO_MSG.PAY_ADDED, 'success');
+        this.refreshPage();
+      },
+      (err: HttpErrorResponse) => {
+        this.notifService.showError(err);
+      }
+    );
   }
 
   get creditCardSummary(): CreditCardSummary {
@@ -98,8 +109,16 @@ export class CardSummaryComponent {
     return this.summary as DebitCardSummary;
   }
 
-  sumbitPayment(request: CreditCardPaymentRequest) {
-    this.cardService.addPaymetToCreditCard(request).subscribe(
+  editCard() {
+    const summary: CreditCardSummary = this.summary as CreditCardSummary;
+    const card: CardItem = this.card;
+    this.cardService
+      .showEditCreditCardDialog(summary, card, this.sumbitEditCard.bind(this))
+      .subscribe();
+  }
+
+  sumbitEditCard(request: CreditCardRequest) {
+    this.cardService.updateCreditCard(request).subscribe(
       (response) => {
         this.notifService.showNotification(INFO_MSG.PAY_ADDED, 'success');
         this.refreshPage();

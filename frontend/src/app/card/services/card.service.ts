@@ -3,10 +3,20 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CardListFilterComponent } from '@card/components/card-list-filter/card-list-filter.component';
 import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
-import { CardFilter, CardFilterOptions } from '@common/types/cardItem';
-import { CreditCardPaymentRequest } from '@common/types/cardPayment';
+import { CreditCardEditFormComponent } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
+import {
+  CARD_STATUS,
+  CARD_STATUS_KEYS,
+  CardFilter,
+  CardFilterOptions,
+  CardItem,
+} from '@common/types/cardItem';
+import {
+  CreditCardPaymentRequest,
+  CreditCardRequest,
+} from '@common/types/cardPayment';
 import { CreditCardSummary } from '@common/types/creditCardSummary';
-import { LEDGER_API } from '@config/constants';
+import { APP_CATALOGS, LEDGER_API } from '@config/constants';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -26,6 +36,13 @@ export class CardService {
   addPaymetToCreditCard(req: CreditCardPaymentRequest): Observable<any> {
     return this.http.put(
       `${LEDGER_API.CREDIT_CARD}/payCreditcard/${req.id}`,
+      req.body
+    );
+  }
+
+  updateCreditCard(req: CreditCardRequest): Observable<any> {
+    return this.http.post(
+      `${LEDGER_API.CREDIT_CARD}/${req.id}`,
       req.body
     );
   }
@@ -57,6 +74,40 @@ export class CardService {
       data: {
         header: header,
         card: summary,
+        formSubmitted: formSubmitted,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
+  showEditCreditCardDialog(
+    summary: CreditCardSummary,
+    card: CardItem,
+    formSubmitted: (request: CreditCardRequest) => void
+  ) {
+    const header: string = `Edit credit card ${summary.card} - ${summary.status.billing.period}`;
+    const year = new Date().getFullYear() - 1;
+    const years = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => year + x);
+    const cardStatus = [
+      CARD_STATUS.ACTIVE,
+      CARD_STATUS.INACTIVE,
+      CARD_STATUS.CANCELLED,
+    ].map((st: CARD_STATUS) => {
+      return { value: st, description: CARD_STATUS_KEYS[st] };
+    });
+    const dialogRef = this.dialog.open(CreditCardEditFormComponent, {
+      width: '980px',
+      data: {
+        header: header,
+        card: summary,
+        item: card,
+        options: {
+          days: APP_CATALOGS.CARD_DAYS,
+          months: APP_CATALOGS.CARD_MONTHS,
+          years: years,
+          colors: APP_CATALOGS.CARD_COLORS,
+          status: cardStatus,
+        },
         formSubmitted: formSubmitted,
       },
     });
