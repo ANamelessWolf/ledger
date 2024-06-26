@@ -28,6 +28,7 @@ export const APP_CATALOGS = {
     'gold',
     'lightblue',
     'platinum',
+    'purple',
     'red',
     'tangerine',
     'yellow',

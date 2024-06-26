@@ -11,4 +11,5 @@ export type DebitCardSummary = {
   ending: string;
   color: string;
   type: number;
+  cutDay: number;
 };

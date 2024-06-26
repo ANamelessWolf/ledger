@@ -175,7 +175,7 @@ export const addCreditcardPayment = asyncErrorHandler(
 
 /**
  * Updates a credit card
- * @summary Handles adding a new payment to a credit card
+ * @summary Handles updates to a credit card
  * @route POST /:id
  * @param {Request} req - The request object
  * @param {Response} res - The response object

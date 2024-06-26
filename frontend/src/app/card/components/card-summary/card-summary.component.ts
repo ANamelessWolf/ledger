@@ -20,6 +20,7 @@ import { INFO_MSG, TOOL_TIP } from '@config/messages';
 import {
   CreditCardPaymentRequest,
   CreditCardRequest,
+  DebitCardRequest,
 } from '@common/types/cardPayment';
 import { Router } from '@angular/router';
 import { CARD_BASE } from '@card/card.routes';
@@ -110,14 +111,21 @@ export class CardSummaryComponent {
   }
 
   editCard() {
-    const summary: CreditCardSummary = this.summary as CreditCardSummary;
     const card: CardItem = this.card;
-    this.cardService
-      .showEditCreditCardDialog(summary, card, this.sumbitEditCard.bind(this))
-      .subscribe();
+    if (this.card.isCreditCard) {
+      const summary: CreditCardSummary = this.summary as CreditCardSummary;
+      this.cardService
+        .showEditCreditCardDialog(summary, card, this.sumbitCreditCard.bind(this))
+        .subscribe();
+    } else {
+      const summary: DebitCardSummary = this.summary as DebitCardSummary;
+      this.cardService
+        .showEditDebitCardDialog(summary, card, this.sumbitDebitCard.bind(this))
+        .subscribe();
+    }
   }
 
-  sumbitEditCard(request: CreditCardRequest) {
+  sumbitCreditCard(request: CreditCardRequest) {
     this.cardService.updateCreditCard(request).subscribe(
       (response) => {
         this.notifService.showNotification(INFO_MSG.PAY_ADDED, 'success');
@@ -128,4 +136,17 @@ export class CardSummaryComponent {
       }
     );
   }
+
+  sumbitDebitCard(request: DebitCardRequest) {
+    this.cardService.updateDebitCard(request).subscribe(
+      (response) => {
+        this.notifService.showNotification(INFO_MSG.PAY_ADDED, 'success');
+        this.refreshPage();
+      },
+      (err: HttpErrorResponse) => {
+        this.notifService.showError(err);
+      }
+    );
+  }
+
 }

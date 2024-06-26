@@ -27,3 +27,22 @@ export type CreditCardRequest = {
   id: number;
   body: CreditCardPaymentBody;
 };
+
+export type DebitCardBody = {
+  entityId?: number;
+  walletId?: number;
+  name?: string;
+  total: number;
+  interestRate: number;
+  cutDay: number;
+  expiration: string;
+  cardType?: number;
+  ending: string;
+  color: string;
+  active: number;
+};
+
+export type DebitCardRequest = {
+  id: number;
+  body: CreditCardPaymentBody;
+};

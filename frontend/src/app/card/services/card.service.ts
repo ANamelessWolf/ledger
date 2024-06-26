@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CardListFilterComponent } from '@card/components/card-list-filter/card-list-filter.component';
 import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
 import { CreditCardEditFormComponent } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
+import { DebitCardEditFormComponent } from '@card/components/debit-card-edit-form/debit-card-edit-form.component';
 import {
   CARD_STATUS,
   CARD_STATUS_KEYS,
@@ -14,8 +15,10 @@ import {
 import {
   CreditCardPaymentRequest,
   CreditCardRequest,
+  DebitCardRequest,
 } from '@common/types/cardPayment';
 import { CreditCardSummary } from '@common/types/creditCardSummary';
+import { DebitCardSummary } from '@common/types/debitCardSummary';
 import { APP_CATALOGS, LEDGER_API } from '@config/constants';
 import { Observable } from 'rxjs';
 
@@ -43,6 +46,13 @@ export class CardService {
   updateCreditCard(req: CreditCardRequest): Observable<any> {
     return this.http.post(
       `${LEDGER_API.CREDIT_CARD}/${req.id}`,
+      req.body
+    );
+  }
+
+  updateDebitCard(req: DebitCardRequest): Observable<any> {
+    return this.http.post(
+      `${LEDGER_API.DEBIT_CARD}/${req.id}`,
       req.body
     );
   }
@@ -85,7 +95,7 @@ export class CardService {
     card: CardItem,
     formSubmitted: (request: CreditCardRequest) => void
   ) {
-    const header: string = `Edit credit card ${summary.card} - ${summary.status.billing.period}`;
+    const header: string = `Edit ${summary.card} - ${summary.status.billing.period}`;
     const year = new Date().getFullYear() - 1;
     const years = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => year + x);
     const cardStatus = [
@@ -113,4 +123,39 @@ export class CardService {
     });
     return dialogRef.afterClosed();
   }
+
+  showEditDebitCardDialog(
+    summary: DebitCardSummary,
+    card: CardItem,
+    formSubmitted: (request: DebitCardRequest) => void
+  ) {
+    const header: string = `Edit ${summary.card}`;
+    const year = new Date().getFullYear() - 1;
+    const years = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => year + x);
+    const cardStatus = [
+      CARD_STATUS.ACTIVE,
+      CARD_STATUS.INACTIVE,
+      CARD_STATUS.CANCELLED,
+    ].map((st: CARD_STATUS) => {
+      return { value: st, description: CARD_STATUS_KEYS[st] };
+    });
+    const dialogRef = this.dialog.open(DebitCardEditFormComponent, {
+      width: '980px',
+      data: {
+        header: header,
+        card: summary,
+        item: card,
+        options: {
+          days: APP_CATALOGS.CARD_DAYS,
+          months: APP_CATALOGS.CARD_MONTHS,
+          years: years,
+          colors: APP_CATALOGS.CARD_COLORS,
+          status: cardStatus,
+        },
+        formSubmitted: formSubmitted,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
 }
