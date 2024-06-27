@@ -9,10 +9,10 @@ import {
   getPayments,
 } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
-import { CatalogItem } from "../types/response/CatalogItemResponse";
+import { CatalogItem } from "../types/response/catalogItemResponse";
 import { Creditcard } from "../models/ledger";
 import { PAYMENT_STATUS } from "../common/enums";
-import { CardItemResponse } from "../types/response/CardItemResponse";
+import { CardItemResponse } from "../types/response/cardItemResponse";
 
 const NAME_FILTER: any = {
   order: {

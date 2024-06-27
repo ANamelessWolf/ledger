@@ -6,7 +6,7 @@ import { AppDataSource } from "..";
 import { filterCard } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { formatMoney, formatPercent } from "../utils/formatUtils";
-import { DebitCardSummary } from "../types/response/DebitCardSummaryResponse";
+import { DebitCardSummary } from "../types/response/debitCardSummaryResponse";
 
 /**
  * Retrieves a summary of debit cards, including their current status and details.

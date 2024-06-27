@@ -111,7 +111,7 @@
  *         color:
  *           type: string
  *           description: The color of the credit card
- *     CreditcardPayment:
+ *     CreditCardPayment:
  *       type: object
  *       properties:
  *         id:
@@ -133,10 +133,61 @@
  *           type: string
  *           format: date
  *           description: The date payment due date
+ *     CardSpending:
+ *       type: object
+ *       properties:
+ *         label:
+ *           type: string
+ *           description: The spending label as month name and year
+ *         spending:
+ *           type: number
+ *           description: The spending amount
+ *         period:
+ *           type: string
+ *           description: The spending period
+ *         cutDate:
+ *           type: date
+ *           description: The credit card current cut date
+ *     CardSpendingResponse:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           description: The credit card id
+ *         entityId:
+ *           type: number
+ *           description: The id of the entity associated with the credit card
+ *         name:
+ *           type: string
+ *           description: The name of the credit card
+ *         banking:
+ *           type: string
+ *           description: Banking details associated with the credit card
+ *         ending:
+ *           type: string
+ *           description: The last four digits of the credit card number
+ *         active:
+ *           type: number
+ *           description: The credit card active status
+ *         average:
+ *           type: string
+ *           description: The spending payment average in the 12 month periods
+ *         max:
+ *           type: string
+ *           description: The maximum spending in the 12 month periods
+ *         min:
+ *           type: string
+ *           description: The minum spending in the 12 month periods
+ *         spending:
+ *             description: The credit card spending history
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/CardSpending'
  */
 import { Router } from "express";
 import {
   addCreditcardPayment,
+  getCreditcardSpendingHistoryById,
   getCreditcardSummary,
   getCreditcardSummarybyId,
   updateCreditcard,
@@ -189,7 +240,7 @@ const router = Router();
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/CreditCard' 
+ *                 $ref: '#/components/schemas/CreditCard'
  * /creditcard/summary/{id}:
  *   get:
  *     summary: Credit card summary
@@ -209,6 +260,25 @@ const router = Router();
  *           application/json:
  *             schema:
  *              $ref: '#/components/schemas/CreditCardSummary'
+ * /creditcard/spending/{id}:
+ *   get:
+ *     summary: Credit card spending history in 12 months
+ *     description: Returns the spending history for a credit card id filter by id
+ *     tags: [Creditcard]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The credit card ID
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the credit card spending history.
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/CardSpendingResponse' 
  * /creditcard/payCreditcard/{id}:
  *   put:
  *     summary: Add a payment to a credit card
@@ -255,6 +325,7 @@ const router = Router();
 router.route("/summary").get(getCreditcardSummary);
 router.route("/summary/:id").get(getCreditcardSummarybyId);
 router.route("/payCreditcard/:id").put(addCreditcardPayment);
+router.route("/spending/:id").get(getCreditcardSpendingHistoryById);
 
 router.route("/:id").post(updateCreditcard);
 // .put(updateCreditcard)

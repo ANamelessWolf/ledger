@@ -10,6 +10,7 @@ import {
 import { Credit, Expense } from "./models/expenses";
 import {
   Cash,
+  CreditCardSpendingReport,
   Creditcard,
   CreditcardPayment,
   Debitcard,
@@ -48,6 +49,7 @@ export const createConnection = (): DataSource => {
       Cash,
       Creditcard,
       CreditcardPayment,
+      CreditCardSpendingReport,
       Debitcard,
       DigitalWallet,
       Investment,
