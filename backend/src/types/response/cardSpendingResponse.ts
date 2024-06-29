@@ -2,7 +2,7 @@ import { CardSpending } from "../cardSpending";
 
 export type CardSpendingResponse = {
   id: number;
-  entity_id: number;
+  entityId: number;
   name: string;
   banking: string;
   ending: string;

@@ -5,6 +5,8 @@ export const APP_SETTINGS = {
   CONTACT_EMAIL: 'contact_email@gmail.com',
   COMPANY_NAME: 'Nameless dev',
   OWNER_EMAIL: '',
+  APP_LOCAL: 'en-US',
+  CURRENCY: 'MXN',
 };
 
 export const LEDGER_API_URL = EnvConfig.LEDGER_API_URL;

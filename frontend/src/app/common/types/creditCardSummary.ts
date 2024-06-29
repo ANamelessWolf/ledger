@@ -1,4 +1,4 @@
-import { CardType } from "./cardItem";
+import { CardType } from './cardItem';
 
 export type PaymentStatus = {
   cutDate: string;
@@ -24,7 +24,7 @@ export type CreditCardSummary = {
   banking: string;
   credit: string;
   usedCredit: string;
-  available:string;
+  available: string;
   status: PaymentStatus;
   expiration: string;
   type: CardType;
@@ -62,4 +62,37 @@ export const EMPTY_CREDIT_CARD_SUMMARY: CreditCardSummary = {
   type: CardType.OTHER,
   ending: '',
   color: '',
+};
+
+export type CardSpending = {
+  label: string;
+  spending: number;
+  period: string;
+  cutDate: Date;
+};
+
+export type CreditCardSpending = {
+  id: number;
+  entityId: number;
+  name: string;
+  banking: string;
+  ending: string;
+  active: number;
+  average: string;
+  max: string;
+  min: string;
+  spending: CardSpending[];
+};
+
+export const EMPTY_CREDIT_CARD_SPENDING: CreditCardSpending = {
+  id: 0,
+  entityId: 0,
+  name: '',
+  banking: '',
+  ending: '',
+  active: 0,
+  average: '',
+  max: '',
+  min: '',
+  spending: [],
 };

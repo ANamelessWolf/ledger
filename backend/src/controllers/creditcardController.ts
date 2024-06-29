@@ -187,7 +187,7 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
 
       const result: CardSpendingResponse = {
         id: payment.id,
-        entity_id: payment.id,
+        entityId: payment.id,
         name: payment.name,
         banking: payment.entity,
         ending: payment.ending,

@@ -1,4 +1,4 @@
-<div *ngIf="card.id > 0; else noSelection">
+<div *ngIf="card.id > 0; else noSelection" class="scrollable-container">
   <div class="list-header">
     <div class="position">
       <p>Summary</p>
@@ -48,6 +48,12 @@
   />
   <div class="divider-pad">
     <hr />
+  </div>
+  <div class="card-spending-area">
+    <app-credit-card-spending-chart
+      *ngIf="card.isCreditCard"
+      [cardSpending]="creditCardSpending"
+    />
   </div>
 </div>
 <ng-template #noSelection>

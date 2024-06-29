@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import {
   CardItem,
   EMPTY_CARD_ITEM,
   PAYMENT_STATUS,
 } from '@common/types/cardItem';
-import { CreditCardSummary } from '@common/types/creditCardSummary';
+import {
+  CreditCardSpending,
+  CreditCardSummary,
+  EMPTY_CREDIT_CARD_SPENDING,
+} from '@common/types/creditCardSummary';
 import { DebitCardSummary } from '@common/types/debitCardSummary';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,6 +30,7 @@ import { Router } from '@angular/router';
 import { CARD_BASE } from '@card/card.routes';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
+import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/credit-card-spending-chart.component';
 
 @Component({
   selector: 'app-card-summary',
@@ -38,6 +43,7 @@ import { FormControl } from '@angular/forms';
     DebitCardOverviewComponent,
     CardPaymentFormComponent,
     MatTooltipModule,
+    CreditCardSpendingChartComponent,
   ],
   providers: [CommonDialogService],
   templateUrl: './card-summary.component.html',
@@ -46,7 +52,10 @@ import { FormControl } from '@angular/forms';
 export class CardSummaryComponent {
   @Input() card: CardItem = EMPTY_CARD_ITEM;
   @Input() summary: CreditCardSummary | DebitCardSummary | null = null;
+  @Input() creditCardSpending: CreditCardSpending = EMPTY_CREDIT_CARD_SPENDING;
   visibility: boolean = true;
+
+  chartSize = '900px';
 
   //Toolbox
   positionOptions: TooltipPosition = 'below';
@@ -115,7 +124,11 @@ export class CardSummaryComponent {
     if (this.card.isCreditCard) {
       const summary: CreditCardSummary = this.summary as CreditCardSummary;
       this.cardService
-        .showEditCreditCardDialog(summary, card, this.sumbitCreditCard.bind(this))
+        .showEditCreditCardDialog(
+          summary,
+          card,
+          this.sumbitCreditCard.bind(this)
+        )
         .subscribe();
     } else {
       const summary: DebitCardSummary = this.summary as DebitCardSummary;
@@ -148,5 +161,4 @@ export class CardSummaryComponent {
       }
     );
   }
-
 }

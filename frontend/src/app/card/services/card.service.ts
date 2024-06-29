@@ -5,6 +5,7 @@ import { CardListFilterComponent } from '@card/components/card-list-filter/card-
 import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
 import { CreditCardEditFormComponent } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
 import { DebitCardEditFormComponent } from '@card/components/debit-card-edit-form/debit-card-edit-form.component';
+
 import {
   CARD_STATUS,
   CARD_STATUS_KEYS,
@@ -31,6 +32,11 @@ export class CardService {
   getCreditCardSummaryById(id: number): Observable<any> {
     return this.http.get(`${LEDGER_API.CREDIT_CARD}/summary/${id}`);
   }
+
+  getCreditCardSpendingHistoryById(id: number): Observable<any> {
+    return this.http.get(`${LEDGER_API.CREDIT_CARD}/spending/${id}`);
+  }
+
 
   getDebitCardSummaryById(id: number): Observable<any> {
     return this.http.get(`${LEDGER_API.DEBIT_CARD}/summary/${id}`);
