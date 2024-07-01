@@ -63,20 +63,29 @@
     margin: 0px;
   }
 
-  .value{
+  .value {
     font-weight: lighter;
+    .highlight {
+      font-weight: bold;
+      font-size: x-large;
+      margin: 0px;
+    }
   }
 }
 
-.card-percentage{
+.card-percentage {
   position: absolute;
   width: 337px;
   left: 355px;
   top: 0px;
 
-  canvas{
+  canvas {
     height: 250px;
     width: 250px;
   }
+}
 
+.card-notes {
+  position: absolute;
+  bottom: 10px;
 }

@@ -23,5 +23,28 @@ import { CreditCardChartComponent } from '../credit-card-chart/credit-card-chart
 })
 export class CreditCardOverviewComponent {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
-  chartSize = "300px";
+  chartSize = '300px';
+
+  get daysToPay() {
+    try {
+      if (this.summary.status) {
+        let date1 = new Date(this.summary.status.payment.dueDate);
+        let date2 = new Date();
+
+        // Calculating the time difference
+        // of two dates
+        let Difference_In_Time = date1.getTime() - date2.getTime();
+
+        // Calculating the no. of days between
+        // two dates
+        let Difference_In_Days = Math.round(
+          Difference_In_Time / (1000 * 3600 * 24)
+        );
+        return Difference_In_Days;
+      }
+      return 0;
+    } catch (error) {
+      return 0;
+    }
+  }
 }

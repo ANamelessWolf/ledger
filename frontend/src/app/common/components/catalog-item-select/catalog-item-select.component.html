@@ -1,0 +1,18 @@
+<mat-form-field appearance="fill">
+  <mat-label>{{ header }}</mat-label>
+  <input
+    placeholder="Pick one"
+    type="text"
+    matInput
+    [formControl]="control"
+    [matAutocomplete]="auto"
+  />
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="display">
+    <mat-option
+      *ngFor="let item of filteredItems | async"
+      [value]="item"
+    >
+      {{ item.name }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

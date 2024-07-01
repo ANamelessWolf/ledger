@@ -3,24 +3,11 @@
 <div class="filer-form">
   <mat-dialog-content class="form-group" [formGroup]="filterForm">
     <div>
-      <mat-form-field appearance="fill">
-        <mat-label>Financing Entity</mat-label>
-        <input
-          placeholder="Pick a financing entity"
-          type="text"
-          matInput
-          formControlName="entityName"
-          [matAutocomplete]="auto"
-        />
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayEntity">
-          <mat-option
-            *ngFor="let entity of filteredEntities | async"
-            [value]="entity"
-          >
-            {{ entity.name }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+      <app-catalog-item-select
+        header="Financing Entity"
+        [items]="data.options.entities"
+        [control]="entityControl"
+      ></app-catalog-item-select>
     </div>
     <div>
       <mat-form-field appearance="fill">

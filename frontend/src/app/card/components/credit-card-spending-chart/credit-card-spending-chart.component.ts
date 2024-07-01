@@ -115,4 +115,9 @@ export class CreditCardSpendingChartComponent {
       ],
     };
   }
+
+  get total(){
+    return toCurrency(this.cardSpending.spending.map((x)=> x.spending).reduce((pv, cv)=> pv+cv));
+  }
+
 }

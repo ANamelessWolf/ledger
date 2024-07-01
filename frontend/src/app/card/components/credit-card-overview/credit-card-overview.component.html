@@ -7,9 +7,9 @@
   <div class="card-details">
     <mat-grid-list cols="2" rowHeight="28px">
       <mat-grid-tile class="column"> Credit Limit </mat-grid-tile>
-      <mat-grid-tile class="column"> Expense </mat-grid-tile>
+      <mat-grid-tile class="column"> Used Credit </mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.credit }}</mat-grid-tile>
-      <mat-grid-tile class="value">{{ summary.usedCredit }}</mat-grid-tile>
+      <mat-grid-tile class="value"><p class="highlight">{{ summary.usedCredit }}</p></mat-grid-tile>
       <mat-grid-tile class="column"> Cut date </mat-grid-tile>
       <mat-grid-tile class="column"> Due date </mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.status.cutDate }}</mat-grid-tile>
@@ -28,4 +28,8 @@
     ending="{{ summary.ending }}"
     [cardType]="summary.type"
   />
+
+  <div class="card-notes">
+    <p *ngIf="summary.status.status === 'Pending' ">Dias para pagar {{ daysToPay }}</p>
+  </div>
 </div>

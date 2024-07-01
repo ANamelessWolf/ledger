@@ -4,8 +4,8 @@ export type PaymentStatus = {
   cutDate: string;
   dueDate: string;
   payment: {
-    startDate: Date;
-    dueDate: Date;
+    startDate: string;
+    dueDate: string;
   };
   billing: {
     period: string;
@@ -36,8 +36,8 @@ export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
   cutDate: '',
   dueDate: '',
   payment: {
-    startDate: new Date(),
-    dueDate: new Date(),
+    startDate: '',
+    dueDate: '',
   },
   billing: {
     period: '',

@@ -9,17 +9,15 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
   CARD_STATUS,
   CardFilter,
   CardFilterOptions,
 } from '@common/types/cardItem';
-import { map, startWith } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
 import { HEADERS } from '@config/messages';
-import { Observable } from 'rxjs';
 import { CatalogItem } from '@common/types/catalogTypes';
+import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
 @Component({
   selector: 'app-card-list-filter',
   standalone: true,
@@ -34,13 +32,14 @@ import { CatalogItem } from '@common/types/catalogTypes';
     MatButtonModule,
     ReactiveFormsModule,
     DialogModule,
+    CatalogItemSelectComponent
   ],
   templateUrl: './card-list-filter.component.html',
   styleUrl: './card-list-filter.component.scss',
 })
 export class CardListFilterComponent {
   filterForm: FormGroup;
-  filteredEntities: Observable<any[]>;
+  entityControl = new FormControl();
 
   cardTypes = [
     { name: 'isCreditCard', value: '1', description: HEADERS.C_CARD },
@@ -78,12 +77,7 @@ export class CardListFilterComponent {
       active: [filter.active],
     });
 
-    this.filteredEntities = this.filterForm
-      .get('entityName')!
-      .valueChanges.pipe(
-        startWith(entName),
-        map((value) => this._filterEntities(value))
-      );
+    this.entityControl.setValue(entName);
   }
 
   getCreditCardType(form: FormGroup<any>): number {
@@ -93,7 +87,7 @@ export class CardListFilterComponent {
 
   onApply() {
     if (this.filterForm.valid) {
-      const selectedEntity = this.filterForm.value.entityName;
+      const selectedEntity = this.entityControl.value;
       const filter: CardFilter = {
         entityId: selectedEntity ? selectedEntity.id : 0,
         crediCardType: this.getCreditCardType(this.filterForm),
@@ -103,27 +97,9 @@ export class CardListFilterComponent {
       this.dialogRef.close();
     }
   }
+
   onCancel() {
     this.dialogRef.close();
   }
 
-  private _filterEntities(value: string | CatalogItem): any[] {
-    let filterValue = '';
-    try {
-      if (typeof value === 'string') {
-        filterValue = value.toLowerCase();
-      } else {
-        filterValue = value.name.toLowerCase();
-      }
-    } catch (error) {
-      filterValue = '';
-    }
-    return this.data.options.entities.filter((entity) =>
-      entity.name.toLowerCase().includes(filterValue)
-    );
-  }
-
-  displayEntity(entity: any): string {
-    return entity && entity.name ? entity.name : '';
-  }
 }
