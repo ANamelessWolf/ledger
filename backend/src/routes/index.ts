@@ -6,6 +6,7 @@ import swaggerMiddleware from "../middlewares/swaggerMiddleware";
 import creditcardRoutes from './creditcardRoutes';
 import debitcardRoutes from './debitcardRoutes';
 import catalogRoutes from './catalogRoutes';
+import expenseRoutes from './expenseRoutes';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use("/api-docs", swaggerMiddleware);
 router.use('/creditcard', creditcardRoutes);
 router.use('/debitcard', debitcardRoutes);
 router.use('/catalog', catalogRoutes);
+router.use('/expenses', expenseRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

@@ -2,7 +2,7 @@
  * @swagger
  * components:
  *   schemas:
- *     CardItem:
+ *     CardItemResponse:
  *       type: object
  *       properties:
  *         id:
@@ -26,6 +26,9 @@
  *         active:
  *           type: number
  *           description: A flag to check if the card is active, 1 for active
+ *         status:
+ *           type: string
+ *           description: Card paid status
  *     CatalogItem:
  *       type: object
  *       properties:
@@ -37,7 +40,7 @@
  *           description: Catalog item name
  */
 import { Router } from "express";
-import { getCardList, getFinancingEnityList } from "../controllers/catalogController";
+import { getCardList, getExpensesTypesList, getFinancingEnityList, getVendorList, getWalletList } from "../controllers/catalogController";
 
 const router = Router();
 /**
@@ -76,7 +79,7 @@ const router = Router();
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/CardItem'
+ *                 $ref: '#/components/schemas/CardItemResponse'
  * /catalog/financing_entities:
  *   get:
  *     summary: The list of financing entities
@@ -91,9 +94,53 @@ const router = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/CatalogItem'
+ * /catalog/wallets:
+ *   get:
+ *     summary: The list of wallets
+ *     description: Returns a list of available wallets
+ *     tags: [Catalogs]
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the wallets.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CatalogItem' 
+ * /catalog/expenseTypes:
+ *   get:
+ *     summary: The list of expenses types
+ *     description: Returns a list of available expenses types
+ *     tags: [Catalogs]
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the expenses types.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CatalogItem' 
+ * /catalog/vendors:
+ *   get:
+ *     summary: The list of vendors
+ *     description: Returns a list of available vendors
+ *     tags: [Catalogs]
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the vendors.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CatalogItem' 
  */ 
 router.route('/cards').get(getCardList);
 router.route('/financing_entities').get(getFinancingEnityList);
-
+router.route('/wallets').get(getWalletList);
+router.route('/expenseTypes').get(getExpensesTypesList);
+router.route('/vendors').get(getVendorList);
 
 export default router;

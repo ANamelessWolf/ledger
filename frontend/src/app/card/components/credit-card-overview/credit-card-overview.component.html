@@ -1,4 +1,4 @@
-<div class="card-overview">
+<div class="card-overview" *ngIf="summary">
   <h1>Overview</h1>
   <div class="card-balance">
     <h2>Available Balance</h2>
@@ -7,15 +7,29 @@
   <div class="card-details">
     <mat-grid-list cols="2" rowHeight="28px">
       <mat-grid-tile class="column"> Credit Limit </mat-grid-tile>
-      <mat-grid-tile class="column"> Expense </mat-grid-tile>
+      <mat-grid-tile class="column"> Used Credit </mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.credit }}</mat-grid-tile>
-      <mat-grid-tile class="value">{{ summary.usedCredit }}</mat-grid-tile>
+      <mat-grid-tile class="value"><p class="highlight">{{ summary.usedCredit }}</p></mat-grid-tile>
+      <mat-grid-tile class="column"> Cut date </mat-grid-tile>
+      <mat-grid-tile class="column"> Due date </mat-grid-tile>
+      <mat-grid-tile class="value">{{ summary.status.cutDate }}</mat-grid-tile>
+      <mat-grid-tile class="value">{{ summary.status.dueDate }}</mat-grid-tile>
     </mat-grid-list>
   </div>
+
+  <div class="card-percentage">
+    <app-credit-card-chart [summary]="summary" [size]="chartSize" />
+  </div>
+
   <app-card-miniature
     color="{{ summary.color }}"
     banking="{{ summary.banking }}"
     expiration="{{ summary.expiration }}"
     ending="{{ summary.ending }}"
+    [cardType]="summary.type"
   />
+
+  <div class="card-notes">
+    <p *ngIf="summary.status.status === 'Pending' ">Dias para pagar {{ daysToPay }}</p>
+  </div>
 </div>

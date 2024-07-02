@@ -6,3 +6,4 @@ export * from './digitalWallet';
 export * from './investment';
 export * from './saving';
 export * from './wallet';
+export * from './creditcardSpendingHistory';

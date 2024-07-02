@@ -1,7 +1,8 @@
 .card-overview {
   position: relative;
   padding-left: 20px;
-  height: 240px;
+  height: 320px;
+  min-width: 1200px;
 
   h1 {
     font-size: x-large;
@@ -10,8 +11,8 @@
 
   app-card-miniature {
     position: absolute;
-    left: 340px;
-    top: 0px;
+    right: 380px;
+    top: 40px;
   }
 }
 
@@ -62,7 +63,29 @@
     margin: 0px;
   }
 
-  .value{
+  .value {
     font-weight: lighter;
+    .highlight {
+      font-weight: bold;
+      font-size: x-large;
+      margin: 0px;
+    }
   }
+}
+
+.card-percentage {
+  position: absolute;
+  width: 337px;
+  left: 355px;
+  top: 0px;
+
+  canvas {
+    height: 250px;
+    width: 250px;
+  }
+}
+
+.card-notes {
+  position: absolute;
+  bottom: 10px;
 }

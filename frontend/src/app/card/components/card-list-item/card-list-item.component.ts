@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { CardItem, EMPTY_CARD_ITEM } from '@common/types/cardItem';
+import { MatChipsModule } from '@angular/material/chips';
+import {
+  CARD_STATUS,
+  CardItem,
+  EMPTY_CARD_ITEM,
+  PAYMENT_STATUS,
+} from '@common/types/cardItem';
 import { HEADERS } from '@config/messages';
 
 @Component({
   selector: 'app-card-list-item',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, MatIconModule, MatChipsModule],
   templateUrl: './card-list-item.component.html',
   styleUrl: './card-list-item.component.scss',
 })
@@ -25,15 +28,36 @@ export class CardListItemComponent {
     return HEADERS.D_CARD;
   }
 
+  get isActive() {
+    return this.data.active === CARD_STATUS.ACTIVE;
+  }
+
+  get isCancelled() {
+    return this.data.active === CARD_STATUS.CANCELLED;
+  }
+
   get cardStatus() {
-    if (this.data.active) {
+    if (this.data.active === CARD_STATUS.ACTIVE) {
       return HEADERS.ACT;
+    } else if (this.data.active === CARD_STATUS.CANCELLED) {
+      return HEADERS.CANCELED;
     }
     return HEADERS.N_ACT;
   }
 
   get cardEnding() {
-    return `**** ${this.data.ending}`
+    return `**** ${this.data.ending}`;
   }
 
+  get statusStyle() {
+    if (PAYMENT_STATUS.OVERDUE === this.data.status) {
+      return 'status-error';
+    } else if (PAYMENT_STATUS.PENDING === this.data.status) {
+      return 'status-warning';
+    } else if (PAYMENT_STATUS.PAID === this.data.status) {
+      return 'status-ok';
+    } else {
+      return 'status-other';
+    }
+  }
 }

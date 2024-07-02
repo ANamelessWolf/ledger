@@ -1,3 +1,5 @@
+import { CardType } from './cardItem';
+
 export type DebitCardSummary = {
   id: number;
   walletId: number;
@@ -5,14 +7,14 @@ export type DebitCardSummary = {
   card: string;
   banking: string;
   investmentRate: string;
-  yearlyGain:string;
+  yearlyGain: string;
   total: string;
   expiration: string;
-  cardType: number;
+  type: CardType;
   ending: string;
   color: string;
+  cutDay: number;
 };
-
 
 export const EMPTY_DEBIT_CARD_SUMMARY: DebitCardSummary = {
   id: 0,
@@ -24,7 +26,8 @@ export const EMPTY_DEBIT_CARD_SUMMARY: DebitCardSummary = {
   yearlyGain: '',
   total: '',
   expiration: '',
-  cardType: 0,
+  type: CardType.OTHER,
   ending: '',
   color: '',
+  cutDay: 0,
 };

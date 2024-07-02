@@ -22,9 +22,11 @@ export class Debitcard {
   @Column({ type: "int", name: "card_type" })
   cardType: number;
 
-
   @Column({ type: "varchar", length: 12 })
   color: string;
+
+  @Column({ type: "int", name: "active" })
+  active: number;
 
   get saving(): Promise<Saving[]> {
     const options = {

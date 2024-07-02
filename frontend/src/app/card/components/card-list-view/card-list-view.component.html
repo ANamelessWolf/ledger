@@ -2,8 +2,12 @@
   <div class="position">
     <p>Cards</p>
     <div class="btn-group">
-      <button mat-icon-button aria-label="Open filter window">
-        <mat-icon>filter_list</mat-icon>
+      <button
+      mat-icon-button
+      aria-label="Open filter window"
+      (click)="openFilter()">
+        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
+        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
       </button>
       <button mat-icon-button aria-label="Add new window">
         <mat-icon>add</mat-icon>

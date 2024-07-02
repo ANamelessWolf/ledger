@@ -12,6 +12,9 @@ hr {
   padding: 0px 16px;
 }
 
+//Colors
+$color-black-fill: #091228;
+
 :root {
   --code-color: darkred;
   --code-bg-color: #aaaaaa;
@@ -59,3 +62,22 @@ pre {
   border: 3px solid var(--scroll-bar-bg-color);
 }
 
+.other-btn {
+  background-color: #d0cccc;
+  color: black !important;
+}
+
+.danger-btn {
+  color: black !important;
+  background-color: #ff2222c4;
+}
+
+.secondary-btn {
+  background-color: whitesmoke;
+  color: black !important;
+}
+
+.primary-btn {
+  background-color: $color-black-fill !important;
+  color: white !important;
+}

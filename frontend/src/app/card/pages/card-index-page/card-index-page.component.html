@@ -2,10 +2,16 @@
   <div class="card-list-area">
     <app-card-list-view
       [selectedCard]="selectedCard"
-      (cardSelected)="onCardSelected($event)">
+      (cardSelected)="onCardSelected($event)"
+      [cardId]="cardId"
+    >
     </app-card-list-view>
   </div>
   <div class="card-main-area">
-    <app-card-summary [card]="selectedCard" [summary]="cardSummary"></app-card-summary>
+    <app-card-summary
+      [card]="selectedCard"
+      [summary]="cardSummary"
+      [creditCardSpending]="creditCardSpending"
+    ></app-card-summary>
   </div>
 </div>

@@ -1,6 +1,12 @@
+import { CardType } from './cardItem';
+
 export type PaymentStatus = {
   cutDate: string;
   dueDate: string;
+  payment: {
+    startDate: string;
+    dueDate: string;
+  };
   billing: {
     period: string;
     start: string;
@@ -18,10 +24,10 @@ export type CreditCardSummary = {
   banking: string;
   credit: string;
   usedCredit: string;
-  available:string;
+  available: string;
   status: PaymentStatus;
   expiration: string;
-  cardType: number;
+  type: CardType;
   ending: string;
   color: string;
 };
@@ -29,6 +35,10 @@ export type CreditCardSummary = {
 export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
   cutDate: '',
   dueDate: '',
+  payment: {
+    startDate: '',
+    dueDate: '',
+  },
   billing: {
     period: '',
     start: '',
@@ -49,7 +59,40 @@ export const EMPTY_CREDIT_CARD_SUMMARY: CreditCardSummary = {
   available: '',
   status: EMPTY_PAYMENT_STATUS,
   expiration: '',
-  cardType: 0,
+  type: CardType.OTHER,
   ending: '',
   color: '',
+};
+
+export type CardSpending = {
+  label: string;
+  spending: number;
+  period: string;
+  cutDate: Date;
+};
+
+export type CreditCardSpending = {
+  id: number;
+  entityId: number;
+  name: string;
+  banking: string;
+  ending: string;
+  active: number;
+  average: string;
+  max: string;
+  min: string;
+  spending: CardSpending[];
+};
+
+export const EMPTY_CREDIT_CARD_SPENDING: CreditCardSpending = {
+  id: 0,
+  entityId: 0,
+  name: '',
+  banking: '',
+  ending: '',
+  active: 0,
+  average: '',
+  max: '',
+  min: '',
+  spending: [],
 };

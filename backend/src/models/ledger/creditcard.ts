@@ -39,6 +39,9 @@ export class Creditcard {
   @Column({ type: "varchar", length: 12 })
   color: string;
 
+  @Column({ type: "int", name: "active" })
+  active: number;
+
   get financingEntity(): Promise<FinancingEntity[]> {
     const options = {
       where: [{ id: this.entityId }],

@@ -40,6 +40,13 @@
     font-weight: normal;
     left: 24px;
   }
+
+  fa-icon {
+    position: absolute;
+    top: 80px;
+    font-size: 60px;
+    right: 6px;
+  }
 }
 
 .blue {
@@ -48,9 +55,15 @@
   border: #bcd8c1 4px solid;
 }
 
+.darkblue {
+  background-color: #2a4a9f;
+  color: #bcd8c1;
+  border: #bcd8c1 4px solid;
+}
+
 .lightblue {
-  background-color: #b8e1ff;
-  color: black;
+  background-color: #00b9c8;
+  color: white;
   border: black 4px solid;
 }
 
@@ -79,13 +92,19 @@
 }
 
 .gold {
-  background-color: #eedc38;
+  background-color: #a77e2f;
   color: black;
-  border: #eedc38 4px solid;
+  border: #a77e2f 4px solid;
 }
 
 .black {
   background-color: #171219;
+  color: #dbdbdb;
+  border: #dbdbdb 4px solid;
+}
+
+.purple {
+  background-color: rgb(164, 112, 201);
   color: #dbdbdb;
   border: #dbdbdb 4px solid;
 }

@@ -1,0 +1,199 @@
+<div class="header">
+  {{ dialogData.header }}
+</div>
+<hr />
+<form class="dialog-form" [formGroup]="editForm" (ngSubmit)="onSubmit()">
+  <div class="container-miniature">
+    <app-card-miniature
+      color="{{ color?.value + '' }}"
+      banking="{{ card.banking }}"
+      expiration="{{ expiration }}"
+      ending="{{ ending?.value + '' }}"
+      [cardType]="card.type"
+    />
+  </div>
+
+  <h2>Financing information</h2>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Financing Entity</mat-label>
+      <input
+        matInput
+        type="text"
+        placeholder="banking"
+        value="{{ card.banking }}"
+        disabled
+      />
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Cut day</mat-label>
+      <mat-select formControlName="cutDay" required>
+        <mat-option *ngFor="let day of options.days" [value]="day">
+          {{ day }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="cutDay?.invalid && (cutDay?.dirty || cutDay?.touched)">
+        <span *ngIf="cutDay?.errors?.['required']">Cut day is required.</span>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Due day</mat-label>
+      <mat-select formControlName="dueDay" required>
+        <mat-option *ngFor="let day of options.days" [value]="day">
+          {{ day }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="dueDay?.invalid && (dueDay?.dirty || dueDay?.touched)">
+        <span *ngIf="dueDay?.errors?.['required']">Due day is required.</span>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Ending</mat-label>
+      <input
+        matInput
+        formControlName="ending"
+        maxlength="5"
+        type="number"
+        placeholder="Enter used credit"
+        required
+      />
+      <mat-error *ngIf="ending?.invalid && (ending?.dirty || ending?.touched)">
+        <span *ngIf="ending?.errors?.['required']"
+          >Card ending is obligatory</span
+        >
+        <span *ngIf="ending?.errors?.['pattern']">Invalid number format.</span>
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <h2>Balance</h2>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Credit Limit</mat-label>
+      <input
+        matInput
+        formControlName="credit"
+        type="number"
+        placeholder="Enter credit limit"
+        required
+      />
+      <mat-error *ngIf="credit?.invalid && (credit?.dirty || credit?.touched)">
+        <span *ngIf="credit?.errors?.['required']"
+          >Credit limit is required.</span
+        >
+        <span *ngIf="credit?.errors?.['pattern']">Invalid number format.</span>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Used credit</mat-label>
+      <input
+        matInput
+        formControlName="usedCredit"
+        type="number"
+        placeholder="Enter used credit"
+        required
+      />
+      <mat-error
+        *ngIf="
+          usedCredit?.invalid && (usedCredit?.dirty || usedCredit?.touched)
+        "
+      >
+        <span *ngIf="usedCredit?.errors?.['required']"
+          >Used credit is required.</span
+        >
+        <span *ngIf="usedCredit?.errors?.['pattern']"
+          >Invalid number format.</span
+        >
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <h2>Expiration</h2>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Month</mat-label>
+      <mat-select formControlName="expMonth" required>
+        <mat-option *ngFor="let month of options.months" [value]="month">
+          {{ month }}
+        </mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="expMonth?.invalid && (expMonth?.dirty || expMonth?.touched)"
+      >
+        <span *ngIf="expMonth?.errors?.['required']"
+          >Month is required for expiration date</span
+        >
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Year</mat-label>
+      <mat-select formControlName="expYear" required>
+        <mat-option *ngFor="let year of options.years" [value]="year">
+          {{ year }}
+        </mat-option>
+      </mat-select>
+      <mat-error
+        *ngIf="expYear?.invalid && (expYear?.dirty || expYear?.touched)"
+      >
+        <span *ngIf="expYear?.errors?.['required']"
+          >Year is required for expiration date</span
+        >
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <h2>Status</h2>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Card color</mat-label>
+      <mat-select formControlName="color" required>
+        <div class="color-min">
+
+        </div><mat-option
+          *ngFor="let cardColor of options.colors"
+          [value]="cardColor"
+        >
+          {{ cardColor }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="color?.invalid && (color?.dirty || color?.touched)">
+        <span *ngIf="color?.errors?.['required']">Color is required.</span>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Card status</mat-label>
+      <mat-select formControlName="active" required>
+        <mat-option *ngFor="let status of options.status" [value]="status.value">
+          {{ status.description }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="active?.invalid && (active?.dirty || active?.touched)">
+        <span *ngIf="active?.errors?.['required']"
+          >Card status is required.</span
+        >
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-actions">
+    <div>
+      <button mat-raised-button type="submit" [disabled]="editForm.invalid">
+        Submit
+      </button>
+      <button
+        mat-raised-button
+        class="secondary-btn"
+        type="button"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

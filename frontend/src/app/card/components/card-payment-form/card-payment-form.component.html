@@ -1,0 +1,63 @@
+<div class="header">
+  {{ dialogData.header }}
+</div>
+<hr />
+<form class="dialog-form" [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Total to Pay</mat-label>
+      <input
+        matInput
+        formControlName="totalToPay"
+        type="number"
+        placeholder="Enter amount"
+        required
+      />
+      <mat-error
+        *ngIf="
+          totalToPay?.invalid && (totalToPay?.dirty || totalToPay?.touched)
+        "
+      >
+        <span *ngIf="totalToPay?.errors?.['required']"
+          >Total to Pay is required.</span
+        >
+        <span *ngIf="totalToPay?.errors?.['pattern']"
+          >Invalid number format.</span
+        >
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Pay Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="payDate"
+        placeholder="Choose a date"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="payDate?.invalid && (payDate?.dirty || payDate?.touched)"
+      >
+        <span *ngIf="payDate?.errors?.['required']">Pay Date is required.</span>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-actions">
+    <div>
+      <button mat-raised-button type="submit" [disabled]="paymentForm.invalid">
+        Submit
+      </button>
+      <button
+        mat-raised-button
+        class="secondary-btn"
+        type="button"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

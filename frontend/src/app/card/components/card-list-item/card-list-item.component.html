@@ -3,12 +3,15 @@
     <h3>{{ data.name }}</h3>
     <p>{{ cardType }}</p>
     <div>
-      <mat-icon [ngClass]="this.data.active ? 'active-icon' : 'inactive-icon'">
+      <mat-icon [ngClass]="isActive  ? 'active-icon' : (isCancelled?'cancelled-icon':'inactive-icon')">
         circle
       </mat-icon>
       {{ cardStatus }}
     </div>
   </div>
+  <div *ngIf="data.isCreditCard" class="chip {{ statusStyle }}">{{
+    data.status
+  }}</div>
   <div [ngClass]="isSelected ? 'card-info' : 'card-info-gray'">
     <h3 *ngIf="isSelected">{{ data.entity }}</h3>
     <div></div>

@@ -41,9 +41,12 @@
  *         color:
  *           type: string
  *           description: The color of the debit card
+ *         cutDay:
+ *           type: number
+ *           description: The debit card cutDay
  */
 import { Router } from "express";
-import { getDebitcardSummary, getDebitcardSummarybyId } from "../controllers/debitcardController";
+import { getDebitcardSummary, getDebitcardSummarybyId, updateDebitcard } from "../controllers/debitcardController";
 
 const router = Router();
 
@@ -66,6 +69,33 @@ const router = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/DebitCardSummary'
+ * /debitcard/{id}:
+ *   post:
+ *     summary: Update Debit card
+ *     description: Update a debit card by id
+ *     tags: [Debitcard]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The debit card ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *            $ref: '#/components/schemas/DebitCard'
+ *     responses:
+ *       200:
+ *         description: Successful operation. Returns the credit card summary.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/DebitCard' 
  * /debitcard/summary/{id}:
  *   get:
  *     summary: Debit card summary
@@ -89,6 +119,8 @@ const router = Router();
 
 router.route('/summary').get(getDebitcardSummary);
 router.route('/summary/:id').get(getDebitcardSummarybyId);
+
+router.route("/:id").post(updateDebitcard);
 
 export default router;
 

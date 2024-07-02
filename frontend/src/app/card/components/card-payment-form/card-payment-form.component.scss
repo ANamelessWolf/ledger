@@ -1,0 +1,32 @@
+form {
+  padding: 20px 10px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: end;
+
+  div {
+    width: 180px;
+    margin-top: 20px;
+    display: flex;
+    flex: 0 0 auto;
+    text-align: right;
+    justify-content: space-between;
+  }
+}
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  margin: 0px 40px;
+}
+
+hr {
+  width: auto;
+  margin-top: 0px;
+}
+
+.header {
+  padding: 16px;
+  font-size: x-large;
+}

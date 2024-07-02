@@ -23,7 +23,7 @@ import { NavMenuFooterComponent } from '../nav-menu-footer/nav-menu-footer.compo
 })
 export class NavMenuComponent {
   menu_links: MenuLinkType[] = [
-    { header: 'Home', route: '/', icon: 'home' },
-    { header: 'Cards', route: '/cards', icon: 'credit_card' },
+    { header: 'Home', route: '/', icon: 'home', exact: true },
+    { header: 'Cards', route: '/cards', icon: 'credit_card', exact: false },
   ];
 }

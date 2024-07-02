@@ -1,8 +1,29 @@
-<div *ngIf="card.id > 0; else noSelection">
+<div *ngIf="card.id > 0; else noSelection" class="scrollable-container">
   <div class="list-header">
     <div class="position">
       <p>Summary</p>
       <div class="btn-group">
+        <button
+          matTooltip="{{ tooltips.edit }}"
+          [matTooltipPosition]="tool_tip_position.value!"
+          matTooltipHideDelay="{{ tool_tip_delay }}"
+          mat-icon-button
+          aria-label="Edit card data"
+          (click)="editCard()"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          matTooltip="{{ tooltips.add_pay }}"
+          [matTooltipPosition]="tool_tip_position.value!"
+          matTooltipHideDelay="{{ tool_tip_delay }}"
+          mat-icon-button
+          aria-label="Add credit card payment"
+          (click)="addCardPayment()"
+          *ngIf="card.isCreditCard"
+        >
+          <mat-icon>payments</mat-icon>
+        </button>
         <button
           mat-icon-button
           aria-label="Change visibility"
@@ -27,6 +48,12 @@
   />
   <div class="divider-pad">
     <hr />
+  </div>
+  <div class="card-spending-area">
+    <app-credit-card-spending-chart
+      *ngIf="card.isCreditCard"
+      [cardSpending]="creditCardSpending"
+    />
   </div>
 </div>
 <ng-template #noSelection>

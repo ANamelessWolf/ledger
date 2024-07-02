@@ -16,4 +16,6 @@ export const ISO_FORMAT = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD
 export const US_FORMAT = /^\d{2}\/\d{2}\/\d{4}$/; // MM/DD/YYYY
 export const EU_FORMAT = /^\d{2}-\d{2}-\d{4}$/; // DD-MM-YYYY
 
-export const DATE_FORMAT = ISO_FORMAT; 
+export const DATE_FORMAT = ISO_FORMAT;
+
+export const PAGINATION_SIZE = 10;

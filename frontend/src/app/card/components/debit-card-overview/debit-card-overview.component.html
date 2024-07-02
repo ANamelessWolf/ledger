@@ -1,4 +1,4 @@
-<div class="card-overview">
+<div class="card-overview" *ngIf="summary">
   <h1>Overview</h1>
   <div class="card-balance">
     <h2>Savings</h2>
@@ -17,5 +17,6 @@
     banking="{{ summary.banking }}"
     expiration="{{ summary.expiration }}"
     ending="{{ summary.ending }}"
+    [cardType]="summary.type"
   />
 </div>
