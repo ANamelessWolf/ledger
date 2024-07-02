@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
-import { CardItem } from "../models/catalogs";
+import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
 import {
   getCardListFilter,
   getCreditCardStatus,
@@ -10,13 +10,21 @@ import {
 } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { CatalogItem } from "../types/response/catalogItemResponse";
-import { Creditcard } from "../models/ledger";
+import { Creditcard, Wallet } from "../models/ledger";
 import { PAYMENT_STATUS } from "../common/enums";
 import { CardItemResponse } from "../types/response/cardItemResponse";
 
 const NAME_FILTER: any = {
   order: {
     name: {
+      name: "ASC",
+    },
+  },
+};
+
+const DESC_FILTER: any = {
+  order: {
+    description: {
       name: "ASC",
     },
   },
@@ -120,7 +128,127 @@ export const getFinancingEnityList = asyncErrorHandler(
     } catch (error) {
       return next(
         new Exception(
-          `An error occurred getting the credit card summary`,
+          `An error occurred getting the financing entity list`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves a list of wallets
+ * @summary Retrieves all wallets.
+ * @operationId getWalletList
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getWalletList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const sort = NAME_FILTER;
+      const wallets: Wallet[] = await AppDataSource.manager.find(Wallet, sort);
+      let result: CatalogItem[] = [];
+      if (wallets)
+        result = wallets.map((wa: Wallet) => {
+          const catItem: CatalogItem = { id: wa.id, name: wa.name };
+          return catItem;
+        });
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the wallet list`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves a list of expense types
+ * @summary Retrieves all expenses types.
+ * @operationId getExpensesTypesList
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getExpensesTypesList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const sort = DESC_FILTER;
+      const eTypes: ExpenseType[] = await AppDataSource.manager.find(
+        ExpenseType,
+        sort
+      );
+      let result: CatalogItem[] = [];
+      if (eTypes)
+        result = eTypes.map((ex: ExpenseType) => {
+          const catItem: CatalogItem = { id: ex.id, name: ex.description };
+          return catItem;
+        });
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the expense type list`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves a list of vendors types
+ * @summary Retrieves all expenses types.
+ * @operationId getVendorList
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getVendorList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const sort = DESC_FILTER;
+      const vendors: Vendor[] = await AppDataSource.manager.find(
+        Vendor,
+        sort
+      );
+      let result: CatalogItem[] = [];
+      if (vendors)
+        result = vendors.map((v: Vendor) => {
+          const catItem: CatalogItem = { id: v.id, name: v.description };
+          return catItem;
+        });
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error occurred getting the vendor list`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 
-@Entity('CAT_Expense_Type', { database: process.env.DB_NAME })
+@Entity('cat_expense_type', { database: process.env.DB_NAME })
 export class ExpenseType {
   @PrimaryGeneratedColumn("increment")
   id: number;
