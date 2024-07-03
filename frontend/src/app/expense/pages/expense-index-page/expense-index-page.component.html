@@ -1,0 +1,32 @@
+<div class="expense-index-page">
+  <div class="header-section">
+    <h1>Expenses</h1>
+    <div class="button-group">
+      <button mat-icon-button>
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  <hr />
+
+  <!-- Second Section: Widget Area -->
+  <div class="widget-area">
+    <!-- Widget content goes here -->
+  </div>
+  <hr />
+
+  <!-- Third Section: Table Area -->
+  <div class="table-area">
+    <app-expense-table
+      [expenses]="expenses"
+      [totalItems]="totalItems"
+      (pageChange)="loadExpenses($event)"
+    ></app-expense-table>
+  </div>
+</div>

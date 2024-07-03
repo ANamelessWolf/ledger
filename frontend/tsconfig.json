@@ -27,6 +27,7 @@
     "paths": {
       "@home/*": ["app/home/*"],
       "@card/*": ["app/card/*"],
+      "@expense/*": ["app/expense/*"],
       "@common/*": ["app/common/*"],
       "@config/*": ["app/config/*"],
     }

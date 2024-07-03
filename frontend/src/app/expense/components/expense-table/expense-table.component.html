@@ -1,0 +1,52 @@
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="expenses" class="mat-elevation-z8">
+
+    <!-- ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+    </ng-container>
+
+    <!-- Wallet Column -->
+    <ng-container matColumnDef="wallet">
+      <th mat-header-cell *matHeaderCellDef>Wallet</th>
+      <td mat-cell *matCellDef="let row">{{ row.wallet }}</td>
+    </ng-container>
+
+    <!-- Expense Column -->
+    <ng-container matColumnDef="expense">
+      <th mat-header-cell *matHeaderCellDef>Expense</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="expense-item">
+          <div>{{ row.description }}</div>
+          <div>Expense Type: {{ row.expenseType }}
+            <app-ledger-icon [iconName]="row.expenseIcon" iconSize="2x" />
+            </div>
+          <div>Vendor: {{ row.vendor }} <mat-icon>{{ row.vendorIcon }}</mat-icon></div>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Total Column -->
+    <ng-container matColumnDef="total">
+      <th mat-header-cell *matHeaderCellDef>Total</th>
+      <td mat-cell *matCellDef="let row">{{ row.total }}</td>
+    </ng-container>
+
+    <!-- Buy Date Column -->
+    <ng-container matColumnDef="buyDate">
+      <th mat-header-cell *matHeaderCellDef>Buy Date</th>
+      <td mat-cell *matCellDef="let row">{{ row.buyDate | date }}</td>
+    </ng-container>
+
+    <!-- Paginator -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="pageChanged($event)"
+  ></mat-paginator>
+</div>
