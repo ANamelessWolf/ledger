@@ -48,6 +48,8 @@ export const getExpenses = asyncErrorHandler(
       options.skip = skip;
       options.take = take;
 
+      const count = await AppDataSource.manager.count(Expense, { where });
+
       const expenses: Expense[] = await AppDataSource.manager.find(
         Expense,
         options
@@ -63,9 +65,9 @@ export const getExpenses = asyncErrorHandler(
           ...ex,
           wallet: wallet.name,
           expenseType: exType.description,
-          expenseIcon: "",
+          expenseIcon: exType.icon,
           vendor: vendor.description,
-          vendorIcon: "",
+          vendorIcon: vendor.icon,
           total: formatMoney(ex.total, `${currency.symbol} $`),
           value: ex.total * currency.conversion,
           buyDate: formatDate(new Date(ex.buyDate.toString())),
@@ -73,10 +75,16 @@ export const getExpenses = asyncErrorHandler(
         result.push(item);
       }
 
+      const pagination = {
+        page: req.query.page,
+        pageSize: take,
+        total: count,
+      };
+
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
-          data: result,
+          data: { result, pagination },
         })
       );
     } catch (error) {

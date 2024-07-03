@@ -8,4 +8,7 @@ export class Vendor {
   @Column({ type: 'varchar', length: 45 })
   description: string;
 
+  @Column({ type: 'varchar', length: 30 })
+  icon: string;
+
 }
