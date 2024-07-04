@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Sort } from '@angular/material/sort';
 import { NotificationService } from '@common/services/notification.service';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
@@ -48,6 +49,26 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   loadExpenses(e: PaginationEvent) {
     this.options.pagination = { page: e.pageIndex, pageSize: e.pageSize };
+    this.getExpenses();
+  }
+
+  getField(field: string) {
+    switch (field) {
+      case 'wallet':
+        return 'walletId';
+      case 'expense':
+        return 'description';
+      default:
+        return field;
+    }
+  }
+
+  sortExpenses(event: Sort) {
+    console.log(event);
+    this.options.sorting = {
+      orderBy: this.getField(event.active),
+      orderDirection: event.direction === 'asc' ? 'ASC' : 'DESC',
+    };
     this.getExpenses();
   }
 

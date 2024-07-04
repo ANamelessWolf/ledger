@@ -17,7 +17,7 @@ export const EMPTY_PAGINATION: Pagination = {
 
 export type SortType = {
   orderBy: string;
-  orderDirection: 'ASC' | 'DSC';
+  orderDirection: 'ASC' | 'DESC';
 };
 
 export enum IconType {

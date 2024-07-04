@@ -1,9 +1,8 @@
 <div class="mat-elevation-z8">
-  <table mat-table [dataSource]="expenses" class="mat-elevation-z8">
-
+  <table mat-table [dataSource]="expenses" matSort (matSortChange)="sortChanged($event)" class="mat-elevation-z8">
     <!-- ID Column -->
     <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
       <td mat-cell *matCellDef="let row">{{ row.id }}</td>
     </ng-container>
 
@@ -15,28 +14,46 @@
 
     <!-- Expense Column -->
     <ng-container matColumnDef="expense">
-      <th mat-header-cell *matHeaderCellDef>Expense</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Expense</th>
       <td mat-cell *matCellDef="let row">
         <div class="expense-item">
-          <div>{{ row.description }}</div>
-          <div>Expense Type: {{ row.expenseType }}
-            <app-ledger-icon [iconName]="row.expenseIcon" iconSize="2x" />
-            </div>
-          <div>Vendor: {{ row.vendor }} <mat-icon>{{ row.vendorIcon }}</mat-icon></div>
+          <div class="expense-icon">
+            <app-ledger-icon [iconName]="row.expenseIcon" iconSize="2x"></app-ledger-icon>
+            <p>{{ row.expenseType }}</p>
+          </div>
+          <div class="expense-desc">
+            <p>{{ row.description }}</p>
+            <h2>{{ row.vendor }}</h2>
+          </div>
         </div>
       </td>
     </ng-container>
 
     <!-- Total Column -->
     <ng-container matColumnDef="total">
-      <th mat-header-cell *matHeaderCellDef>Total</th>
-      <td mat-cell *matCellDef="let row">{{ row.total }}</td>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+      <td mat-cell *matCellDef="let row">
+        <span [ngClass]="row.value > 0 ? 'expense' : 'income'">{{ row.total }}</span>
+      </td>
     </ng-container>
 
     <!-- Buy Date Column -->
     <ng-container matColumnDef="buyDate">
-      <th mat-header-cell *matHeaderCellDef>Buy Date</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Buy Date</th>
       <td mat-cell *matCellDef="let row">{{ row.buyDate | date }}</td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button>
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
     </ng-container>
 
     <!-- Paginator -->

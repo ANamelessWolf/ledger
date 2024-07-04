@@ -1,0 +1,41 @@
+.expense-item {
+  display: flex;
+  min-height: 100px;
+}
+
+.expense-desc {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 16px 0px;
+
+  p {
+    padding: 0px;
+    margin-bottom: 0px;
+    font-size: large;
+  }
+}
+
+.expense-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 16px 0px 0px;
+  min-width: 100px;
+
+  p {
+    margin-top: 5px;
+    width: 100px;
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.expense {
+  color: #ff3c3c;
+}
+
+.income {
+  color: greenyellow;
+}
