@@ -4,12 +4,17 @@ import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
+import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
+import { CatalogItem } from '@common/types/catalogTypes';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
 import { ExpensesService } from '@expense/services/expenses.service';
 import {
+  AddExpense,
+  EMPTY_EXPENSES,
   EMPTY_EXPENSE_FILTER,
+  ExpenseOptions,
   ExpenseSearchOptions,
 } from '@expense/types/expensesTypes';
 
@@ -24,7 +29,7 @@ import {
   ],
   templateUrl: './expense-index-page.component.html',
   styleUrl: './expense-index-page.component.scss',
-  providers: [ExpensesService, NotificationService],
+  providers: [ExpensesService, CatalogService, NotificationService],
 })
 export class ExpenseIndexPageComponent implements OnInit {
   options: ExpenseSearchOptions = {
@@ -32,6 +37,7 @@ export class ExpenseIndexPageComponent implements OnInit {
     sorting: undefined,
     filter: EMPTY_EXPENSE_FILTER,
   };
+  catalog: ExpenseOptions = EMPTY_EXPENSES;
   isLoading = true;
   error = false;
 
@@ -40,11 +46,13 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   constructor(
     private expenseService: ExpensesService,
+    private catalogService: CatalogService,
     private notifService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.getExpenses();
+    this.getCatalog();
   }
 
   loadExpenses(e: PaginationEvent) {
@@ -72,6 +80,30 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.getExpenses();
   }
 
+  addExpense() {
+    console.log(this.catalog);
+    this.expenseService.showCreateExpenseDialog("Add new expense",this.catalog, this.expenseAdded.bind(this)).subscribe();
+  }
+
+  expenseAdded(newExpense: AddExpense) {
+
+    this.expenseService.createExpense(newExpense).subscribe(
+      (response) => {
+        this.notifService.showNotification("Expense added succesfully", 'success');
+        this.getExpenses();
+      },
+      (err: HttpErrorResponse) => {
+        this.error = true;
+        this.notifService.showError(err);
+      },
+      //Complete
+      () => {
+        this.isLoading = false;
+      }
+    );
+    console.log(newExpense);
+  };
+
   private getExpenses() {
     this.expenseService.getExpenses(this.options).subscribe(
       (response) => {
@@ -82,6 +114,60 @@ export class ExpenseIndexPageComponent implements OnInit {
         });
         this.totalItems = response.data.pagination.total;
         console.log(this.expenses);
+      },
+      (err: HttpErrorResponse) => {
+        this.error = true;
+        this.notifService.showError(err);
+      },
+      //Complete
+      () => {
+        this.isLoading = false;
+      }
+    );
+  }
+
+  private getCatalog() {
+    this.getWalletCatalog();
+    this.getExpenseTypeCatalog();
+    this.getVendorCatalog();
+  }
+
+  private getWalletCatalog() {
+    this.catalogService.getWallets().subscribe(
+      (response) => {
+        this.catalog.wallets = response.data;
+      },
+      (err: HttpErrorResponse) => {
+        this.error = true;
+        this.notifService.showError(err);
+      },
+      //Complete
+      () => {
+        this.isLoading = false;
+      }
+    );
+  }
+
+  private getExpenseTypeCatalog() {
+    this.catalogService.getExpensesTypes().subscribe(
+      (response) => {
+        this.catalog.expenseTypes = response.data;
+      },
+      (err: HttpErrorResponse) => {
+        this.error = true;
+        this.notifService.showError(err);
+      },
+      //Complete
+      () => {
+        this.isLoading = false;
+      }
+    );
+  }
+
+  private getVendorCatalog() {
+    this.catalogService.getVendors().subscribe(
+      (response) => {
+        this.catalog.vendors = response.data;
       },
       (err: HttpErrorResponse) => {
         this.error = true;

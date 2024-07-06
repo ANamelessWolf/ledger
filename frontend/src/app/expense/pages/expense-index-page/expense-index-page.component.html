@@ -3,12 +3,10 @@
     <h1>Expenses</h1>
     <div class="button-group">
       <button mat-icon-button>
-        <mat-icon>edit</mat-icon>
-      </button>
-      <button mat-icon-button>
         <mat-icon>delete</mat-icon>
       </button>
-      <button mat-icon-button>
+      <button mat-icon-button
+      (click)="addExpense()">
         <mat-icon>add</mat-icon>
       </button>
     </div>

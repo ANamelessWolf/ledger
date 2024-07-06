@@ -1,4 +1,5 @@
-import { Pagination, SortType } from "@config/commonTypes";
+import { CatalogItem } from '@common/types/catalogTypes';
+import { Pagination, SortType } from '@config/commonTypes';
 
 export type DateRange = {
   start: Date;
@@ -32,4 +33,34 @@ export type ExpenseSearchOptions = {
   pagination: Pagination;
   sorting?: SortType;
   filter: ExpenseFilter;
+};
+
+export type AddExpense = {
+  walletId: number;
+  expenseTypeId: number;
+  vendorId: number;
+  total: number;
+  expenseDate: string;
+  description: string;
+};
+
+export const EMPTY_NEW_EXPENSE = {
+  walletId: 0,
+  expenseTypeId: 0,
+  vendorId: 0,
+  total: 0,
+  expenseDate: new Date(),
+  description: '',
+};
+
+export type ExpenseOptions = {
+  wallets: CatalogItem[];
+  expenseTypes: CatalogItem[];
+  vendors: CatalogItem[];
+};
+
+export const EMPTY_EXPENSES: ExpenseOptions = {
+  wallets: [],
+  expenseTypes: [],
+  vendors: [],
 };

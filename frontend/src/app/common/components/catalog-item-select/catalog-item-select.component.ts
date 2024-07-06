@@ -31,6 +31,8 @@ export class CatalogItemSelectComponent implements OnInit {
   @Input() header: string = '';
   @Input() items: CatalogItem[] = [];
   @Input() control: FormControl = new FormControl();
+  @Input() isRequired: boolean = false;
+  @Input() errMessage: string = 'Field is required.';
   filteredItems!: Observable<CatalogItem[]>;
 
   ngOnInit(): void {
@@ -55,4 +57,10 @@ export class CatalogItemSelectComponent implements OnInit {
   display(item: CatalogItem): string {
     return item && item.name ? item.name : '';
   }
+
+  get isInvalid(){
+    const value = this.control;
+    return value?.invalid && (value?.dirty || value?.touched)
+  }
+
 }
