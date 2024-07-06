@@ -40,7 +40,7 @@ export type AddExpense = {
   expenseTypeId: number;
   vendorId: number;
   total: number;
-  expenseDate: string;
+  buyDate: string;
   description: string;
 };
 
@@ -49,7 +49,7 @@ export const EMPTY_NEW_EXPENSE = {
   expenseTypeId: 0,
   vendorId: 0,
   total: 0,
-  expenseDate: new Date(),
+  buyDate: '',
   description: '',
 };
 

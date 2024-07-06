@@ -29,9 +29,6 @@
  *         vendor:
  *           type: string
  *           example: "NA"
- *         vendorIcon:
- *           type: string
- *           example: ""
  *         description:
  *           type: string
  *           example: "Préstamo por transferencia"
@@ -44,9 +41,33 @@
  *         buyDate:
  *           type: string
  *           example: "May 17, 2023"
+ *     Expense:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         walletId:
+ *           type: integer
+ *           example: 12
+ *         expenseTypeId:
+ *           type: integer
+ *           example: 45
+ *         vendorId:
+ *           type: integer
+ *           example: 34
+ *         description:
+ *           type: string
+ *           example: "Préstamo por transferencia"
+ *         total:
+ *           type: string
+ *           example: "MXN $10,000.00"
+ *         buyDate:
+ *           type: string
+ *           example: "May 17, 2023"
  */
 import { Router } from "express";
-import { getExpenses } from "../controllers/expenseController";
+import { createExpense, getExpenses } from "../controllers/expenseController";
 
 const router = Router();
 /**
@@ -160,7 +181,26 @@ const router = Router();
  *                  type: array
  *                  items:
  *                    $ref: '#/components/schemas/ExpenseItemResponse'
- */ 
-router.route('/').get(getExpenses);
+ *  post:
+ *     summary: Add an expense
+ *     description: Adds an expense
+ *     tags: [Expenses]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Expense'
+ *     responses:
+ *       200:
+ *         description: Successfully added payment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Expense'
+ */
+router.route('/').
+get(getExpenses).
+post(createExpense);
 
 export default router;

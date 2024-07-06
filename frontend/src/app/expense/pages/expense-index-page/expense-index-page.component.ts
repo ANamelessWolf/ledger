@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
+import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
 import { CatalogItem } from '@common/types/catalogTypes';
@@ -26,6 +27,7 @@ import {
     MatButtonModule,
     MatIconModule,
     ExpenseTableComponent,
+    SearchBarComponent,
   ],
   templateUrl: './expense-index-page.component.html',
   styleUrl: './expense-index-page.component.scss',
@@ -72,7 +74,6 @@ export class ExpenseIndexPageComponent implements OnInit {
   }
 
   sortExpenses(event: Sort) {
-    console.log(event);
     this.options.sorting = {
       orderBy: this.getField(event.active),
       orderDirection: event.direction === 'asc' ? 'ASC' : 'DESC',
@@ -81,15 +82,22 @@ export class ExpenseIndexPageComponent implements OnInit {
   }
 
   addExpense() {
-    console.log(this.catalog);
-    this.expenseService.showCreateExpenseDialog("Add new expense",this.catalog, this.expenseAdded.bind(this)).subscribe();
+    this.expenseService
+      .showCreateExpenseDialog(
+        'Add new expense',
+        this.catalog,
+        this.expenseAdded.bind(this)
+      )
+      .subscribe();
   }
 
   expenseAdded(newExpense: AddExpense) {
-
     this.expenseService.createExpense(newExpense).subscribe(
       (response) => {
-        this.notifService.showNotification("Expense added succesfully", 'success');
+        this.notifService.showNotification(
+          'Expense added succesfully',
+          'success'
+        );
         this.getExpenses();
       },
       (err: HttpErrorResponse) => {
@@ -101,8 +109,42 @@ export class ExpenseIndexPageComponent implements OnInit {
         this.isLoading = false;
       }
     );
-    console.log(newExpense);
-  };
+  }
+
+  onSearch(searchTerm: string) {
+    this.options.filter.description = searchTerm;
+    this.getExpenses();
+  }
+
+  openFilter() {}
+
+  get hasFilter() {
+    const filter = this.options.filter;
+    if (
+      filter.expenseRange &&
+      filter.expenseRange.min >= 0 &&
+      filter.expenseRange.max > 0
+    ) {
+      return true;
+    }
+    if (filter.expenseTypes && filter.expenseTypes.length > 0) {
+      return true;
+    }
+    if (filter.vendors && filter.vendors.length > 0) {
+      return true;
+    }
+    if (filter.wallet && filter.wallet.length > 0) {
+      return true;
+    }
+    if (
+      filter.period &&
+      filter.period.end !== undefined &&
+      filter.period.start !== undefined
+    ) {
+      return true;
+    }
+    return false;
+  }
 
   private getExpenses() {
     this.expenseService.getExpenses(this.options).subscribe(
@@ -113,7 +155,6 @@ export class ExpenseIndexPageComponent implements OnInit {
           };
         });
         this.totalItems = response.data.pagination.total;
-        console.log(this.expenses);
       },
       (err: HttpErrorResponse) => {
         this.error = true;

@@ -7,7 +7,6 @@ export type ExpenseItemResponse = {
   expenseIcon: string;
   vendorId: number;
   vendor: string;
-  vendorIcon: string;
   description: string;
   total: string;
   value: number;

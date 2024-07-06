@@ -2,11 +2,16 @@
   <div class="header-section">
     <h1>Expenses</h1>
     <div class="button-group">
-      <button mat-icon-button>
-        <mat-icon>delete</mat-icon>
+      <app-search-bar (search)="onSearch($event)"></app-search-bar>
+      <button
+        mat-icon-button
+        aria-label="Open filter window"
+        (click)="openFilter()"
+      >
+        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
+        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
       </button>
-      <button mat-icon-button
-      (click)="addExpense()">
+      <button mat-icon-button (click)="addExpense()">
         <mat-icon>add</mat-icon>
       </button>
     </div>

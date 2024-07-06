@@ -22,7 +22,6 @@ import { formatDate } from "../utils/dateUtils";
 /**
  * Retrieves a list of expenses.
  * @summary Retrieves list of expenses filtered or not filtered.
- * @operationId getCardList
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  * @param {NextFunction} next - The Express next middleware function.
@@ -67,7 +66,6 @@ export const getExpenses = asyncErrorHandler(
           expenseType: exType.description,
           expenseIcon: exType.icon,
           vendor: vendor.description,
-          vendorIcon: vendor.icon,
           total: formatMoney(ex.total, `${currency.symbol} $`),
           value: ex.total * currency.conversion,
           buyDate: formatDate(new Date(ex.buyDate.toString())),
@@ -92,6 +90,56 @@ export const getExpenses = asyncErrorHandler(
       return next(
         new Exception(
           `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Submit a new expense to the expense table
+ * @summary Handles adding a new expense
+ * @route POST /expenses
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const createExpense = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {
+        total,
+        buyDate,
+        description,
+        walletId,
+        expenseTypeId,
+        vendorId,
+      } = req.body;
+      // Create a new instance of CreditcardPayment
+      const expense = new Expense();
+      expense.walletId = walletId;
+      expense.expenseTypeId = expenseTypeId;
+      expense.vendorId = vendorId;
+      expense.description = description;
+      expense.buyDate = buyDate;
+      expense.total = total;
+
+      // Save the insert record
+      const result = await AppDataSource.manager.save(expense);
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred adding a new Expense`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

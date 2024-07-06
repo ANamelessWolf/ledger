@@ -9,8 +9,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import {
+  MatNativeDateModule,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +28,7 @@ import {
 @Component({
   selector: 'app-expense-create-form',
   standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     MatFormFieldModule,
@@ -72,7 +76,7 @@ export class ExpenseCreateFormComponent implements OnInit {
       const expenseDate = new Date(this.expensesForm.value.expenseDate);
       const body: AddExpense = {
         total: +this.expensesForm.value.total,
-        expenseDate: toRequestFormat(expenseDate),
+        buyDate: toRequestFormat(expenseDate),
         description: this.expensesForm.value.description,
         walletId: this.walletControl.value.id,
         expenseTypeId: this.expenseTypeControl.value.id,
