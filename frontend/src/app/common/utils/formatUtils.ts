@@ -1,3 +1,4 @@
+import { CatalogItem } from '@common/types/catalogTypes';
 import { APP_SETTINGS } from '@config/constants';
 
 export const round = (numberValue: number) => {
@@ -30,4 +31,9 @@ export const toCurrency = (value: number): string => {
     style: 'currency',
     currency: APP_SETTINGS.CURRENCY,
   }).format(value);
+};
+
+export const toIds = (items: CatalogItem[] | undefined): number[] => {
+  const ids: number[] = items ? (items as CatalogItem[]).map((x) => x.id) : [];
+  return ids;
 };

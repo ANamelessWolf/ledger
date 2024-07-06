@@ -1,0 +1,32 @@
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  div {
+    width: 100%;
+  }
+
+  mat-slider {
+    width: 100%;
+    margin: 0px;
+  }
+
+  mat-checkbox {
+    width: 100%;
+  }
+
+  .range-label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: -10px;
+  }
+
+  .error {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+}

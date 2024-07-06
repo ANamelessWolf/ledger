@@ -4,9 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
+import { ExpenseFilterFormComponent } from '@expense/components/expense-filter-form/expense-filter-form.component';
 import {
   AddExpense,
   ExpenseFilter,
+  ExpenseFilterOptions,
   ExpenseOptions,
   ExpenseSearchOptions,
 } from '@expense/types/expensesTypes';
@@ -40,6 +42,22 @@ export class ExpensesService {
         header: header,
         options: options,
         expenseAdded: expenseAdded,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
+  showFilterExpenseDialog(
+    options: ExpenseFilterOptions,
+    filterSelected: (filter: ExpenseFilter) => void
+  ) {
+    const header: string = 'Expense Filters';
+    const dialogRef = this.dialog.open(ExpenseFilterFormComponent, {
+      width: '800px',
+      data: {
+        header: header,
+        options: options,
+        filterSelected: filterSelected,
       },
     });
     return dialogRef.afterClosed();

@@ -15,6 +15,8 @@ import {
   AddExpense,
   EMPTY_EXPENSES,
   EMPTY_EXPENSE_FILTER,
+  ExpenseFilter,
+  ExpenseFilterOptions,
   ExpenseOptions,
   ExpenseSearchOptions,
 } from '@expense/types/expensesTypes';
@@ -116,10 +118,30 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.getExpenses();
   }
 
-  openFilter() {}
+  openFilter() {
+    const options: ExpenseFilterOptions = {
+      wallets: this.catalog.wallets,
+      expenseTypes: this.catalog.expenseTypes,
+      vendors: this.catalog.vendors,
+      filter: this.options.filter,
+      visibility: {
+        enableWallet: true,
+        enableExpenseTypes: true,
+        enableVendors: true,
+      },
+    };
+    this.expenseService
+      .showFilterExpenseDialog(options, this.applyFilter.bind(this))
+      .subscribe();
+  }
+
+  applyFilter(filter: ExpenseFilter) {
+    this.options.filter = filter;
+    this.getExpenses();
+  }
 
   get hasFilter() {
-    const filter = this.options.filter;
+    const filter: ExpenseFilter = this.options.filter;
     if (
       filter.expenseRange &&
       filter.expenseRange.min >= 0 &&

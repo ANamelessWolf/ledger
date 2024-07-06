@@ -1,0 +1,35 @@
+<div class="slider-container">
+  <mat-checkbox [(ngModel)]="disabled">{{ header }}</mat-checkbox>
+  <div>
+    <mat-slider
+      [discrete]="true"
+      [displayWith]="displayWith"
+      *ngIf="disabled"
+      [step]="step"
+      [min]="matSliderStartThumb"
+      [max]="matSliderEndThumb"
+    >
+      <input
+        title="Min"
+        placeholder=""
+        matSliderStartThumb
+        (input)="onMinSliderChange($event)"
+        value="{{ sliderRange.min }}"
+      />
+      <input
+        title="Max"
+        placeholder=""
+        matSliderEndThumb
+        (input)="onMaxSliderChange($event)"
+        value="{{ sliderRange.max }}"
+      />
+    </mat-slider>
+    <div *ngIf="isRequired && control.invalid" class="error">
+      {{ errMessage }}
+    </div>
+  </div>
+  <div class="range-label" *ngIf="disabled">
+    <p>{{ matSliderStartThumb | currencyFormat }}</p>
+    <p>{{ matSliderEndThumb | currencyFormat }}</p>
+  </div>
+</div>

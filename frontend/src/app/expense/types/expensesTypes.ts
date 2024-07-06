@@ -1,14 +1,9 @@
 import { CatalogItem } from '@common/types/catalogTypes';
-import { Pagination, SortType } from '@config/commonTypes';
+import { Pagination, SliderRange, SortType } from '@config/commonTypes';
 
 export type DateRange = {
   start: Date;
   end: Date;
-};
-
-export type ExpenseRange = {
-  min: number;
-  max: number;
 };
 
 export type ExpenseFilter = {
@@ -16,7 +11,7 @@ export type ExpenseFilter = {
   expenseTypes?: number[];
   vendors?: number[];
   period?: DateRange;
-  expenseRange?: ExpenseRange;
+  expenseRange?: SliderRange;
   description?: string;
 };
 
@@ -27,6 +22,18 @@ export const EMPTY_EXPENSE_FILTER = {
   period: undefined,
   expenseRange: undefined,
   description: undefined,
+};
+
+export type ExpenseFilterOptions = {
+  wallets: CatalogItem[];
+  expenseTypes: CatalogItem[];
+  vendors: CatalogItem[];
+  visibility:{
+    enableWallet:boolean;
+    enableExpenseTypes:boolean;
+    enableVendors:boolean;
+  }
+  filter: ExpenseFilter;
 };
 
 export type ExpenseSearchOptions = {

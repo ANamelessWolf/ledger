@@ -24,3 +24,7 @@ export enum IconType {
   NORMAL = 1,
   BRAND = 2,
 }
+export type SliderRange = {
+  min: number;
+  max: number;
+};
