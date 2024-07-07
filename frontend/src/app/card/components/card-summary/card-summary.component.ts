@@ -9,6 +9,7 @@ import {
   CreditCardSpending,
   CreditCardSummary,
   EMPTY_CREDIT_CARD_SPENDING,
+  PaymentStatus,
 } from '@common/types/creditCardSummary';
 import { DebitCardSummary } from '@common/types/debitCardSummary';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,6 +32,8 @@ import { CARD_BASE } from '@card/card.routes';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/credit-card-spending-chart.component';
+import { WalletExpenseTableComponent } from 'app/wallet/components/wallet-expense-table/wallet-expense-table.component';
+import { DateRange } from '@expense/types/expensesTypes';
 
 @Component({
   selector: 'app-card-summary',
@@ -44,6 +47,7 @@ import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/
     CardPaymentFormComponent,
     MatTooltipModule,
     CreditCardSpendingChartComponent,
+    WalletExpenseTableComponent,
   ],
   providers: [CommonDialogService],
   templateUrl: './card-summary.component.html',
@@ -117,6 +121,14 @@ export class CardSummaryComponent {
 
   get debitCardSummary(): DebitCardSummary {
     return this.summary as DebitCardSummary;
+  }
+
+  get walletId(): number {
+    if (this.summary) {
+      return this.summary.walletId;
+    } else {
+      return 0;
+    }
   }
 
   editCard() {

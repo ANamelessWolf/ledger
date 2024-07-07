@@ -26,7 +26,6 @@ export class SearchBarComponent {
   @Output() search = new EventEmitter<string>();
 
   onSearch() {
-    console.log(this.searchControl.value);
     this.search.emit(this.searchControl.value || '');
   }
 }

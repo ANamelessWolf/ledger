@@ -43,7 +43,7 @@
       >
       </app-range-slider>
     </div>
-    <div>
+    <div *ngIf="visibility.enableWallet">
       <app-catalog-item-multi-select
         #walletMultiSelect
         header="Wallets"
@@ -52,7 +52,7 @@
       ></app-catalog-item-multi-select>
     </div>
     <h2>Expense Category</h2>
-    <div>
+    <div *ngIf="visibility.enableExpenseTypes">
       <app-catalog-item-multi-select
         #expenseTypeMultiSelect
         header="Expense Type"
@@ -60,7 +60,7 @@
         [control]="expenseTypeControl"
       ></app-catalog-item-multi-select>
     </div>
-    <div>
+    <div *ngIf="visibility.enableVendors">
       <app-catalog-item-multi-select
         #vendorMultiSelect
         header="Vendors"

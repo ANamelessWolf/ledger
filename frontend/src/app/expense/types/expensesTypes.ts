@@ -28,11 +28,11 @@ export type ExpenseFilterOptions = {
   wallets: CatalogItem[];
   expenseTypes: CatalogItem[];
   vendors: CatalogItem[];
-  visibility:{
-    enableWallet:boolean;
-    enableExpenseTypes:boolean;
-    enableVendors:boolean;
-  }
+  visibility: {
+    enableWallet: boolean;
+    enableExpenseTypes: boolean;
+    enableVendors: boolean;
+  };
   filter: ExpenseFilter;
 };
 
@@ -70,4 +70,19 @@ export const EMPTY_EXPENSES: ExpenseOptions = {
   wallets: [],
   expenseTypes: [],
   vendors: [],
+};
+
+export type Expense = {
+  id: number;
+  vendorId: number;
+  vendor: string;
+  walletId: number;
+  wallet: string;
+  expenseTypeId: number;
+  expenseType: string;
+  expenseIcon: string;
+  description: string;
+  buyDate: string;
+  total: string;
+  value: number;
 };

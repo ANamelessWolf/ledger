@@ -55,6 +55,12 @@
       [cardSpending]="creditCardSpending"
     />
   </div>
+  <div class="divider-pad">
+    <hr />
+  </div>
+  <div class="card-expense-area">
+    <app-wallet-expense-table [WalletId]="walletId"/>
+  </div>
 </div>
 <ng-template #noSelection>
   <p>No card selected</p>

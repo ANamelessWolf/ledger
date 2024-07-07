@@ -57,10 +57,13 @@ export class ExpenseFilterFormComponent {
   vendorControl = new FormControl();
   expenseRangeControl = new FormControl();
 
-  @ViewChild('walletMultiSelect') walletMultiSelect!:CatalogItemMultiSelectComponent;
-  @ViewChild('expenseTypeMultiSelect') expenseTypeMultiSelect!:CatalogItemMultiSelectComponent;
-  @ViewChild('vendorMultiSelect') vendorMultiSelect!:CatalogItemMultiSelectComponent;
-  @ViewChild('expenseRange') expenseRange!:RangeSliderComponent;
+  @ViewChild('walletMultiSelect')
+  walletMultiSelect!: CatalogItemMultiSelectComponent;
+  @ViewChild('expenseTypeMultiSelect')
+  expenseTypeMultiSelect!: CatalogItemMultiSelectComponent;
+  @ViewChild('vendorMultiSelect')
+  vendorMultiSelect!: CatalogItemMultiSelectComponent;
+  @ViewChild('expenseRange') expenseRange!: RangeSliderComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -98,6 +101,10 @@ export class ExpenseFilterFormComponent {
     }
   }
 
+  get visibility() {
+    return this.data.options.visibility;
+  }
+
   onApply() {
     let period: DateRange | undefined = undefined;
     if (this.filterForm.value.start && this.filterForm.value.end) {
@@ -133,10 +140,16 @@ export class ExpenseFilterFormComponent {
     this.dialogRef.close();
   }
 
-  onReset(){
-    this.walletMultiSelect.reset();
-    this.expenseTypeMultiSelect.reset();
-    this.vendorMultiSelect.reset();
+  onReset() {
+    if (this.visibility.enableWallet) {
+      this.walletMultiSelect.reset();
+    }
+    if (this.visibility.enableExpenseTypes) {
+      this.expenseTypeMultiSelect.reset();
+    }
+    if (this.visibility.enableVendors) {
+      this.vendorMultiSelect.reset();
+    }
     this.expenseRange.reset();
     this.filterForm = this.fb.group({
       start: [],

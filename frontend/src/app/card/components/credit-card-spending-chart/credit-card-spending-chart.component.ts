@@ -9,9 +9,11 @@ import {
 import { round, toCurrency, toNumber } from '@common/utils/formatUtils';
 import { Chart, registerables } from 'chart.js';
 import {
+  CardSpending,
   CreditCardSpending,
   EMPTY_CREDIT_CARD_SPENDING,
 } from '@common/types/creditCardSummary';
+import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 
 const ticksFormat = (value: string | number) => {
   return typeof value === 'number' ? toCurrency(value) : value;
@@ -20,7 +22,7 @@ const ticksFormat = (value: string | number) => {
 @Component({
   selector: 'app-credit-card-spending-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CurrencyFormatPipe],
   templateUrl: './credit-card-spending-chart.component.html',
   styleUrl: './credit-card-spending-chart.component.scss',
 })
@@ -68,7 +70,7 @@ export class CreditCardSpendingChartComponent {
             y: {
               beginAtZero: true,
               ticks: {
-                callback: ticksFormat
+                callback: ticksFormat,
               },
             },
           },
@@ -116,8 +118,16 @@ export class CreditCardSpendingChartComponent {
     };
   }
 
-  get total(){
-    return toCurrency(this.cardSpending.spending.map((x)=> x.spending).reduce((pv, cv)=> pv+cv));
+  get total() {
+    if (
+      this.cardSpending &&
+      this.cardSpending.spending &&
+      this.cardSpending.spending.length === 0
+    ) {
+      return 0;
+    }
+    const spending: CardSpending[] = this.cardSpending.spending;
+    const total = spending.map((x) => x.spending).reduce((pv, cv) => pv + cv);
+    return total;
   }
-
 }

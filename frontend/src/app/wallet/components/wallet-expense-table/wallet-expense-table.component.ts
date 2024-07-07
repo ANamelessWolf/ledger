@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
@@ -12,7 +18,6 @@ import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
 import { ExpensesService } from '@expense/services/expenses.service';
 import {
-  AddExpense,
   DateRange,
   EMPTY_EXPENSES,
   EMPTY_EXPENSE_FILTER,
@@ -29,7 +34,7 @@ import {
 } from '@expense/utils/expenseUtils';
 
 @Component({
-  selector: 'app-expense-index-page',
+  selector: 'app-wallet-expense-table',
   standalone: true,
   imports: [
     CommonModule,
@@ -38,22 +43,22 @@ import {
     ExpenseTableComponent,
     SearchBarComponent,
   ],
-  templateUrl: './expense-index-page.component.html',
-  styleUrl: './expense-index-page.component.scss',
+  templateUrl: './wallet-expense-table.component.html',
+  styleUrl: './wallet-expense-table.component.scss',
   providers: [ExpensesService, CatalogService, NotificationService],
 })
-export class ExpenseIndexPageComponent implements OnInit {
+export class WalletExpenseTableComponent implements OnInit, OnChanges {
+  @Input() WalletId = 1;
+  catalog: ExpenseOptions = EMPTY_EXPENSES;
   options: ExpenseSearchOptions = {
     pagination: EMPTY_PAGINATION,
     sorting: undefined,
     filter: EMPTY_EXPENSE_FILTER,
   };
-  catalog: ExpenseOptions = EMPTY_EXPENSES;
-  isLoading = true;
-  error = false;
-
   expenses: Expense[] = [];
   totalItems: number = 0;
+  isLoading = true;
+  error = false;
 
   constructor(
     private expenseService: ExpensesService,
@@ -61,11 +66,22 @@ export class ExpenseIndexPageComponent implements OnInit {
     private notifService: NotificationService
   ) {
     const today = new Date();
-    const monthlyPeriod: DateRange = {
+    const period = {
       start: new Date(today.getFullYear(), today.getMonth(), 1),
       end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
     };
-    this.options.filter.period = monthlyPeriod;
+
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['WalletId']) {
+      this.options.filter.wallet = [this.WalletId];
+      this.getExpenses();
+    }
+  }
+
+  ngOnInit(): void {
+    this.getCatalog();
   }
 
   get tableHeader(): string {
@@ -79,11 +95,6 @@ export class ExpenseIndexPageComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.getExpenses();
-    this.getCatalog();
-  }
-
   loadExpenses(e: PaginationEvent) {
     this.options.pagination = { page: e.pageIndex, pageSize: e.pageSize };
     this.getExpenses();
@@ -92,36 +103,6 @@ export class ExpenseIndexPageComponent implements OnInit {
   sortExpenses(event: Sort) {
     this.options.sorting = getSortType(event);
     this.getExpenses();
-  }
-
-  addExpense() {
-    this.expenseService
-      .showCreateExpenseDialog(
-        'Add new expense',
-        this.catalog,
-        this.expenseAdded.bind(this)
-      )
-      .subscribe();
-  }
-
-  expenseAdded(newExpense: AddExpense) {
-    this.expenseService.createExpense(newExpense).subscribe(
-      (response) => {
-        this.notifService.showNotification(
-          'Expense added succesfully',
-          'success'
-        );
-        this.getExpenses();
-      },
-      (err: HttpErrorResponse) => {
-        this.error = true;
-        this.notifService.showError(err);
-      },
-      //Complete
-      () => {
-        this.isLoading = false;
-      }
-    );
   }
 
   onSearch(searchTerm: string) {
@@ -136,7 +117,7 @@ export class ExpenseIndexPageComponent implements OnInit {
       vendors: this.catalog.vendors,
       filter: this.options.filter,
       visibility: {
-        enableWallet: true,
+        enableWallet: false,
         enableExpenseTypes: true,
         enableVendors: true,
       },
