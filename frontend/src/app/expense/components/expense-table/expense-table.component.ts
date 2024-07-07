@@ -26,6 +26,7 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./expense-table.component.scss'],
 })
 export class ExpenseTableComponent {
+  @Input() header: string = '';
   @Input() expenses: any[] = [];
   @Input() totalItems: number = 0;
   @Output() pageChange = new EventEmitter<PaginationEvent>();

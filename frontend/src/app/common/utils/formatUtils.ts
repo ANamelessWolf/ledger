@@ -1,5 +1,6 @@
 import { CatalogItem } from '@common/types/catalogTypes';
 import { APP_SETTINGS } from '@config/constants';
+import { SHORT_MONTH_NAME } from '@config/messages';
 
 export const round = (numberValue: number) => {
   return +(Math.round(numberValue * 100) / 100).toFixed(2);
@@ -36,4 +37,10 @@ export const toCurrency = (value: number): string => {
 export const toIds = (items: CatalogItem[] | undefined): number[] => {
   const ids: number[] = items ? (items as CatalogItem[]).map((x) => x.id) : [];
   return ids;
+};
+
+export const toShortDate = (date: Date): string => {
+  const monthIndex = date.getMonth();
+  const monthName = SHORT_MONTH_NAME[monthIndex];
+  return `${monthName} ${date.getDate()} ${date.getFullYear()}`;
 };

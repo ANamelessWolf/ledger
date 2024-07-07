@@ -8,11 +8,13 @@ import { SearchBarComponent } from '@common/components/search-bar/search-bar.com
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
 import { CatalogItem } from '@common/types/catalogTypes';
+import { toShortDate } from '@common/utils/formatUtils';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
 import { ExpensesService } from '@expense/services/expenses.service';
 import {
   AddExpense,
+  DateRange,
   EMPTY_EXPENSES,
   EMPTY_EXPENSE_FILTER,
   ExpenseFilter,
@@ -52,7 +54,25 @@ export class ExpenseIndexPageComponent implements OnInit {
     private expenseService: ExpensesService,
     private catalogService: CatalogService,
     private notifService: NotificationService
-  ) {}
+  ) {
+    const today = new Date();
+    const monthlyPeriod: DateRange = {
+      start: new Date(today.getFullYear(), today.getMonth(), 1),
+      end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+    };
+    this.options.filter.period = monthlyPeriod;
+  }
+
+  get tableHeader(): string {
+    if (this.options.filter.period === undefined) {
+      return 'All Expenses';
+    } else {
+      const period = this.options.filter.period;
+      return `Expenses from ${toShortDate(period.start)} to ${toShortDate(
+        period.end
+      )}`;
+    }
+  }
 
   ngOnInit(): void {
     this.getExpenses();
@@ -174,6 +194,7 @@ export class ExpenseIndexPageComponent implements OnInit {
         this.expenses = response.data.result.map((row: any) => {
           return {
             ...row,
+            description: row.description.replace('\n','<br>')
           };
         });
         this.totalItems = response.data.pagination.total;

@@ -9,13 +9,14 @@ const ERROR_MSG_ES = {
 const INFO_MSG_EN = {
   PAY_N_REQ: 'Payment not required',
   PAY_ADDED: 'Payment added succesfully',
-  CREDIT_CARD_UPD: 'Credit card updated, succesfully'
+  CREDIT_CARD_UPD: 'Credit card updated, succesfully',
 };
 
 const INFO_MSG_ES = {
   PAY_N_REQ: 'El pago no es requerido',
   PAY_ADDED: 'El pago se registro de manera correcta',
-  CREDIT_CARD_UPD: 'La tarjeta de credito ha sido actualizada de manera correcta'
+  CREDIT_CARD_UPD:
+    'La tarjeta de credito ha sido actualizada de manera correcta',
 };
 
 const HEADERS_EN = {
@@ -26,7 +27,7 @@ const HEADERS_EN = {
   CANCELED: 'CANCELLED',
   LOAD: 'Loading...',
   OTHER: 'Other',
-  ANY: 'Any'
+  ANY: 'Any',
 };
 
 const HEADERS_ES = {
@@ -37,7 +38,7 @@ const HEADERS_ES = {
   CANCELED: 'CANCELADA',
   LOAD: 'Cargando...',
   OTHER: 'Otro',
-  ANY: 'Cualquiera'
+  ANY: 'Cualquiera',
 };
 
 const BTN_EN = {
@@ -58,16 +59,47 @@ const BTN_ES = {
 
 const TOOL_TIP_EN = {
   ADD_PAY: 'Add payment to the credit card',
-  EDIT_CARD: 'Edit the card'
+  EDIT_CARD: 'Edit the card',
 };
 
 const TOOL_TIP_ES = {
   ADD_PAY: 'Agregar un pago a la tarjeta de credito',
-  EDIT_CARD: 'Editar la tarjeta'
+  EDIT_CARD: 'Editar la tarjeta',
 };
+
+const SHORT_MONTH_NAME_EN = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+];
+
+const SHORT_MONTH_NAME_ES = [
+  'ENE',
+  'FEB',
+  'MAR',
+  'ABR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AGO',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DIC',
+];
 
 export const ERROR_MSG = ERROR_MSG_EN;
 export const INFO_MSG = INFO_MSG_EN;
 export const HEADERS = HEADERS_EN;
 export const BTN = BTN_EN;
 export const TOOL_TIP = TOOL_TIP_EN;
+export const SHORT_MONTH_NAME = SHORT_MONTH_NAME_EN;
