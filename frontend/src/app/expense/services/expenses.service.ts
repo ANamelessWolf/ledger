@@ -4,13 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
+import { ExpenseEditFormComponent } from '@expense/components/expense-edit-form/expense-edit-form.component';
 import { ExpenseFilterFormComponent } from '@expense/components/expense-filter-form/expense-filter-form.component';
 import {
   AddExpense,
   ExpenseFilter,
   ExpenseFilterOptions,
   ExpenseOptions,
+  ExpenseRequest,
   ExpenseSearchOptions,
+  UpdateExpense,
 } from '@expense/types/expensesTypes';
 import { Observable } from 'rxjs';
 
@@ -30,6 +33,10 @@ export class ExpensesService {
     return this.http.post(`${LEDGER_API.EXPENSES}`, body);
   }
 
+  editExpense(id:number, body: UpdateExpense): Observable<any> {
+    return this.http.put(`${LEDGER_API.EXPENSES}/${id}`, body);
+  }
+
   // Dialogs
   showCreateExpenseDialog(
     header: string,
@@ -42,6 +49,24 @@ export class ExpensesService {
         header: header,
         options: options,
         expenseAdded: expenseAdded,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
+  showEditExpenseDialog(
+    header: string,
+    expense: UpdateExpense,
+    options: ExpenseOptions,
+    expenseUpdated: (request: ExpenseRequest) => void
+  ) {
+    const dialogRef = this.dialog.open(ExpenseEditFormComponent, {
+      width: '600px',
+      data: {
+        header,
+        expense,
+        options,
+        expenseUpdated
       },
     });
     return dialogRef.afterClosed();

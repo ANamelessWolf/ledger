@@ -94,6 +94,10 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.getExpenses();
   }
 
+  refresh(event: number) {
+    this.getExpenses();
+  }
+
   addExpense() {
     this.expenseService
       .showCreateExpenseDialog(

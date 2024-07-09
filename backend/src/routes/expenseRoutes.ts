@@ -67,7 +67,7 @@
  *           example: "May 17, 2023"
  */
 import { Router } from "express";
-import { createExpense, getExpenses } from "../controllers/expenseController";
+import { createExpense, getExpenses, updateExpense } from "../controllers/expenseController";
 
 const router = Router();
 /**
@@ -202,5 +202,7 @@ const router = Router();
 router.route('/').
 get(getExpenses).
 post(createExpense);
+
+router.route("/:id").put(updateExpense);
 
 export default router;

@@ -51,6 +51,15 @@ export type AddExpense = {
   description: string;
 };
 
+export type UpdateExpense = AddExpense & {
+  id: number;
+};
+
+export type ExpenseRequest = {
+  id: number;
+  body: UpdateExpense;
+};
+
 export const EMPTY_NEW_EXPENSE = {
   walletId: 0,
   expenseTypeId: 0,

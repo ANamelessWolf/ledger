@@ -30,8 +30,10 @@
       [header]="tableHeader"
       [expenses]="expenses"
       [totalItems]="totalItems"
+      [catalog]="catalog"
       (pageChange)="loadExpenses($event)"
       (sortChange)="sortExpenses($event)"
+      (expenseEdited)="refresh($event)"
     ></app-expense-table>
   </div>
 </div>

@@ -27,7 +27,8 @@ export const getPeriodName = (date: Date) => {
 export const parseDate = (dateString: string): Date => {
   //Configure date format on constants.ts
   if (DATE_FORMAT === ISO_FORMAT && DATE_FORMAT.test(dateString)) {
-    return new Date(dateString);
+    const [year, month, day] = dateString.split("-");
+    return new Date(+year, +month - 1, +day);
   } else if (DATE_FORMAT === US_FORMAT && DATE_FORMAT.test(dateString)) {
     const [month, day, year] = dateString.split("/");
     return new Date(`${year}-${month}-${day}`);
@@ -45,11 +46,12 @@ export const parseDate = (dateString: string): Date => {
  * @returns A string representing the formatted date.
  */
 export const formatDate = (date: Date): string => {
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric', 
-    };
-    // Format the date using Intl.DateTimeFormat
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   };
+  // Format the date using Intl.DateTimeFormat
+  const dateString = new Intl.DateTimeFormat("en-US", options).format(date);
+  return dateString;
+};

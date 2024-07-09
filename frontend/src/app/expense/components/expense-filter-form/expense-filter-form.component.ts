@@ -6,7 +6,6 @@ import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -29,7 +28,6 @@ import {
   ExpenseFilter,
   ExpenseFilterOptions,
 } from '@expense/types/expensesTypes';
-import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-expense-filter-form',
