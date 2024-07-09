@@ -7,6 +7,7 @@ export const APP_SETTINGS = {
   OWNER_EMAIL: '',
   APP_LOCAL: 'en-US',
   CURRENCY: 'MXN',
+  PAGINATION_SIZE: 10,
 };
 
 export const LEDGER_API_URL = EnvConfig.LEDGER_API_URL;
@@ -15,6 +16,7 @@ export const LEDGER_API = {
   CATALOG: `${LEDGER_API_URL}/catalog`,
   CREDIT_CARD: `${LEDGER_API_URL}/creditcard`,
   DEBIT_CARD: `${LEDGER_API_URL}/debitcard`,
+  EXPENSES: `${LEDGER_API_URL}/expenses`,
 };
 
 export const APP_CATALOGS = {

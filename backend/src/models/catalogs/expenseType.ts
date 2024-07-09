@@ -8,4 +8,7 @@ export class ExpenseType {
   @Column({ type: 'varchar', length: 100 })
   description: string;
 
+  @Column({ type: 'varchar', length: 30 })
+  icon: string;
+  
 }

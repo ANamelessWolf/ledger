@@ -3,6 +3,7 @@ import { SideScreenComponent } from '@common/components/side-screen/side-screen.
 import { initLedgerGuardGuard } from '@config/guards/init-ledger-guard.guard';
 import { HOME_BASE } from '@home/home.routes';
 import { CARD_BASE } from '@card/card.routes';
+import { EXPENSE_BASE } from '@expense/expenses.routes';
 
 export const routes: Routes = [
   {
@@ -19,6 +20,11 @@ export const routes: Routes = [
         path: CARD_BASE,
         loadChildren: () =>
           import('@card/card.routes').then((mod) => mod.CARD_ROUTES),
+      },
+      {
+        path: EXPENSE_BASE,
+        loadChildren: () =>
+          import('@expense/expenses.routes').then((mod) => mod.EXPENSE_ROUTES),
       },
     ],
   },

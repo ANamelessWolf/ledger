@@ -24,7 +24,7 @@ export class Expense {
   total: number;
 
   @Column({ type: "date", name: "buy_date" })
-  buyDate: Date;
+  buyDate: string;
 
   get expenseType(): Promise<ExpenseType[]> {
     const options = {

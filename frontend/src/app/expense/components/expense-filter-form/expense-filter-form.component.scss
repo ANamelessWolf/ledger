@@ -1,0 +1,47 @@
+.filter-form {
+  padding: 20px 10px;
+  margin-top: 0px;
+  mat-dialog-content {
+    width: calc(100% - 80px);
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: end;
+  padding: 20px;
+
+  div {
+    width: 280px;
+    margin-top: 20px;
+    display: flex;
+    flex: 0 0 auto;
+    text-align: right;
+    justify-content: space-between;
+  }
+}
+.form-group {
+  display: block;
+  justify-content: space-between;
+  margin: 0px 40px;
+  h2 {
+    margin: 0px 0px 10px 0px;
+  }
+}
+
+hr {
+  width: auto;
+  margin-top: 0px;
+}
+
+.header {
+  padding: 16px;
+  margin-bottom: 0px;
+  font-size: x-large;
+}
+.doubleFields {
+  display: grid;
+  gap: unset;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 80px;
+}

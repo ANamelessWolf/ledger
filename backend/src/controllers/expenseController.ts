@@ -17,12 +17,11 @@ import { Wallet } from "../models/ledger";
 import { ExpenseType, Vendor } from "../models/catalogs";
 import { formatMoney } from "../utils/formatUtils";
 import { Currency } from "../models/settings";
-import { formatDate } from "../utils/dateUtils";
+import { formatDate, parseDate } from "../utils/dateUtils";
 
 /**
  * Retrieves a list of expenses.
  * @summary Retrieves list of expenses filtered or not filtered.
- * @operationId getCardList
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  * @param {NextFunction} next - The Express next middleware function.
@@ -41,12 +40,16 @@ export const getExpenses = asyncErrorHandler(
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
         options.order = { [field]: sortBy };
+      }else{
+        options.order = { ['buyDate']: 'DESC' };
       }
 
       // Add pagination
       const { skip, take } = getPagination(req.query);
       options.skip = skip;
       options.take = take;
+
+      const count = await AppDataSource.manager.count(Expense, { where });
 
       const expenses: Expense[] = await AppDataSource.manager.find(
         Expense,
@@ -59,19 +62,134 @@ export const getExpenses = asyncErrorHandler(
         const currency: Currency = (await wallet.currency)[0];
         const exType: ExpenseType = (await ex.expenseType)[0];
         const vendor: Vendor = (await ex.vendor)[0];
+        const exDate:Date = parseDate(ex.buyDate);
         const item: ExpenseItemResponse = {
           ...ex,
           wallet: wallet.name,
           expenseType: exType.description,
-          expenseIcon: "",
+          expenseIcon: exType.icon,
           vendor: vendor.description,
-          vendorIcon: "",
           total: formatMoney(ex.total, `${currency.symbol} $`),
           value: ex.total * currency.conversion,
-          buyDate: formatDate(new Date(ex.buyDate.toString())),
+          buyDate: formatDate(exDate),
         };
         result.push(item);
       }
+      const pagination = {
+        page: req.query.page,
+        pageSize: take,
+        total: count,
+      };
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: { result, pagination },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Submit a new expense to the expense table
+ * @summary Handles adding a new expense
+ * @route POST /expenses
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const createExpense = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {
+        total,
+        buyDate,
+        description,
+        walletId,
+        expenseTypeId,
+        vendorId,
+      } = req.body;
+      // Create a new instance of CreditcardPayment
+      const expense = new Expense();
+      expense.walletId = walletId;
+      expense.expenseTypeId = expenseTypeId;
+      expense.vendorId = vendorId;
+      expense.description = description;
+      expense.buyDate = buyDate;
+      expense.total = total;
+
+      // Save the insert record
+      const result = await AppDataSource.manager.save(expense);
+      
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred adding a new Expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Updates an expense table
+ * @summary Handles updating an existant expense
+ * @route PUT /expenses/:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const updateExpense = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const where: any = { id: id };
+      const expenses: Expense[] = await AppDataSource.manager.find(Expense, {
+        where,
+      });
+
+      // Validate id
+      if (expenses.length === 0) {
+        return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
+      }
+      // Get the current Creditcard
+      const expense: Expense = expenses[0];
+      const {
+        total,
+        buyDate,
+        description,
+        walletId,
+        expenseTypeId,
+        vendorId,
+      } = req.body;
+      // Update the expense
+      expense.walletId = walletId;
+      expense.expenseTypeId = expenseTypeId;
+      expense.vendorId = vendorId;
+      expense.description = description;
+      expense.buyDate = buyDate;
+      expense.total = total;
+
+      // Save the insert record
+      const result = await AppDataSource.manager.save(expense);
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
@@ -83,7 +201,7 @@ export const getExpenses = asyncErrorHandler(
       console.log(error);
       return next(
         new Exception(
-          `An error occurred getting the credit card summary`,
+          `An error occurred updating a new Expense`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

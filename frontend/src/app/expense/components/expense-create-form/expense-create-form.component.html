@@ -1,0 +1,103 @@
+<div class="header">
+  {{ data.header }}
+</div>
+<hr />
+<form class="dialog-form" [formGroup]="expensesForm" (ngSubmit)="onSubmit()">
+  <h2>Paying Options</h2>
+  <div class="form-group">
+    <app-catalog-item-select
+      header="Wallet"
+      [items]="data.options.wallets"
+      [control]="walletControl"
+    ></app-catalog-item-select>
+    <mat-form-field appearance="fill">
+      <mat-label>Total</mat-label>
+      <input
+        matInput
+        formControlName="total"
+        type="number"
+        placeholder="Enter amount"
+        required
+      />
+      <mat-error *ngIf="total?.invalid && (total?.dirty || total?.touched)">
+        <span *ngIf="total?.errors?.['required']"
+          >Expense total is required.</span
+        >
+        <span *ngIf="total?.errors?.['pattern']">Invalid number format.</span>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <h2>Expense Category</h2>
+  <div class="form-group">
+    <app-catalog-item-select
+      header="Type"
+      [items]="data.options.expenseTypes"
+      [control]="expenseTypeControl"
+    ></app-catalog-item-select>
+    <app-catalog-item-select
+      header="Vendor"
+      [items]="data.options.vendors"
+      [control]="vendorControl"
+    ></app-catalog-item-select>
+  </div>
+  <h2>Details</h2>
+  <div class="form-group">
+    <mat-form-field appearance="fill">
+      <mat-label>Expense Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="expenseDate"
+        placeholder="Choose a date"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="
+          expenseDate?.invalid && (expenseDate?.dirty || expenseDate?.touched)
+        "
+      >
+        <span *ngIf="expenseDate?.errors?.['required']"
+          >Expense date is required.</span
+        >
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field appearance="fill" class="textArea">
+      <mat-label>Add expense description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        type="text"
+        placeholder="Enter a description"
+        required
+      ></textarea>
+      <mat-error
+        *ngIf="
+          description?.invalid && (description?.dirty || description?.touched)
+        "
+      >
+        <span *ngIf="description?.errors?.['required']"
+          >Expense description is required</span
+        >
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-actions">
+    <div>
+      <button mat-raised-button type="submit" [disabled]="expensesForm.invalid">
+        Save
+      </button>
+      <button
+        mat-raised-button
+        class="secondary-btn"
+        type="button"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

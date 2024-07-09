@@ -8,11 +8,11 @@
     [matAutocomplete]="auto"
   />
   <mat-autocomplete #auto="matAutocomplete" [displayWith]="display">
-    <mat-option
-      *ngFor="let item of filteredItems | async"
-      [value]="item"
-    >
+    <mat-option *ngFor="let item of filteredItems | async" [value]="item">
       {{ item.name }}
     </mat-option>
   </mat-autocomplete>
+  <mat-error *ngIf="isRequired && isInvalid">
+    <span *ngIf="control?.errors?.['required']">{{ errMessage }}</span>
+  </mat-error>
 </mat-form-field>

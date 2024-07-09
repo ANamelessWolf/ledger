@@ -67,7 +67,6 @@ export class CardIndexPageComponent implements OnInit {
     this.cardService.getCreditCardSummaryById(id).subscribe(
       (response) => {
         this.cardSummary = response.data;
-        console.log(this.cardSummary);
       },
       (err: HttpErrorResponse) => {
         this.error = true;

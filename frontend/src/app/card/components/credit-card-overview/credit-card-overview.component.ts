@@ -47,4 +47,16 @@ export class CreditCardOverviewComponent {
       return 0;
     }
   }
+
+  get cutDate() {
+    try {
+      if (this.summary.status) {
+        return this.summary.status.cutDate;
+      }
+      return '';
+    } catch (error) {
+      console.log(error);
+    }
+    return '';
+  }
 }

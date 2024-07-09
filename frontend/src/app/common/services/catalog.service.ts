@@ -33,4 +33,13 @@ export class CatalogService {
   getFinancingEntities(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/financing_entities`);
   }
+  getWallets(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/wallets`);
+  }
+  getExpensesTypes(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/expenseTypes`);
+  }
+  getVendors(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/vendors`);
+  }
 }
