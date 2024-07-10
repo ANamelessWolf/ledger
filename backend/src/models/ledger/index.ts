@@ -7,3 +7,5 @@ export * from './investment';
 export * from './saving';
 export * from './wallet';
 export * from './creditcardSpendingHistory';
+export * from './walletGroup';
+export * from './walletMember';

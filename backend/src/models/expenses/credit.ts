@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Wallet } from "../ledger";
 import { PaymentFrequency } from "../settings";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Credit", { database: process.env.DB_NAME })
 export class Credit {
@@ -41,18 +41,11 @@ export class Credit {
   @Column({ type: "double", name: "remaining_payment" })
   remaining: number;
 
-  get paymentFrequency(): Promise<PaymentFrequency[]> {
-    const options = {
-      where: [{ id: this.paymentFrequencyId }],
-    };
-    return AppDataSource.manager.find(PaymentFrequency, options);
+  get paymentFrequency() {
+    return getObject(PaymentFrequency, this.paymentFrequencyId);
   }
 
-  get wallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get wallet() {
+    return getObject(Wallet, this.walletId);
   }
-
 }

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Saving } from "./saving";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Debit_Card", { database: process.env.DB_NAME })
 export class Debitcard {
@@ -28,11 +28,8 @@ export class Debitcard {
   @Column({ type: "int", name: "active" })
   active: number;
 
-  get saving(): Promise<Saving[]> {
-    const options = {
-      where: [{ id: this.savingId }],
-    };
-    return AppDataSource.manager.find(Saving, options);
+  get saving(){
+    return getObject(Saving, this.savingId);
   }
   
 }

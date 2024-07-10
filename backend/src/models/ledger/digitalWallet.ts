@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
-import { AppDataSource } from "../../index";
 import { Wallet } from "./wallet";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity('Digital_Wallet_Payment_Wallet', { database: process.env.DB_NAME })
 export class DigitalWallet {
@@ -13,18 +13,12 @@ export class DigitalWallet {
   @Column({ type: "int", name: "payment_wallet_id" })
   paymentWalletId: number;
 
-  get digitalWallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.digitalWalletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get digitalWallet(){
+    return getObject(Wallet,this.digitalWalletId);
   }
 
-  get paymentWallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.paymentWalletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get paymentWallet(){
+    return getObject(Wallet,this.paymentWalletId);
   }
 
 }

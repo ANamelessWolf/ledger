@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
-import { AppDataSource } from "../../index";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Wallet } from "./wallet";
+import { getObject } from "../../utils/dbUtils";
 
-@Entity('Cash', { database: process.env.DB_NAME })
+@Entity("Cash", { database: process.env.DB_NAME })
 export class Cash {
   @PrimaryGeneratedColumn("increment")
   id: number;
@@ -16,11 +16,7 @@ export class Cash {
   @Column({ type: "int" })
   active: number;
 
-  get currency(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get wallet() {
+    return getObject(Wallet, this.walletId);
   }
-
 }

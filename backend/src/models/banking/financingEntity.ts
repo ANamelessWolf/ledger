@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { FinancingType } from "../catalogs";
-import { AppDataSource } from "../../index";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Financing_Entity", { database: process.env.DB_NAME })
 export class FinancingEntity {
@@ -13,10 +13,7 @@ export class FinancingEntity {
   @Column({ type: "varchar", length: 20 })
   name: string;
 
-  get financingType(): Promise<FinancingType[]> {
-    const options = {
-      where: [{ id: this.financingTypeId }],
-    };
-    return AppDataSource.manager.find(FinancingType, options);
+  get financingType() {
+    return getObject(FinancingType, this.financingTypeId);
   }
 }

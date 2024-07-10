@@ -7,17 +7,15 @@ import {
 } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { ExpenseFilter } from "../types/filter/expenseFilter";
-import { getExpenseFilter } from "../utils/expenseUtils";
+import {
+  getExpenseFilter,
+  getExpenseItemResponse,
+} from "../utils/expenseUtils";
 import QueryString from "qs";
 import { Expense } from "../models/expenses";
 import { AppDataSource } from "..";
 import { FindManyOptions } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
-import { Wallet } from "../models/ledger";
-import { ExpenseType, Vendor } from "../models/catalogs";
-import { formatMoney } from "../utils/formatUtils";
-import { Currency } from "../models/settings";
-import { formatDate, parseDate } from "../utils/dateUtils";
 
 /**
  * Retrieves a list of expenses.
@@ -40,8 +38,8 @@ export const getExpenses = asyncErrorHandler(
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
         options.order = { [field]: sortBy };
-      }else{
-        options.order = { ['buyDate']: 'DESC' };
+      } else {
+        options.order = { ["buyDate"]: "DESC" };
       }
 
       // Add pagination
@@ -57,23 +55,13 @@ export const getExpenses = asyncErrorHandler(
       );
       const result: ExpenseItemResponse[] = [];
       for (let index = 0; index < expenses.length; index++) {
-        const ex: Expense = expenses[index];
-        const wallet: Wallet = (await ex.wallet)[0];
-        const currency: Currency = (await wallet.currency)[0];
-        const exType: ExpenseType = (await ex.expenseType)[0];
-        const vendor: Vendor = (await ex.vendor)[0];
-        const exDate:Date = parseDate(ex.buyDate);
-        const item: ExpenseItemResponse = {
-          ...ex,
-          wallet: wallet.name,
-          expenseType: exType.description,
-          expenseIcon: exType.icon,
-          vendor: vendor.description,
-          total: formatMoney(ex.total, `${currency.symbol} $`),
-          value: ex.total * currency.conversion,
-          buyDate: formatDate(exDate),
-        };
-        result.push(item);
+        try {
+          const ex: Expense = expenses[index];
+          const item: ExpenseItemResponse = await getExpenseItemResponse(ex);
+          result.push(item);
+        } catch (error) {
+          console.log(error);
+        }
       }
       const pagination = {
         page: req.query.page,
@@ -110,14 +98,8 @@ export const getExpenses = asyncErrorHandler(
 export const createExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        total,
-        buyDate,
-        description,
-        walletId,
-        expenseTypeId,
-        vendorId,
-      } = req.body;
+      const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
+        req.body;
       // Create a new instance of CreditcardPayment
       const expense = new Expense();
       expense.walletId = walletId;
@@ -129,7 +111,7 @@ export const createExpense = asyncErrorHandler(
 
       // Save the insert record
       const result = await AppDataSource.manager.save(expense);
-      
+
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
@@ -172,14 +154,8 @@ export const updateExpense = asyncErrorHandler(
       }
       // Get the current Creditcard
       const expense: Expense = expenses[0];
-      const {
-        total,
-        buyDate,
-        description,
-        walletId,
-        expenseTypeId,
-        vendorId,
-      } = req.body;
+      const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
+        req.body;
       // Update the expense
       expense.walletId = walletId;
       expense.expenseTypeId = expenseTypeId;

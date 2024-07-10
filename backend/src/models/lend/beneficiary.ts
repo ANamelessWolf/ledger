@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Owner } from "../settings";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Beneficiary", { database: process.env.DB_NAME })
 export class Beneficiary {
@@ -13,11 +13,7 @@ export class Beneficiary {
   @Column({ type: "varchar", length: 100 })
   name: string;
 
-  get owner(): Promise<Owner[]> {
-    const options = {
-      where: [{ id: this.ownerId }],
-    };
-    return AppDataSource.manager.find(Owner, options);
+  get owner() {
+    return getObject(Owner, this.ownerId);
   }
-
 }

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Wallet } from "../ledger";
 import { ExpenseType, Vendor } from "../catalogs";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Expense", { database: process.env.DB_NAME })
 export class Expense {
@@ -24,27 +24,18 @@ export class Expense {
   total: number;
 
   @Column({ type: "date", name: "buy_date" })
-  buyDate: string;
+  buyDate: Date;
 
-  get expenseType(): Promise<ExpenseType[]> {
-    const options = {
-      where: [{ id: this.expenseTypeId }],
-    };
-    return AppDataSource.manager.find(ExpenseType, options);
+  get expenseType(){
+    return getObject(ExpenseType, this.expenseTypeId);
   }
 
-  get vendor(): Promise<Vendor[]> {
-    const options = {
-      where: [{ id: this.vendorId }],
-    };
-    return AppDataSource.manager.find(Vendor, options);
+  get vendor(){
+    return getObject(Vendor, this.vendorId);
   }
 
-  get wallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get wallet(){
+    return getObject(Wallet, this.walletId);
   }
 
 }

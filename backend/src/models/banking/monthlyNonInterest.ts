@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Creditcard } from "../ledger";
 import { Expense } from "../expenses";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Monthly_With_No_Interest", { database: process.env.DB_NAME })
 export class MonthlyNonInterest {
@@ -13,7 +13,7 @@ export class MonthlyNonInterest {
 
   @Column({ type: "int", name: "expense_id" })
   expenseId: number;
-  
+
   @Column({ type: "date", name: "start_date" })
   startDate: Date;
 
@@ -26,17 +26,11 @@ export class MonthlyNonInterest {
   @Column({ type: "int" })
   archived: number;
 
-  get creditcard(): Promise<Creditcard[]> {
-    const options = {
-      where: [{ id: this.creditcardId }],
-    };
-    return AppDataSource.manager.find(Creditcard, options);
+  get creditcard() {
+    return getObject(Creditcard, this.creditcardId);
   }
 
-  get expense(): Promise<Expense[]> {
-    const options = {
-      where: [{ id: this.expenseId }],
-    };
-    return AppDataSource.manager.find(Expense, options);
+  get expense() {
+    return getObject(Expense, this.expenseId);
   }
 }
