@@ -1,0 +1,38 @@
+.expense-index-page {
+  display: flex;
+  flex-direction: column;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 16px 0px 120px;
+
+    h1 {
+      min-width: 200px;
+      font-size: xx-large;
+      margin-top: 16px;
+      margin-left: 4px;
+      color: black;
+      margin: 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+
+      button {
+        margin: 0;
+      }
+    }
+  }
+
+  hr {
+    margin: 0px;
+  }
+
+  .table-area {
+    flex: 1;
+    padding: 16px;
+  }
+}

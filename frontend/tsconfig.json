@@ -28,6 +28,7 @@
       "@home/*": ["app/home/*"],
       "@card/*": ["app/card/*"],
       "@expense/*": ["app/expense/*"],
+      "@wallet/*": ["app/wallet/*"],
       "@common/*": ["app/common/*"],
       "@config/*": ["app/config/*"],
     }

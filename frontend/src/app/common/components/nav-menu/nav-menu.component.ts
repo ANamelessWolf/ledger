@@ -26,5 +26,6 @@ export class NavMenuComponent {
     { header: 'Home', route: '/', icon: 'home', exact: true },
     { header: 'Cards', route: '/cards', icon: 'credit_card', exact: false },
     { header: 'Expenses', route: '/expenses', icon: 'payments', exact: false },
+    { header: 'Wallets', route: '/wallets', icon: 'wallet', exact: false },
   ];
 }
