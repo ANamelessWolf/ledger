@@ -3,6 +3,9 @@
     <h1>Expenses</h1>
     <div class="button-group">
       <app-search-bar (search)="onSearch($event)"></app-search-bar>
+      <button mat-icon-button (click)="goToDaily()">
+        <mat-icon>calendar_month</mat-icon>
+      </button>
       <button
         mat-icon-button
         aria-label="Open filter window"

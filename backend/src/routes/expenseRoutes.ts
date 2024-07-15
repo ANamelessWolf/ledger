@@ -65,9 +65,38 @@
  *         buyDate:
  *           type: string
  *           example: "May 17, 2023"
+ *     DailyExpense:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: number
+ *           format: double
+ *           example: 10000.0
+ *         buy_date:
+ *           type: string
+ *           format: date
+ *           example: "2023-05-18"
+ *         dayId:
+ *           type: integer
+ *           example: 18
+ *         monthId:
+ *           type: integer
+ *           example: 5
+ *         yearId:
+ *           type: integer
+ *           example: 2023
+ *         weekDay:
+ *           type: integer
+ *           example: 5
+
  */
 import { Router } from "express";
-import { createExpense, getExpenses, updateExpense } from "../controllers/expenseController";
+import {
+  createExpense,
+  getDailyExpenses,
+  getExpenses,
+  updateExpense,
+} from "../controllers/expenseController";
 
 const router = Router();
 /**
@@ -198,11 +227,42 @@ const router = Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Expense'
+ * /expenses/daily/{month}/{year}:
+ *  get:
+ *    summary: Get daily expenses by month and year
+ *    description: Retrieves a list of daily expenses for a specific month and year.
+ *    tags: [Expenses]
+ *    parameters:
+ *      - name: month
+ *        in: path
+ *        description: The month for which to retrieve daily expenses.
+ *        required: true
+ *        schema:
+ *          type: integer
+ *          format: int32
+ *          example: 5  # Example month, May
+ *      - name: year
+ *        in: path
+ *        description: The year for which to retrieve daily expenses.
+ *        required: true
+ *        schema:
+ *          type: integer
+ *          format: int32
+ *          example: 2023  # Example year
+ *    responses:
+ *      '200':
+ *        description: An array of daily expenses for the given month and year.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/DailyExpense'
+ *      '404':
+ *        description: No expenses found for the specified month and year. 
  */
-router.route('/').
-get(getExpenses).
-post(createExpense);
-
+router.route("/").get(getExpenses).post(createExpense);
 router.route("/:id").put(updateExpense);
+router.route("/daily/:month/:year").get(getDailyExpenses);
 
 export default router;

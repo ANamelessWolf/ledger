@@ -29,11 +29,15 @@ export class ExpensesService {
     return this.http.get(`${LEDGER_API.EXPENSES}?${query}`);
   }
 
+  getDailyExpenses(month: number, year: number): Observable<any> {
+    return this.http.get(`${LEDGER_API.EXPENSES}/daily/${month}/${year}`);
+  }
+
   createExpense(body: AddExpense): Observable<any> {
     return this.http.post(`${LEDGER_API.EXPENSES}`, body);
   }
 
-  editExpense(id:number, body: UpdateExpense): Observable<any> {
+  editExpense(id: number, body: UpdateExpense): Observable<any> {
     return this.http.put(`${LEDGER_API.EXPENSES}/${id}`, body);
   }
 
@@ -66,7 +70,7 @@ export class ExpensesService {
         header,
         expense,
         options,
-        expenseUpdated
+        expenseUpdated,
       },
     });
     return dialogRef.afterClosed();

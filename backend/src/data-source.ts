@@ -7,7 +7,7 @@ import {
   Vendor,
   CardItem,
 } from "./models/catalogs";
-import { Credit, Expense } from "./models/expenses";
+import { Credit, DailyExpense, Expense } from "./models/expenses";
 import {
   Cash,
   CreditCardSpendingReport,
@@ -48,6 +48,7 @@ export const createConnection = (): DataSource => {
       CardItem,
       Credit,
       Expense,
+      DailyExpense,
       Cash,
       Creditcard,
       CreditcardPayment,

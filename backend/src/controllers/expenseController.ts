@@ -14,8 +14,9 @@ import {
 import QueryString from "qs";
 import { Expense } from "../models/expenses";
 import { AppDataSource } from "..";
-import { FindManyOptions } from "typeorm";
+import { Equal, FindManyOptions, FindOptionsWhere } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
+import { DailyExpense } from "../models/expenses/expenseDaily";
 
 /**
  * Retrieves a list of expenses.
@@ -72,6 +73,40 @@ export const getExpenses = asyncErrorHandler(
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
           data: { result, pagination },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves a list of daily expenses for a given month
+ * @summary Retrieves list of expenses from a given month.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getDailyExpenses = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const where = getMonthYearFilter(req.params);
+      const expenses: DailyExpense[] = await AppDataSource.manager.find(
+        DailyExpense,
+        { where }
+      );
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: expenses,
         })
       );
     } catch (error) {
@@ -184,6 +219,19 @@ export const updateExpense = asyncErrorHandler(
     }
   }
 );
+
+const getMonthYearFilter = (
+  query: QueryString.ParsedQs
+): FindOptionsWhere<DailyExpense> => {
+  const { month, year } = query;
+  const where: FindManyOptions<DailyExpense>["where"] = {};
+  const today = new Date();
+  const monthId = !month ? today.getMonth() + 1 : +month;
+  const yearId = !year ? today.getFullYear() : +year;
+  where.monthId = Equal(monthId);
+  where.yearId = Equal(yearId);
+  return where;
+};
 
 const buildFilter = (query: QueryString.ParsedQs): ExpenseFilter => {
   const { wallet, expenseTypes, vendors, start, end, min, max, description } =

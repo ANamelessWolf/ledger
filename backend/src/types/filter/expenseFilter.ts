@@ -16,4 +16,3 @@ export type ExpenseFilter = {
   expenseRange?: ExpenseRange;
   description?: string;
 };
-

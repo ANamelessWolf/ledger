@@ -94,4 +94,14 @@ export type Expense = {
   buyDate: string;
   total: string;
   value: number;
+  index?: number;
 };
+
+export type  DailyExpense = {
+  total: number;
+  buyDate: string;
+  dayId: number;
+  monthId: number;
+  yearId: number;
+  weekDay: number;
+}

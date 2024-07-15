@@ -44,3 +44,24 @@ export const toShortDate = (date: Date): string => {
   const monthName = SHORT_MONTH_NAME[monthIndex];
   return `${monthName} ${date.getDate()} ${date.getFullYear()}`;
 };
+
+export const getDaysOfMonth = (date: Date): number[] => {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  // Calculate the offset based on the first day of the month
+  const offset = (firstDay + 6) % 7;
+  // Get the number of days in the month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Create an array with the appropriate number of zeros based on the offset
+  const daysArray = new Array(offset).fill(0);
+
+  // Append the days of the month to the array
+  for (let day = 1; day <= daysInMonth; day++) {
+    daysArray.push(day);
+  }
+
+  return daysArray;
+};
