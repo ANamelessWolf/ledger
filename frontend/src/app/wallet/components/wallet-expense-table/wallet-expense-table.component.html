@@ -1,6 +1,6 @@
 <div class="expense-section" *ngIf="WalletId > 0">
   <div class="header">
-    <h1>Expenses</h1>
+    <h1>Expenses - {{ this.total | currencyFormat }}</h1>
     <div class="button-group">
       <app-search-bar (search)="onSearch($event)"></app-search-bar>
       <button

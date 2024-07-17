@@ -10,7 +10,7 @@ export const mapExpense = (response: any) => {
     };
   });
   const totalItems: number = response.data.pagination.total;
-  return { expenses, totalItems };
+  return { expenses, totalItems, total: response.data.total };
 };
 
 export const validateFilter = (filter: ExpenseFilter): boolean => {

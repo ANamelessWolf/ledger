@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
+import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
 import { toShortDate } from '@common/utils/formatUtils';
@@ -42,6 +43,7 @@ import {
     MatIconModule,
     ExpenseTableComponent,
     SearchBarComponent,
+    CurrencyFormatPipe
   ],
   templateUrl: './wallet-expense-table.component.html',
   styleUrl: './wallet-expense-table.component.scss',
@@ -57,6 +59,7 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   };
   expenses: Expense[] = [];
   totalItems: number = 0;
+  total: number = 0;
   isLoading = true;
   error = false;
 
@@ -76,6 +79,7 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['WalletId']) {
       this.options.filter.wallet = [this.WalletId];
+      this.options.filter.description = "";
       this.getExpenses();
     }
   }
@@ -139,9 +143,10 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   private getExpenses() {
     this.expenseService.getExpenses(this.options).subscribe(
       (response) => {
-        const { expenses, totalItems } = mapExpense(response);
+        const { expenses, totalItems, total } = mapExpense(response);
         this.expenses = expenses;
         this.totalItems = totalItems;
+        this.total = total;
       },
       this.errorResponse,
       this.completed

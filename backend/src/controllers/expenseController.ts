@@ -49,7 +49,7 @@ export const getExpenses = asyncErrorHandler(
       options.take = take;
 
       const count = await AppDataSource.manager.count(Expense, { where });
-
+      const totalExpense = await getTotalSum(where);
       const expenses: Expense[] = await AppDataSource.manager.find(
         Expense,
         options
@@ -72,7 +72,7 @@ export const getExpenses = asyncErrorHandler(
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
-          data: { result, pagination },
+          data: { result, pagination, total: totalExpense },
         })
       );
     } catch (error) {
@@ -285,4 +285,14 @@ const getPagination = (query: QueryString.ParsedQs) => {
   const skip = (index - 1) * size;
   const take = size;
   return { skip, take };
+};
+
+const getTotalSum = async (where: any): Promise<number> => {
+  const sumResult = await AppDataSource.getRepository(Expense)
+    .createQueryBuilder("expense")
+    .select("SUM(expense.total)", "sum")
+    .where(where)
+    .getRawOne();
+
+  return sumResult.sum ? parseFloat(sumResult.sum) : 0;
 };
