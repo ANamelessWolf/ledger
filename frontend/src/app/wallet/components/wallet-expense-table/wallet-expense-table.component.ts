@@ -14,6 +14,7 @@ import { SearchBarComponent } from '@common/components/search-bar/search-bar.com
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
+import { getDateRange } from '@common/utils/dateUtils';
 import { toShortDate } from '@common/utils/formatUtils';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
@@ -43,7 +44,7 @@ import {
     MatIconModule,
     ExpenseTableComponent,
     SearchBarComponent,
-    CurrencyFormatPipe
+    CurrencyFormatPipe,
   ],
   templateUrl: './wallet-expense-table.component.html',
   styleUrl: './wallet-expense-table.component.scss',
@@ -51,6 +52,7 @@ import {
 })
 export class WalletExpenseTableComponent implements OnInit, OnChanges {
   @Input() WalletId = 1;
+  @Input() Period: DateRange = getDateRange(1, '');
   catalog: ExpenseOptions = EMPTY_EXPENSES;
   options: ExpenseSearchOptions = {
     pagination: EMPTY_PAGINATION,
@@ -67,19 +69,13 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
     private expenseService: ExpensesService,
     private catalogService: CatalogService,
     private notifService: NotificationService
-  ) {
-    const today = new Date();
-    const period = {
-      start: new Date(today.getFullYear(), today.getMonth(), 1),
-      end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
-    };
-
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['WalletId']) {
       this.options.filter.wallet = [this.WalletId];
-      this.options.filter.description = "";
+      this.options.filter.description = '';
+      this.options.filter.period = this.Period;
       this.getExpenses();
     }
   }

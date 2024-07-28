@@ -15,4 +15,5 @@ export type CreditCardSummary = {
   ending: string;
   color: string;
   type: number;
+  cutday: number;
 };

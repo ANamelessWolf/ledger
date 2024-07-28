@@ -59,6 +59,7 @@ export const getCreditcardSummary = asyncErrorHandler(
             ending: cc.ending,
             color: cc.color,
             type: cc.cardType,
+            cutday: cc.cutDay
           });
         }
       }
@@ -131,6 +132,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         ending: cc.ending,
         color: cc.color,
         type: cc.cardType,
+        cutday: cc.cutDay
       };
 
       // Ok Response

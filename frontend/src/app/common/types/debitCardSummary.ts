@@ -1,6 +1,7 @@
 import { CardType } from './cardItem';
 
 export type DebitCardSummary = {
+  objtype: 'CreditCard';
   id: number;
   walletId: number;
   entityId: number;
@@ -13,10 +14,11 @@ export type DebitCardSummary = {
   type: CardType;
   ending: string;
   color: string;
-  cutDay: number;
+  cutday: number;
 };
 
 export const EMPTY_DEBIT_CARD_SUMMARY: DebitCardSummary = {
+  objtype: 'CreditCard',
   id: 0,
   walletId: 0,
   entityId: 0,
@@ -29,5 +31,5 @@ export const EMPTY_DEBIT_CARD_SUMMARY: DebitCardSummary = {
   type: CardType.OTHER,
   ending: '',
   color: '',
-  cutDay: 0,
+  cutday: 0,
 };

@@ -34,6 +34,7 @@ import { FormControl } from '@angular/forms';
 import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/credit-card-spending-chart.component';
 import { WalletExpenseTableComponent } from 'app/wallet/components/wallet-expense-table/wallet-expense-table.component';
 import { DateRange } from '@expense/types/expensesTypes';
+import { getDateRange } from '@common/utils/dateUtils';
 
 @Component({
   selector: 'app-card-summary',
@@ -113,6 +114,23 @@ export class CardSummaryComponent {
         this.notifService.showError(err);
       }
     );
+  }
+
+  get period(): DateRange {
+    if (this.summary) {
+      let status = '';
+      if ((this.summary as any).status) {
+        status = (this.summary as CreditCardSummary).status?.status || '';
+      }
+      return getDateRange(this.summary.cutday, status);
+    } else {
+      const today = new Date();
+      const period = {
+        start: new Date(today.getFullYear(), today.getMonth(), 1),
+        end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+      };
+      return period;
+    }
   }
 
   get creditCardSummary(): CreditCardSummary {
