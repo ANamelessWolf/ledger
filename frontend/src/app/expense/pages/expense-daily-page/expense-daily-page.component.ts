@@ -57,6 +57,7 @@ export class ExpenseDailyPageComponent implements OnInit {
   daysInMonth: number[] = [];
   dayExpenses: { [key: number]: number } = {};
   selectedDay: number | null = null;
+  monthlyTotal: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -82,7 +83,7 @@ export class ExpenseDailyPageComponent implements OnInit {
       (response) => {
         this.expenses = response.data;
         const totals = this.calculateExpenses(this.expenses);
-        console.log(totals);
+        this.monthlyTotal = totals.monthly;
         this.initializeCalendar();
       },
       this.errorResponse,
