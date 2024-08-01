@@ -173,7 +173,7 @@ export const updateDebitcard = asyncErrorHandler(
       if (cards.length === 0) {
         return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
       }
-      // Get the current Creditcard
+      // Get the current Debit card
       const debitCard: Debitcard = cards[0];
 
       // Get the current Savings

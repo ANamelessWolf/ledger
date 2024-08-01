@@ -4,6 +4,7 @@ import { FinancingEntity } from "../banking/financingEntity";
 import { Wallet } from "./wallet";
 import { CreditcardPayment } from "./creditcardPayment";
 import { getObject } from "../../utils/dbUtils";
+import { WalletGroup } from "./walletGroup";
 
 @Entity("Credit_Card", { database: process.env.DB_NAME })
 export class Creditcard {
@@ -13,8 +14,11 @@ export class Creditcard {
   @Column({ type: "int", name: "entity_id" })
   entityId: number;
 
-  @Column({ type: "int", name: "wallet_id" })
-  walletId: number;
+  @Column({ type: "int", name: "preferred_wallet_id" })
+  preferredWalletId: number;
+
+  @Column({ type: "int", name: "wallet_group_id" })
+  walletGroupId: number;
 
   @Column({ type: "double" })
   credit: number;
@@ -47,8 +51,12 @@ export class Creditcard {
     return getObject(FinancingEntity, this.entityId);
   }
 
-  get wallet() {
-    return getObject(Wallet, this.walletId);
+  get preferredWallet() {
+    return getObject(Wallet, this.preferredWalletId);
+  }
+
+  get walletGroup() {
+    return getObject(WalletGroup, this.walletGroupId);
   }
 
   get payments() {

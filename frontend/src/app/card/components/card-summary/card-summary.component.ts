@@ -142,8 +142,10 @@ export class CardSummaryComponent {
   }
 
   get walletId(): number {
-    if (this.summary) {
-      return this.summary.walletId;
+    if (this.summary && (this.summary as any).walletId) {
+      return (this.summary as DebitCardSummary).walletId;
+    } else if (this.summary) {
+      return (this.summary as CreditCardSummary).preferredWalletId;
     } else {
       return 0;
     }

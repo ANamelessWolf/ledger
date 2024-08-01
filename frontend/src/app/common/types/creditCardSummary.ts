@@ -19,7 +19,8 @@ export type PaymentStatus = {
 export type CreditCardSummary = {
   objtype: 'CreditCard';
   id: number;
-  walletId: number;
+  preferredWalletId: number;
+  walletGroupId: number;
   entityId: number;
   card: string;
   banking: string;
@@ -53,7 +54,8 @@ export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
 export const EMPTY_CREDIT_CARD_SUMMARY: CreditCardSummary = {
   objtype: 'CreditCard',
   id: 0,
-  walletId: 0,
+  preferredWalletId: 0,
+  walletGroupId: 0,
   entityId: 0,
   card: '',
   banking: '',

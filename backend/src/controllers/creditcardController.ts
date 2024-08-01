@@ -37,7 +37,7 @@ export const getCreditcardSummary = asyncErrorHandler(
         const cc: Creditcard = cards[index];
         const payments = await cc.payments;
         const status = getCreditCardStatus(today, payments, cc.cutDay);
-        const wallet: Wallet | null = await cc.wallet;
+        const wallet: Wallet | null = await cc.preferredWallet;
         const banking: FinancingEntity | null = await cc.financingEntity;
         if (
           wallet !== null &&
@@ -46,7 +46,8 @@ export const getCreditcardSummary = asyncErrorHandler(
         ) {
           result.push({
             id: cc.id,
-            walletId: cc.walletId,
+            preferredWalletId: cc.preferredWalletId,
+            walletGroupId: cc.walletGroupId,
             entityId: cc.entityId,
             card: wallet.name,
             banking: banking.name,
@@ -109,7 +110,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       const cc: Creditcard = cards[0];
       const payments = await cc.payments;
       const status = getCreditCardStatus(today, payments, cc.cutDay);
-      const wallet: Wallet | null = await cc.wallet;
+      const wallet: Wallet | null = await cc.preferredWallet;
       const banking: FinancingEntity | null = await cc.financingEntity;
       if (wallet === null || banking === null) {
         return next(
@@ -119,7 +120,8 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
 
       const result: CreditCardSummary = {
         id: cc.id,
-        walletId: cc.walletId,
+        preferredWalletId: cc.preferredWalletId,
+        walletGroupId: cc.walletGroupId,
         entityId: cc.entityId,
         card: wallet.name,
         banking: banking.name,

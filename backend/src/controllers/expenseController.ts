@@ -135,7 +135,7 @@ export const createExpense = asyncErrorHandler(
     try {
       const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
         req.body;
-      // Create a new instance of CreditcardPayment
+      // Create a new instance of Expense
       const expense = new Expense();
       expense.walletId = walletId;
       expense.expenseTypeId = expenseTypeId;

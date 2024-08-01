@@ -2,7 +2,8 @@ import { PaymentStatus } from "../paymentStatus";
 
 export type CreditCardSummary = {
   id: number;
-  walletId: number;
+  preferredWalletId: number;
+  walletGroupId: number;
   entityId: number;
   card: string;
   banking: string;
