@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { isValidDate } from '@common/utils/dateUtils';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
@@ -125,7 +126,7 @@ export class ExpensesService {
       query += `&vendors=${filter.vendors.join(',')}`;
     }
 
-    if (filter.period) {
+    if (filter.period && isValidDate(filter.period.start) && isValidDate(filter.period.end)) {
       query += `&start=${filter.period.start.toISOString()}`;
       query += `&end=${filter.period.end.toISOString()}`;
     }

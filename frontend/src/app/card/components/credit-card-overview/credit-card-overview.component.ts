@@ -59,4 +59,17 @@ export class CreditCardOverviewComponent {
     }
     return '';
   }
+
+  get dueDate() {
+    try {
+      if (this.summary.status) {
+        return this.summary.status.dueDate;
+      }
+      return '';
+    } catch (error) {
+      console.log(error);
+    }
+    return '';
+  }
+
 }

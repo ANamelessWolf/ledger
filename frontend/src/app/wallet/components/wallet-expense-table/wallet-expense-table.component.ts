@@ -14,7 +14,7 @@ import { SearchBarComponent } from '@common/components/search-bar/search-bar.com
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
-import { getDateRange } from '@common/utils/dateUtils';
+import { getDateRange, isValidDate } from '@common/utils/dateUtils';
 import { toShortDate } from '@common/utils/formatUtils';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
@@ -52,7 +52,7 @@ import {
 })
 export class WalletExpenseTableComponent implements OnInit, OnChanges {
   @Input() WalletId = 1;
-  @Input() Period: DateRange = getDateRange(1, '');
+  @Input() Period: DateRange = getDateRange(new Date(), 1, '');
   catalog: ExpenseOptions = EMPTY_EXPENSES;
   options: ExpenseSearchOptions = {
     pagination: EMPTY_PAGINATION,
@@ -87,7 +87,11 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   get tableHeader(): string {
     if (this.options.filter.period === undefined) {
       return 'All Expenses';
-    } else {
+    }
+    else if(!isValidDate(this.options.filter.period.start) || !isValidDate(this.options.filter.period.end)){
+      return 'All Expenses';
+    }
+    else {
       const period = this.options.filter.period;
       return `Expenses from ${toShortDate(period.start)} to ${toShortDate(
         period.end

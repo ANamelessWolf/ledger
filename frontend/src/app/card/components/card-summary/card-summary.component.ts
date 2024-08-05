@@ -122,7 +122,7 @@ export class CardSummaryComponent {
       if ((this.summary as any).status) {
         status = (this.summary as CreditCardSummary).status?.status || '';
       }
-      return getDateRange(this.summary.cutday, status);
+      return getDateRange(this.cutDate, this.summary.cutday, status);
     } else {
       const today = new Date();
       const period = {
@@ -139,6 +139,16 @@ export class CardSummaryComponent {
 
   get debitCardSummary(): DebitCardSummary {
     return this.summary as DebitCardSummary;
+  }
+
+  get cutDate(): Date {
+    if ((this.summary as any).status) {
+      const payment = (this.summary as CreditCardSummary).status?.payment;
+      return new Date(payment.startDate);
+    } else {
+      //To DO Debit card CutDate
+      return new Date();
+    }
   }
 
   get walletId(): number {

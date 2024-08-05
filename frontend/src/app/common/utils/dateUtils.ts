@@ -8,18 +8,30 @@ export const getWeekOfMonth = (date: Date) => {
   return Math.ceil((dayOfMonth + dayOfWeekStarting) / 7);
 };
 
-export const getDateRange = (cutDay: number, status: string): DateRange => {
+export const getDateRange = (
+  cutDate: Date,
+  cutDay: number,
+  status: string
+): DateRange => {
   const now = new Date();
   let start: Date;
   let end: Date;
-
+  let month = now.getMonth();
+  if (cutDate !== new Date(now.getFullYear(), month, cutDay + 1)) {
+    month = cutDate.getMonth();
+    if (cutDay > 15) month++;
+  }
   if (status === 'Pending') {
-    start = new Date(now.getFullYear(), now.getMonth() - 1, cutDay + 1);
-    end = new Date(now.getFullYear(), now.getMonth(), cutDay);
+    start = new Date(now.getFullYear(), month - 1, cutDay + 1);
+    end = new Date(now.getFullYear(), month, cutDay);
   } else {
-    start = new Date(now.getFullYear(), now.getMonth(), cutDay + 1);
-    end = new Date(now.getFullYear(), now.getMonth() + 1, cutDay);
+    start = new Date(now.getFullYear(), month, cutDay + 1);
+    end = new Date(now.getFullYear(), month + 1, cutDay);
   }
 
   return { start, end };
+};
+
+export const isValidDate = (date: any) => {
+  return date instanceof Date && !isNaN(date.getTime());
 };
