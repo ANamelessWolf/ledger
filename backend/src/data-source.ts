@@ -18,6 +18,7 @@ import {
   Investment,
   Saving,
   Wallet,
+  WalletExpense,
   WalletGroup,
   WalletMember,
 } from "./models/ledger";
@@ -58,6 +59,7 @@ export const createConnection = (): DataSource => {
       Investment,
       Saving,
       Wallet,
+      WalletExpense,
       WalletGroup,
       WalletMember,
       Beneficiary,

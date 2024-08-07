@@ -5,9 +5,10 @@ import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
 import { formatMoney } from "./formatUtils";
 import { formatDate, parseDate } from "./dateUtils";
 import { Exception, HTTP_STATUS } from "../common";
-import { Wallet } from "../models/ledger";
+import { Wallet, WalletExpense } from "../models/ledger";
 import { ExpenseType, Vendor } from "../models/catalogs";
 import { Currency } from "../models/settings";
+import { WalletExpenseFilter } from "../types/filter/walletExpenseFilter";
 
 /**
  *
@@ -46,7 +47,52 @@ export const getExpenseFilter = (
   return where;
 };
 
-export const getExpenseItemResponse = async (ex: Expense): Promise<ExpenseItemResponse> => {
+export const getWalletExpenseFilter = (
+  filter: WalletExpenseFilter
+): FindManyOptions<WalletExpense>["where"] => {
+  // Initial OR condition for walletGroupId
+  let where: any = [
+    { walletGroupId: filter.walletGroupId },
+    { parentWalletGroupId: filter.walletGroupId },
+  ];
+
+  // Adding AND conditions
+  const andConditions: any = {};
+
+  if (filter.expenseTypes && filter.expenseTypes.length > 0) {
+    andConditions.expenseTypeId = In(filter.expenseTypes);
+  }
+
+  if (filter.vendors && filter.vendors.length > 0) {
+    andConditions.vendorId = In(filter.vendors);
+  }
+
+  if (filter.period) {
+    andConditions.buyDate = Between(filter.period.start, filter.period.end);
+  }
+
+  if (filter.expenseRange) {
+    andConditions.total = Between(
+      filter.expenseRange.min,
+      filter.expenseRange.max
+    );
+  }
+
+  if (filter.description) {
+    andConditions.description = Like(`%${filter.description}%`);
+  }
+
+  // Merge AND conditions into the main where clause if there are additional conditions
+  if (Object.keys(andConditions).length > 0) {
+    where = { $and: [{ $or: where }, andConditions] };
+  }
+
+  return where;
+};
+
+export const getExpenseItemResponse = async (
+  ex: Expense
+): Promise<ExpenseItemResponse> => {
   // Wallet Id
   const wallet: Wallet | null = await ex.wallet;
   if (wallet === null)

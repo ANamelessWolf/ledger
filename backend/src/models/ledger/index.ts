@@ -6,6 +6,7 @@ export * from './digitalWallet';
 export * from './investment';
 export * from './saving';
 export * from './wallet';
+export * from './walletExpense';
 export * from './creditcardSpendingHistory';
 export * from './walletGroup';
 export * from './walletMember';

@@ -7,6 +7,7 @@ import creditcardRoutes from './creditcardRoutes';
 import debitcardRoutes from './debitcardRoutes';
 import catalogRoutes from './catalogRoutes';
 import expenseRoutes from './expenseRoutes';
+import walletRoutes from './walletRoutes';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use('/creditcard', creditcardRoutes);
 router.use('/debitcard', debitcardRoutes);
 router.use('/catalog', catalogRoutes);
 router.use('/expenses', expenseRoutes);
+router.use('/wallet', walletRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);
