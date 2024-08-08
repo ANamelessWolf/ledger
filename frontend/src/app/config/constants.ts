@@ -17,6 +17,7 @@ export const LEDGER_API = {
   CREDIT_CARD: `${LEDGER_API_URL}/creditcard`,
   DEBIT_CARD: `${LEDGER_API_URL}/debitcard`,
   EXPENSES: `${LEDGER_API_URL}/expenses`,
+  WALLET: `${LEDGER_API_URL}/wallet`,
 };
 
 export const APP_CATALOGS = {

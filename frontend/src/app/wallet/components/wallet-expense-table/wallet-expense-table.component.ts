@@ -34,6 +34,7 @@ import {
   mapExpense,
   validateFilter,
 } from '@expense/utils/expenseUtils';
+import { WalletService } from '@wallet/services/wallet.service';
 
 @Component({
   selector: 'app-wallet-expense-table',
@@ -48,10 +49,16 @@ import {
   ],
   templateUrl: './wallet-expense-table.component.html',
   styleUrl: './wallet-expense-table.component.scss',
-  providers: [ExpensesService, CatalogService, NotificationService],
+  providers: [
+    ExpensesService,
+    WalletService,
+    CatalogService,
+    NotificationService,
+  ],
 })
 export class WalletExpenseTableComponent implements OnInit, OnChanges {
   @Input() WalletId = 1;
+  @Input() WalletGroupId = 0;
   @Input() Period: DateRange = getDateRange(new Date(), 1, '');
   catalog: ExpenseOptions = EMPTY_EXPENSES;
   options: ExpenseSearchOptions = {
@@ -67,13 +74,14 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
 
   constructor(
     private expenseService: ExpensesService,
+    private walletExpenseService: WalletService,
     private catalogService: CatalogService,
     private notifService: NotificationService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['WalletId']) {
-      this.options.filter.wallet = [this.WalletId];
+    if (changes['WalletGroupId']) {
+      this.options.filter.wallet = [];
       this.options.filter.description = '';
       this.options.filter.period = this.Period;
       this.getExpenses();
@@ -87,11 +95,12 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   get tableHeader(): string {
     if (this.options.filter.period === undefined) {
       return 'All Expenses';
-    }
-    else if(!isValidDate(this.options.filter.period.start) || !isValidDate(this.options.filter.period.end)){
+    } else if (
+      !isValidDate(this.options.filter.period.start) ||
+      !isValidDate(this.options.filter.period.end)
+    ) {
       return 'All Expenses';
-    }
-    else {
+    } else {
       const period = this.options.filter.period;
       return `Expenses from ${toShortDate(period.start)} to ${toShortDate(
         period.end
@@ -141,16 +150,20 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   }
 
   private getExpenses() {
-    this.expenseService.getExpenses(this.options).subscribe(
-      (response) => {
-        const { expenses, totalItems, total } = mapExpense(response);
-        this.expenses = expenses;
-        this.totalItems = totalItems;
-        this.total = total;
-      },
-      this.errorResponse,
-      this.completed
-    );
+    if (this.WalletGroupId > 0) {
+      this.walletExpenseService
+        .getWalletExpenses(this.WalletGroupId, this.options)
+        .subscribe(
+          (response) => {
+            const { expenses, totalItems, total } = mapExpense(response);
+            this.expenses = expenses;
+            this.totalItems = totalItems;
+            this.total = total;
+          },
+          this.errorResponse,
+          this.completed
+        );
+    }
   }
 
   private getCatalog() {

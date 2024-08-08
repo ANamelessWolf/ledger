@@ -48,43 +48,33 @@ export const getExpenseFilter = (
 };
 
 export const getWalletExpenseFilter = (
+  walletGroupId: number,
   filter: WalletExpenseFilter
 ): FindManyOptions<WalletExpense>["where"] => {
   // Initial OR condition for walletGroupId
-  let where: any = [
-    { walletGroupId: filter.walletGroupId },
-    { parentWalletGroupId: filter.walletGroupId },
-  ];
+  const where: FindManyOptions<WalletExpense>["where"] = {};
 
-  // Adding AND conditions
-  const andConditions: any = {};
+  where.walletGroupId = walletGroupId;
+  where.parentWalletGroupId = In([walletGroupId, 0]);
 
   if (filter.expenseTypes && filter.expenseTypes.length > 0) {
-    andConditions.expenseTypeId = In(filter.expenseTypes);
+    where.expenseTypeId = In(filter.expenseTypes);
   }
 
   if (filter.vendors && filter.vendors.length > 0) {
-    andConditions.vendorId = In(filter.vendors);
+    where.vendorId = In(filter.vendors);
   }
 
   if (filter.period) {
-    andConditions.buyDate = Between(filter.period.start, filter.period.end);
+    where.buyDate = Between(filter.period.start, filter.period.end);
   }
 
   if (filter.expenseRange) {
-    andConditions.total = Between(
-      filter.expenseRange.min,
-      filter.expenseRange.max
-    );
+    where.total = Between(filter.expenseRange.min, filter.expenseRange.max);
   }
 
   if (filter.description) {
-    andConditions.description = Like(`%${filter.description}%`);
-  }
-
-  // Merge AND conditions into the main where clause if there are additional conditions
-  if (Object.keys(andConditions).length > 0) {
-    where = { $and: [{ $or: where }, andConditions] };
+    where.description = Like(`%${filter.description}%`);
   }
 
   return where;

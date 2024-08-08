@@ -161,6 +161,14 @@ export class CardSummaryComponent {
     }
   }
 
+  get walletGroupId(): number | undefined {
+    if (this.summary && (this.summary as any).walletGroupId) {
+      return (this.summary as CreditCardSummary).walletGroupId;
+    } else {
+      return undefined;
+    }
+  }
+
   editCard() {
     const card: CardItem = this.card;
     if (this.card.isCreditCard) {

@@ -6,9 +6,7 @@ import {
   PAGINATION_SIZE,
 } from "../common";
 import { asyncErrorHandler } from "../middlewares";
-import {
-  getWalletExpenseFilter,
-} from "../utils/expenseUtils";
+import { getWalletExpenseFilter } from "../utils/expenseUtils";
 import QueryString from "qs";
 import { AppDataSource } from "..";
 import { FindManyOptions } from "typeorm";
@@ -30,11 +28,10 @@ import { formatDate } from "../utils/dateUtils";
 export const getExpensesById = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const groupId: number = +req.params.id;
-      const filter = buildFilter(groupId, req.query);
-      const where = getWalletExpenseFilter(filter);
+      const walletGroupId: number = +req.params.id;
+      const filter = buildFilter(req.query);
+      const where: any = getWalletExpenseFilter(walletGroupId, filter);
       const options: FindManyOptions<WalletExpense> = { where };
-
       // Add sorting
       const { orderBy, orderDirection } = req.query;
       if (orderBy !== undefined) {
@@ -105,15 +102,10 @@ export const getExpensesById = asyncErrorHandler(
   }
 );
 
-const buildFilter = (
-  groupId: number,
-  query: QueryString.ParsedQs
-): WalletExpenseFilter => {
+const buildFilter = (query: QueryString.ParsedQs): WalletExpenseFilter => {
   const { expenseTypes, vendors, start, end, min, max, description } = query;
 
   const filter: WalletExpenseFilter = {
-    parentWalletGroupId: groupId,
-    walletGroupId: groupId,
     expenseTypes:
       expenseTypes
         ?.toString()
