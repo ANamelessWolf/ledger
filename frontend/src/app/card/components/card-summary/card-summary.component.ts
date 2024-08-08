@@ -121,8 +121,15 @@ export class CardSummaryComponent {
       let status = '';
       if ((this.summary as any).status) {
         status = (this.summary as CreditCardSummary).status?.status || '';
+        return getDateRange(this.cutDate, this.summary.cutday, status);
+      } else {
+        const today = new Date();
+        const period = {
+          start: new Date(today.getFullYear(), today.getMonth(), 1),
+          end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+        };
+        return period;
       }
-      return getDateRange(this.cutDate, this.summary.cutday, status);
     } else {
       const today = new Date();
       const period = {

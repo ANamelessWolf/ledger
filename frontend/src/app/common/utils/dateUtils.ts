@@ -24,7 +24,13 @@ export const getDateRange = (
   if (status === 'Pending') {
     start = new Date(now.getFullYear(), month - 1, cutDay + 1);
     end = new Date(now.getFullYear(), month, cutDay);
+  } else if (status === 'Not required') {
+    start = new Date(now.getFullYear(), month+1, cutDay + 1);
+    end = new Date(now.getFullYear(), month + 2, cutDay);
   } else {
+    if (cutDay < 15) {
+      month = now.getMonth();
+    }
     start = new Date(now.getFullYear(), month, cutDay + 1);
     end = new Date(now.getFullYear(), month + 1, cutDay);
   }
