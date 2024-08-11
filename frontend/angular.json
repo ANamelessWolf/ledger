@@ -63,7 +63,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "host": "0.0.0.0",
-            "publicHost": "192.168.1.195:4200",
+            "publicHost": "192.168.1.120:4200",
             "port": 4200
           },
           "configurations": {
