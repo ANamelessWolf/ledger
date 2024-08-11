@@ -34,6 +34,7 @@ import { FormControl } from '@angular/forms';
 import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/credit-card-spending-chart.component';
 import { WalletExpenseTableComponent } from 'app/wallet/components/wallet-expense-table/wallet-expense-table.component';
 import { DateRange } from '@expense/types/expensesTypes';
+import { getDateRange } from '@common/utils/dateUtils';
 
 @Component({
   selector: 'app-card-summary',
@@ -115,6 +116,30 @@ export class CardSummaryComponent {
     );
   }
 
+  get period(): DateRange {
+    if (this.summary) {
+      let status = '';
+      if ((this.summary as any).status) {
+        status = (this.summary as CreditCardSummary).status?.status || '';
+        return getDateRange(this.cutDate, this.summary.cutday, status);
+      } else {
+        const today = new Date();
+        const period = {
+          start: new Date(today.getFullYear(), today.getMonth(), 1),
+          end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+        };
+        return period;
+      }
+    } else {
+      const today = new Date();
+      const period = {
+        start: new Date(today.getFullYear(), today.getMonth(), 1),
+        end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+      };
+      return period;
+    }
+  }
+
   get creditCardSummary(): CreditCardSummary {
     return this.summary as CreditCardSummary;
   }
@@ -123,11 +148,31 @@ export class CardSummaryComponent {
     return this.summary as DebitCardSummary;
   }
 
+  get cutDate(): Date {
+    if ((this.summary as any).status) {
+      const payment = (this.summary as CreditCardSummary).status?.payment;
+      return new Date(payment.startDate);
+    } else {
+      //To DO Debit card CutDate
+      return new Date();
+    }
+  }
+
   get walletId(): number {
-    if (this.summary) {
-      return this.summary.walletId;
+    if (this.summary && (this.summary as any).walletId) {
+      return (this.summary as DebitCardSummary).walletId;
+    } else if (this.summary) {
+      return (this.summary as CreditCardSummary).preferredWalletId;
     } else {
       return 0;
+    }
+  }
+
+  get walletGroupId(): number | undefined {
+    if (this.summary && (this.summary as any).walletGroupId) {
+      return (this.summary as CreditCardSummary).walletGroupId;
+    } else {
+      return undefined;
     }
   }
 

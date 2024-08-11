@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Wallet } from "../ledger";
 import { Currency, PaymentFrequency } from "../settings";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Subscription", { database: process.env.DB_NAME })
 export class Subscription {
@@ -32,25 +32,15 @@ export class Subscription {
   @Column({ type: "date", name: "last_payment_date" })
   lastPaymentDate: Date;
 
-  get currency(): Promise<Currency[]> {
-    const options = {
-      where: [{ id: this.currencyId }],
-    };
-    return AppDataSource.manager.find(Currency, options);
+  get currency() {
+    return getObject(Currency, this.currencyId);
   }
 
-  get paymentFrequency(): Promise<PaymentFrequency[]> {
-    const options = {
-      where: [{ id: this.paymentFrequencyId  }],
-    };
-    return AppDataSource.manager.find(PaymentFrequency, options);
+  get paymentFrequency() {
+    return getObject(PaymentFrequency, this.currencyId);
   }
 
-  get wallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get wallet() {
+    return getObject(Wallet, this.walletId);
   }
-
 }

@@ -36,9 +36,12 @@
  *         id:
  *           type: number
  *           description: The auto-generated id of the credit card summary
- *         walletId:
+ *         preferredWalletId:
  *           type: number
- *           description: The id of the wallet containing the credit card
+ *           description: The id of the preferred wallet containing the credit card
+ *         walletGroupId:
+ *           type: number
+ *           description: The id of the wallet group containing the credit card
  *         entityId:
  *           type: number
  *           description: The id of the entity associated with the credit card
@@ -75,9 +78,12 @@
  *         id:
  *           type: number
  *           description: The auto-generated id of the credit card summary
- *         walletId:
+ *         preferredWalletId:
  *           type: number
  *           description: The id of the wallet containing the credit card
+ *         walletGroupId:
+ *           type: number
+ *           description: The id of the wallet group containing the credit card
  *         entityId:
  *           type: number
  *           description: The id of the entity associated with the credit card

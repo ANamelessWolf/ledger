@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
+import { Router } from '@angular/router';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
@@ -58,7 +59,8 @@ export class ExpenseIndexPageComponent implements OnInit {
   constructor(
     private expenseService: ExpensesService,
     private catalogService: CatalogService,
-    private notifService: NotificationService
+    private notifService: NotificationService,
+    private router: Router
   ) {
     const today = new Date();
     const monthlyPeriod: DateRange = {
@@ -106,6 +108,14 @@ export class ExpenseIndexPageComponent implements OnInit {
         this.expenseAdded.bind(this)
       )
       .subscribe();
+  }
+
+  goToDaily(){
+    const today = new Date();
+    const month = today.getMonth() + 1; // getMonth() returns 0-11, so add 1
+    const year = today.getFullYear();
+
+    this.router.navigate([`/expenses/daily/${month}/${year}`]);
   }
 
   expenseAdded(newExpense: AddExpense) {

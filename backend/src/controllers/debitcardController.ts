@@ -25,27 +25,33 @@ export const getDebitcardSummary = asyncErrorHandler(
       const result: DebitCardSummary[] = [];
       for (let index = 0; index < cards.length; index++) {
         const dc: Debitcard = cards[index];
-        const saving = (await dc.saving)[0];
-        const wallet: Wallet = (await saving.wallet)[0];
-        const banking: FinancingEntity = (await saving.financingEntity)[0];
-        if (filterCard(value, wallet, banking)) {
-          result.push({
-            id: dc.id,
-            walletId: saving.walletId,
-            entityId: saving.entityId,
-            card: wallet.name,
-            banking: banking.name,
-            investmentRate: formatPercent(saving.interestRate),
-            yearlyGain: formatPercent(
-              (saving.interestRate / 100) * saving.total
-            ),
-            total: formatMoney(saving.total),
-            expiration: dc.expiration,
-            cutDay: dc.cutDay,
-            type: dc.cardType,
-            ending: dc.ending,
-            color: dc.color,
-          });
+        const saving = await dc.saving;
+        if (saving !== null) {
+          const wallet = await saving.wallet;
+          const banking = await saving.financingEntity;
+          if (
+            wallet !== null &&
+            banking !== null &&
+            filterCard(value, wallet, banking)
+          ) {
+            result.push({
+              id: dc.id,
+              walletId: saving.walletId,
+              entityId: saving.entityId,
+              card: wallet.name,
+              banking: banking.name,
+              investmentRate: formatPercent(saving.interestRate),
+              yearlyGain: formatPercent(
+                (saving.interestRate / 100) * saving.total
+              ),
+              total: formatMoney(saving.total),
+              expiration: dc.expiration,
+              cutDay: dc.cutDay,
+              type: dc.cardType,
+              ending: dc.ending,
+              color: dc.color,
+            });
+          }
         }
       }
 
@@ -91,9 +97,27 @@ export const getDebitcardSummarybyId = asyncErrorHandler(
 
       // Get summary
       const dc: Debitcard = cards[0];
-      const saving = (await dc.saving)[0];
-      const wallet: Wallet = (await saving.wallet)[0];
-      const banking: FinancingEntity = (await saving.financingEntity)[0];
+      const saving = await dc.saving;
+      if (saving === null) {
+        return next(
+          new Exception(
+            `Saving was not found with id: ${dc.savingId}`,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR
+          )
+        );
+      }
+
+      const wallet: Wallet | null = await saving.wallet;
+      const banking: FinancingEntity | null = await saving.financingEntity;
+      if (wallet === null || banking === null) {
+        return next(
+          new Exception(
+            `Wallet or banking are invalid for saving: ${dc.savingId}`,
+            HTTP_STATUS.INTERNAL_SERVER_ERROR
+          )
+        );
+      }
+
       const result = {
         id: dc.id,
         walletId: saving.walletId,
@@ -149,14 +173,14 @@ export const updateDebitcard = asyncErrorHandler(
       if (cards.length === 0) {
         return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
       }
-      // Get the current Creditcard
+      // Get the current Debit card
       const debitCard: Debitcard = cards[0];
 
       // Get the current Savings
-      const savings: Saving[] = await debitCard.saving;
+      const saving: Saving | null = await debitCard.saving;
 
       // Validate savings id
-      if (savings.length === 0) {
+      if (saving === null) {
         return next(
           new Exception(
             `Invalid card, savings not found`,
@@ -164,8 +188,6 @@ export const updateDebitcard = asyncErrorHandler(
           )
         );
       }
-
-      const saving: Saving = savings[0];
 
       const { active, color, cutDay, ending, expiration, interestRate, total } =
         req.body;

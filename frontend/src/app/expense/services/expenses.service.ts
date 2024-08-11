@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { isValidDate } from '@common/utils/dateUtils';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
@@ -29,11 +30,15 @@ export class ExpensesService {
     return this.http.get(`${LEDGER_API.EXPENSES}?${query}`);
   }
 
+  getDailyExpenses(month: number, year: number): Observable<any> {
+    return this.http.get(`${LEDGER_API.EXPENSES}/daily/${month}/${year}`);
+  }
+
   createExpense(body: AddExpense): Observable<any> {
     return this.http.post(`${LEDGER_API.EXPENSES}`, body);
   }
 
-  editExpense(id:number, body: UpdateExpense): Observable<any> {
+  editExpense(id: number, body: UpdateExpense): Observable<any> {
     return this.http.put(`${LEDGER_API.EXPENSES}/${id}`, body);
   }
 
@@ -66,7 +71,7 @@ export class ExpensesService {
         header,
         expense,
         options,
-        expenseUpdated
+        expenseUpdated,
       },
     });
     return dialogRef.afterClosed();
@@ -121,7 +126,7 @@ export class ExpensesService {
       query += `&vendors=${filter.vendors.join(',')}`;
     }
 
-    if (filter.period) {
+    if (filter.period && isValidDate(filter.period.start) && isValidDate(filter.period.end)) {
       query += `&start=${filter.period.start.toISOString()}`;
       query += `&end=${filter.period.end.toISOString()}`;
     }

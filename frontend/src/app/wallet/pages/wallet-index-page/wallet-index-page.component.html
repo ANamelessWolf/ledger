@@ -1,0 +1,23 @@
+<div class="expense-index-page">
+  <div class="header-section">
+    <h1>Wallets</h1>
+    <div class="button-group">
+      <app-search-bar (search)="onSearch($event)"></app-search-bar>
+      <button
+        mat-icon-button
+        aria-label="Open filter window"
+        (click)="openFilter()"
+      >
+        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
+        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
+      </button>
+      <button mat-icon-button (click)="addWallet()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  <hr />
+  <div class="table-area">
+
+  </div>
+</div>

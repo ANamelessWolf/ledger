@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Expense } from "../expenses";
 import { Beneficiary } from "./beneficiary";
 import { Owner, PaymentFrequency } from "../settings";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Lend_Money", { database: process.env.DB_NAME })
 export class LendMoney {
@@ -33,32 +33,19 @@ export class LendMoney {
   @Column({ type: "date", name: "last_payment_date" })
   lastPaymentDate: Date;
 
-  get owner(): Promise<Owner[]> {
-    const options = {
-      where: [{ id: this.ownerId }],
-    };
-    return AppDataSource.manager.find(Owner, options);
+  get owner() {
+    return getObject(Owner, this.ownerId);
   }
 
-  get expense(): Promise<Expense[]> {
-    const options = {
-      where: [{ id: this.expenseId }],
-    };
-    return AppDataSource.manager.find(Expense, options);
+  get expense() {
+    return getObject(Expense, this.expenseId);
   }
 
-  get beneficiary(): Promise<Beneficiary[]> {
-    const options = {
-      where: [{ id: this.beneficiaryId }],
-    };
-    return AppDataSource.manager.find(Beneficiary, options);
+  get beneficiary() {
+    return getObject(Beneficiary, this.beneficiaryId);
   }
 
-  get paymentFrequency(): Promise<PaymentFrequency[]> {
-    const options = {
-      where: [{ id: this.paymentFrequencyId  }],
-    };
-    return AppDataSource.manager.find(PaymentFrequency, options);
+  get paymentFrequency() {
+    return getObject(PaymentFrequency, this.paymentFrequencyId);
   }
-
 }

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Creditcard } from "./creditcard";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("Credit_Card_Payment", { database: process.env.DB_NAME })
 export class CreditcardPayment {
@@ -22,11 +22,8 @@ export class CreditcardPayment {
   @Column({ type: "date", name: "period_due_date" })
   paymentDueDate: string;
 
-  get creditcard(): Promise<Creditcard[]> {
-    const options = {
-      where: [{ id: this.creditcardId }],
-    };
-    return AppDataSource.manager.find(Creditcard, options);
+  get creditcard(){
+    return getObject(Creditcard, this.creditcardId);
   }
 
 }

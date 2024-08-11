@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 import { Currency, Owner } from "../settings";
-import { AppDataSource } from "../../index";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity('Investment', { database: process.env.DB_NAME })
 export class Investment {
@@ -25,18 +25,12 @@ export class Investment {
   @Column({ type: "double" })
   total: number;
 
-  get owner(): Promise<Owner[]> {
-    const options = {
-      where: [{ id: this.ownerId }],
-    };
-    return AppDataSource.manager.find(Owner, options);
+  get owner(){
+    return getObject(Owner, this.ownerId);
   }
 
-  get currency(): Promise<Currency[]> {
-    const options = {
-      where: [{ id: this.currencyId }],
-    };
-    return AppDataSource.manager.find(Currency, options);
+  get currency(){
+    return getObject(Currency, this.currencyId);
   }
 
 }

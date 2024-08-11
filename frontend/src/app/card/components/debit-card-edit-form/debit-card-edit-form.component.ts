@@ -72,7 +72,7 @@ export class DebitCardEditFormComponent {
         iRate,
         [Validators.required, Validators.pattern(NUM_REG)],
       ],
-      cutDay: [this.card.cutDay, [Validators.required, Validators.pattern(NUM_REG)]],
+      cutDay: [this.card.cutday, [Validators.required, Validators.pattern(NUM_REG)]],
       expMonth: [+expMonth, [Validators.required, Validators.pattern(NUM_REG)]],
       expYear: [+expYear, [Validators.required, Validators.pattern(NUM_REG)]],
       ending: [

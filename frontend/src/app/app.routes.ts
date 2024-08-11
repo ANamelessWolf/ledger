@@ -4,6 +4,7 @@ import { initLedgerGuardGuard } from '@config/guards/init-ledger-guard.guard';
 import { HOME_BASE } from '@home/home.routes';
 import { CARD_BASE } from '@card/card.routes';
 import { EXPENSE_BASE } from '@expense/expenses.routes';
+import { WALLET_BASE } from './wallet/wallet.routes';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,11 @@ export const routes: Routes = [
         path: EXPENSE_BASE,
         loadChildren: () =>
           import('@expense/expenses.routes').then((mod) => mod.EXPENSE_ROUTES),
+      },
+      {
+        path: WALLET_BASE,
+        loadChildren: () =>
+          import('@wallet/wallet.routes').then((mod) => mod.WALLET_ROUTES),
       },
     ],
   },

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { AppDataSource } from "../../index";
 import { Subscription } from "./subscription";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity("SubscriptionPaymentHistory", { database: process.env.DB_NAME })
 export class SubscriptionPaymentHistory {
@@ -15,15 +15,12 @@ export class SubscriptionPaymentHistory {
 
   @Column({ type: "double", name: "exchange_rate" })
   exchangeRate: number;
-  
+
   @Column({ type: "date", name: "payment_date" })
   paymentDate: Date;
 
-  get subscription(): Promise<Subscription[]> {
-    const options = {
-      where: [{ id: this.subscriptionId }],
-    };
-    return AppDataSource.manager.find(Subscription, options);
+  get subscription() {
+    return getObject(Subscription, this.subscriptionId);
   }
-
+  
 }

@@ -11,8 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
+import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
+import { getDateRange, isValidDate } from '@common/utils/dateUtils';
 import { toShortDate } from '@common/utils/formatUtils';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
@@ -32,6 +34,7 @@ import {
   mapExpense,
   validateFilter,
 } from '@expense/utils/expenseUtils';
+import { WalletService } from '@wallet/services/wallet.service';
 
 @Component({
   selector: 'app-wallet-expense-table',
@@ -42,13 +45,21 @@ import {
     MatIconModule,
     ExpenseTableComponent,
     SearchBarComponent,
+    CurrencyFormatPipe,
   ],
   templateUrl: './wallet-expense-table.component.html',
   styleUrl: './wallet-expense-table.component.scss',
-  providers: [ExpensesService, CatalogService, NotificationService],
+  providers: [
+    ExpensesService,
+    WalletService,
+    CatalogService,
+    NotificationService,
+  ],
 })
 export class WalletExpenseTableComponent implements OnInit, OnChanges {
   @Input() WalletId = 1;
+  @Input() WalletGroupId = 0;
+  @Input() Period: DateRange = getDateRange(new Date(), 1, '');
   catalog: ExpenseOptions = EMPTY_EXPENSES;
   options: ExpenseSearchOptions = {
     pagination: EMPTY_PAGINATION,
@@ -57,25 +68,22 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   };
   expenses: Expense[] = [];
   totalItems: number = 0;
+  total: number = 0;
   isLoading = true;
   error = false;
 
   constructor(
     private expenseService: ExpensesService,
+    private walletExpenseService: WalletService,
     private catalogService: CatalogService,
     private notifService: NotificationService
-  ) {
-    const today = new Date();
-    const period = {
-      start: new Date(today.getFullYear(), today.getMonth(), 1),
-      end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
-    };
-
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['WalletId']) {
-      this.options.filter.wallet = [this.WalletId];
+    if (changes['WalletGroupId']) {
+      this.options.filter.wallet = [];
+      this.options.filter.description = '';
+      this.options.filter.period = this.Period;
       this.getExpenses();
     }
   }
@@ -86,6 +94,11 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
 
   get tableHeader(): string {
     if (this.options.filter.period === undefined) {
+      return 'All Expenses';
+    } else if (
+      !isValidDate(this.options.filter.period.start) ||
+      !isValidDate(this.options.filter.period.end)
+    ) {
       return 'All Expenses';
     } else {
       const period = this.options.filter.period;
@@ -137,15 +150,20 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   }
 
   private getExpenses() {
-    this.expenseService.getExpenses(this.options).subscribe(
-      (response) => {
-        const { expenses, totalItems } = mapExpense(response);
-        this.expenses = expenses;
-        this.totalItems = totalItems;
-      },
-      this.errorResponse,
-      this.completed
-    );
+    if (this.WalletGroupId > 0) {
+      this.walletExpenseService
+        .getWalletExpenses(this.WalletGroupId, this.options)
+        .subscribe(
+          (response) => {
+            const { expenses, totalItems, total } = mapExpense(response);
+            this.expenses = expenses;
+            this.totalItems = totalItems;
+            this.total = total;
+          },
+          this.errorResponse,
+          this.completed
+        );
+    }
   }
 
   private getCatalog() {

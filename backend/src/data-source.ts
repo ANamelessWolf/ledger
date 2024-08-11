@@ -5,9 +5,9 @@ import {
   WalletType,
   FinancingType,
   Vendor,
-  CardItem
+  CardItem,
 } from "./models/catalogs";
-import { Credit, Expense } from "./models/expenses";
+import { Credit, DailyExpense, Expense } from "./models/expenses";
 import {
   Cash,
   CreditCardSpendingReport,
@@ -18,6 +18,9 @@ import {
   Investment,
   Saving,
   Wallet,
+  WalletExpense,
+  WalletGroup,
+  WalletMember,
 } from "./models/ledger";
 import { Beneficiary, LendMoney } from "./models/lend";
 import { Currency, Owner, PaymentFrequency } from "./models/settings";
@@ -46,6 +49,7 @@ export const createConnection = (): DataSource => {
       CardItem,
       Credit,
       Expense,
+      DailyExpense,
       Cash,
       Creditcard,
       CreditcardPayment,
@@ -55,6 +59,9 @@ export const createConnection = (): DataSource => {
       Investment,
       Saving,
       Wallet,
+      WalletExpense,
+      WalletGroup,
+      WalletMember,
       Beneficiary,
       LendMoney,
       Currency,

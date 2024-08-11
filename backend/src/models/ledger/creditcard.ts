@@ -3,6 +3,8 @@ import { AppDataSource } from "../../index";
 import { FinancingEntity } from "../banking/financingEntity";
 import { Wallet } from "./wallet";
 import { CreditcardPayment } from "./creditcardPayment";
+import { getObject } from "../../utils/dbUtils";
+import { WalletGroup } from "./walletGroup";
 
 @Entity("Credit_Card", { database: process.env.DB_NAME })
 export class Creditcard {
@@ -12,8 +14,11 @@ export class Creditcard {
   @Column({ type: "int", name: "entity_id" })
   entityId: number;
 
-  @Column({ type: "int", name: "wallet_id" })
-  walletId: number;
+  @Column({ type: "int", name: "preferred_wallet_id" })
+  preferredWalletId: number;
+
+  @Column({ type: "int", name: "wallet_group_id" })
+  walletGroupId: number;
 
   @Column({ type: "double" })
   credit: number;
@@ -42,21 +47,19 @@ export class Creditcard {
   @Column({ type: "int", name: "active" })
   active: number;
 
-  get financingEntity(): Promise<FinancingEntity[]> {
-    const options = {
-      where: [{ id: this.entityId }],
-    };
-    return AppDataSource.manager.find(FinancingEntity, options);
+  get financingEntity() {
+    return getObject(FinancingEntity, this.entityId);
   }
 
-  get wallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get preferredWallet() {
+    return getObject(Wallet, this.preferredWalletId);
   }
 
-  get payments(): Promise<CreditcardPayment[]> {
+  get walletGroup() {
+    return getObject(WalletGroup, this.walletGroupId);
+  }
+
+  get payments() {
     const options: any = {
       order: {
         paymentDate: "DESC",

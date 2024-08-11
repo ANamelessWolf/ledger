@@ -1,9 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Currency, Owner } from "../settings";
-import { AppDataSource } from "../../index";
 import { WalletType } from "../catalogs";
+import { getObject } from "../../utils/dbUtils";
 
-@Entity('Wallet', { database: process.env.DB_NAME })
+@Entity("Wallet", { database: process.env.DB_NAME })
 export class Wallet {
   @PrimaryGeneratedColumn("increment")
   id: number;
@@ -17,28 +17,18 @@ export class Wallet {
   @Column({ type: "int", name: "currency_id" })
   currencyId: number;
 
-  @Column({ type: 'varchar', length: 40 })
+  @Column({ type: "varchar", length: 40 })
   name: string;
 
-  get owner(): Promise<Owner[]> {
-    const options = {
-      where: [{ id: this.ownerId }],
-    };
-    return AppDataSource.manager.find(Owner, options);
+  get owner() {
+    return getObject(Owner, this.ownerId);
   }
 
-  get walletType(): Promise<WalletType[]> {
-    const options = {
-      where: [{ id: this.walletTypeId }],
-    };
-    return AppDataSource.manager.find(WalletType, options);
+  get walletType() {
+    return getObject(WalletType, this.walletTypeId);
   }
 
-  get currency(): Promise<Currency[]> {
-    const options = {
-      where: [{ id: this.currencyId }],
-    };
-    return AppDataSource.manager.find(Currency, options);
+  get currency() {
+    return getObject(Currency, this.currencyId);
   }
-
 }

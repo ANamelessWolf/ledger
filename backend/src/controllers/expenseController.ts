@@ -7,17 +7,16 @@ import {
 } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { ExpenseFilter } from "../types/filter/expenseFilter";
-import { getExpenseFilter } from "../utils/expenseUtils";
+import {
+  getExpenseFilter,
+  getExpenseItemResponse,
+} from "../utils/expenseUtils";
 import QueryString from "qs";
 import { Expense } from "../models/expenses";
 import { AppDataSource } from "..";
-import { FindManyOptions } from "typeorm";
+import { Equal, FindManyOptions, FindOptionsWhere } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
-import { Wallet } from "../models/ledger";
-import { ExpenseType, Vendor } from "../models/catalogs";
-import { formatMoney } from "../utils/formatUtils";
-import { Currency } from "../models/settings";
-import { formatDate, parseDate } from "../utils/dateUtils";
+import { DailyExpense } from "../models/expenses/expenseDaily";
 
 /**
  * Retrieves a list of expenses.
@@ -40,8 +39,8 @@ export const getExpenses = asyncErrorHandler(
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
         options.order = { [field]: sortBy };
-      }else{
-        options.order = { ['buyDate']: 'DESC' };
+      } else {
+        options.order = { ["buyDate"]: "DESC" };
       }
 
       // Add pagination
@@ -50,30 +49,20 @@ export const getExpenses = asyncErrorHandler(
       options.take = take;
 
       const count = await AppDataSource.manager.count(Expense, { where });
-
+      const totalExpense = await getTotalSum(where);
       const expenses: Expense[] = await AppDataSource.manager.find(
         Expense,
         options
       );
       const result: ExpenseItemResponse[] = [];
       for (let index = 0; index < expenses.length; index++) {
-        const ex: Expense = expenses[index];
-        const wallet: Wallet = (await ex.wallet)[0];
-        const currency: Currency = (await wallet.currency)[0];
-        const exType: ExpenseType = (await ex.expenseType)[0];
-        const vendor: Vendor = (await ex.vendor)[0];
-        const exDate:Date = parseDate(ex.buyDate);
-        const item: ExpenseItemResponse = {
-          ...ex,
-          wallet: wallet.name,
-          expenseType: exType.description,
-          expenseIcon: exType.icon,
-          vendor: vendor.description,
-          total: formatMoney(ex.total, `${currency.symbol} $`),
-          value: ex.total * currency.conversion,
-          buyDate: formatDate(exDate),
-        };
-        result.push(item);
+        try {
+          const ex: Expense = expenses[index];
+          const item: ExpenseItemResponse = await getExpenseItemResponse(ex);
+          result.push(item);
+        } catch (error) {
+          console.log(error);
+        }
       }
       const pagination = {
         page: req.query.page,
@@ -83,7 +72,41 @@ export const getExpenses = asyncErrorHandler(
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
-          data: { result, pagination },
+          data: { result, pagination, total: totalExpense },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves a list of daily expenses for a given month
+ * @summary Retrieves list of expenses from a given month.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getDailyExpenses = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const where = getMonthYearFilter(req.params);
+      const expenses: DailyExpense[] = await AppDataSource.manager.find(
+        DailyExpense,
+        { where }
+      );
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: expenses,
         })
       );
     } catch (error) {
@@ -110,15 +133,9 @@ export const getExpenses = asyncErrorHandler(
 export const createExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        total,
-        buyDate,
-        description,
-        walletId,
-        expenseTypeId,
-        vendorId,
-      } = req.body;
-      // Create a new instance of CreditcardPayment
+      const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
+        req.body;
+      // Create a new instance of Expense
       const expense = new Expense();
       expense.walletId = walletId;
       expense.expenseTypeId = expenseTypeId;
@@ -129,7 +146,7 @@ export const createExpense = asyncErrorHandler(
 
       // Save the insert record
       const result = await AppDataSource.manager.save(expense);
-      
+
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
@@ -172,14 +189,8 @@ export const updateExpense = asyncErrorHandler(
       }
       // Get the current Creditcard
       const expense: Expense = expenses[0];
-      const {
-        total,
-        buyDate,
-        description,
-        walletId,
-        expenseTypeId,
-        vendorId,
-      } = req.body;
+      const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
+        req.body;
       // Update the expense
       expense.walletId = walletId;
       expense.expenseTypeId = expenseTypeId;
@@ -208,6 +219,19 @@ export const updateExpense = asyncErrorHandler(
     }
   }
 );
+
+const getMonthYearFilter = (
+  query: QueryString.ParsedQs
+): FindOptionsWhere<DailyExpense> => {
+  const { month, year } = query;
+  const where: FindManyOptions<DailyExpense>["where"] = {};
+  const today = new Date();
+  const monthId = !month ? today.getMonth() + 1 : +month;
+  const yearId = !year ? today.getFullYear() : +year;
+  where.monthId = Equal(monthId);
+  where.yearId = Equal(yearId);
+  return where;
+};
 
 const buildFilter = (query: QueryString.ParsedQs): ExpenseFilter => {
   const { wallet, expenseTypes, vendors, start, end, min, max, description } =
@@ -261,4 +285,14 @@ const getPagination = (query: QueryString.ParsedQs) => {
   const skip = (index - 1) * size;
   const take = size;
   return { skip, take };
+};
+
+const getTotalSum = async (where: any): Promise<number> => {
+  const sumResult = await AppDataSource.getRepository(Expense)
+    .createQueryBuilder("expense")
+    .select("SUM(expense.total)", "sum")
+    .where(where)
+    .getRawOne();
+
+  return sumResult.sum ? parseFloat(sumResult.sum) : 0;
 };

@@ -58,8 +58,8 @@
   <div class="divider-pad">
     <hr />
   </div>
-  <div class="card-expense-area">
-    <app-wallet-expense-table [WalletId]="walletId"/>
+  <div class="card-expense-area" *ngIf="walletGroupId!==undefined">
+    <app-wallet-expense-table [WalletGroupId]="walletGroupId" [Period]="period"/>
   </div>
 </div>
 <ng-template #noSelection>

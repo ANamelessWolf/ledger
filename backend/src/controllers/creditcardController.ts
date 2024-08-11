@@ -37,12 +37,17 @@ export const getCreditcardSummary = asyncErrorHandler(
         const cc: Creditcard = cards[index];
         const payments = await cc.payments;
         const status = getCreditCardStatus(today, payments, cc.cutDay);
-        const wallet: Wallet = (await cc.wallet)[0];
-        const banking: FinancingEntity = (await cc.financingEntity)[0];
-        if (filterCard(value, wallet, banking)) {
+        const wallet: Wallet | null = await cc.preferredWallet;
+        const banking: FinancingEntity | null = await cc.financingEntity;
+        if (
+          wallet !== null &&
+          banking !== null &&
+          filterCard(value, wallet, banking)
+        ) {
           result.push({
             id: cc.id,
-            walletId: cc.walletId,
+            preferredWalletId: cc.preferredWalletId,
+            walletGroupId: cc.walletGroupId,
             entityId: cc.entityId,
             card: wallet.name,
             banking: banking.name,
@@ -55,6 +60,7 @@ export const getCreditcardSummary = asyncErrorHandler(
             ending: cc.ending,
             color: cc.color,
             type: cc.cardType,
+            cutday: cc.cutDay
           });
         }
       }
@@ -104,11 +110,18 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       const cc: Creditcard = cards[0];
       const payments = await cc.payments;
       const status = getCreditCardStatus(today, payments, cc.cutDay);
-      const wallet: Wallet = (await cc.wallet)[0];
-      const banking: FinancingEntity = (await cc.financingEntity)[0];
+      const wallet: Wallet | null = await cc.preferredWallet;
+      const banking: FinancingEntity | null = await cc.financingEntity;
+      if (wallet === null || banking === null) {
+        return next(
+          new Exception(`Invalid wallet or banking`, HTTP_STATUS.BAD_REQUEST)
+        );
+      }
+
       const result: CreditCardSummary = {
         id: cc.id,
-        walletId: cc.walletId,
+        preferredWalletId: cc.preferredWalletId,
+        walletGroupId: cc.walletGroupId,
         entityId: cc.entityId,
         card: wallet.name,
         banking: banking.name,
@@ -121,6 +134,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         ending: cc.ending,
         color: cc.color,
         type: cc.cardType,
+        cutday: cc.cutDay
       };
 
       // Ok Response
@@ -176,14 +190,16 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
       const payment_avg: number =
         values.reduce((pV, cV) => pV + cV) / values.length;
 
-      const data: CardSpending[] = payments.map((p: CreditCardSpendingReport) => {
-        return {
-          label: getPeriodName(p.cutDate),
-          spending: p.payment,
-          period: p.period,
-          cutDate: p.cutDate,
-        };
-      });
+      const data: CardSpending[] = payments.map(
+        (p: CreditCardSpendingReport) => {
+          return {
+            label: getPeriodName(p.cutDate),
+            spending: p.payment,
+            period: p.period,
+            cutDate: p.cutDate,
+          };
+        }
+      );
 
       const result: CardSpendingResponse = {
         id: payment.id,

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
-import { AppDataSource } from "../../index";
 import { Wallet } from "./wallet";
 import { FinancingEntity } from "../banking/financingEntity";
+import { getObject } from "../../utils/dbUtils";
 
 @Entity('Saving', { database: process.env.DB_NAME })
 export class Saving {
@@ -23,18 +23,12 @@ export class Saving {
   @Column({ type: "double" })
   total: number;
 
-  get wallet(): Promise<Wallet[]> {
-    const options = {
-      where: [{ id: this.walletId }],
-    };
-    return AppDataSource.manager.find(Wallet, options);
+  get wallet(){
+    return getObject(Wallet,this.walletId);
   }
 
-  get financingEntity(): Promise<FinancingEntity[]> {
-    const options = {
-      where: [{ id: this.entityId }],
-    };
-    return AppDataSource.manager.find(FinancingEntity, options);
+  get financingEntity(){
+    return getObject(FinancingEntity,this.entityId);
   }
 
 }

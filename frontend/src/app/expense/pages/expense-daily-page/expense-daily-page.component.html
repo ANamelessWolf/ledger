@@ -1,0 +1,71 @@
+<div class="expense-daily-page">
+  <div class="header-section">
+    <h1>{{ monthName }}/{{ year }} - Daily Expenses - {{monthlyTotal | currencyFormat}}</h1>
+    <div class="button-group">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+  </div>
+  <hr />
+  <div class="content-container">
+    <div class="calendar-container">
+      <mat-grid-list cols="7" rowHeight="1:1">
+        <mat-grid-tile class="gridHeader" *ngFor="let day of daysInWeek">{{
+          day
+        }}</mat-grid-tile>
+        <mat-grid-tile class="tile" *ngFor="let day of daysInMonth">
+          <div class="tileContent">
+            <button
+              *ngIf="day > 0"
+              [ngClass]="isSelected(day) ? 'btn-selected' : ''"
+              mat-icon-button
+              (click)="getExpensesForDay(day)"
+            >
+              <p>{{ day }}</p>
+            </button>
+            <div class="total" *ngIf="day > 0">
+              {{ (dayExpenses[day] ? dayExpenses[day] : 0) | currencyFormat }}
+            </div>
+          </div>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+    <div class="detail-container">
+      <h1 *ngIf="dailyExpenses.length > 0">Expenses Details</h1>
+      <mat-list *ngIf="dailyExpenses.length > 0">
+        @for (expense of dailyExpenses; track expense) {
+        <mat-list-item
+          [ngClass]="(expense.index || 0) % 2 !== 0 ? 'odd' : 'even'"
+        >
+          <div class="expense-item">
+            <div class="expense-icon">
+              <p>{{ expense.vendor }}</p>
+              <app-ledger-icon
+                [iconName]="expense.expenseIcon"
+                iconSize="2x"
+              ></app-ledger-icon>
+              <p>{{ expense.expenseType }}</p>
+            </div>
+            <div class="expense-desc">
+              <p [innerHTML]="expense.description"></p>
+              <h2>
+                <app-ledger-icon
+                  iconName="credit-card"
+                  iconSize="1x"
+                ></app-ledger-icon>
+                {{ expense.wallet }} <br />
+              </h2>
+            </div>
+          </div>
+          <div>
+            <p [ngClass]="expense.value > 0 ? 'expense' : 'income'">
+              {{ expense.total }}
+            </p>
+          </div>
+        </mat-list-item>
+        }
+      </mat-list>
+    </div>
+  </div>
+</div>
