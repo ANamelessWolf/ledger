@@ -27,5 +27,6 @@ export class NavMenuComponent {
     { header: 'Cards', route: '/cards', icon: 'credit_card', exact: false },
     { header: 'Expenses', route: '/expenses', icon: 'payments', exact: false },
     { header: 'Wallets', route: '/wallets', icon: 'wallet', exact: false },
+    { header: '0% Interest Financing', route: '/monoint', icon: 'percent', exact: false },
   ];
 }
