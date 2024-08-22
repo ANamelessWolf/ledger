@@ -6,6 +6,10 @@ export type PaymentStatus = {
     dueDate: Date;
   };
   billing: {
+    filter: {
+      start: Date;
+      end: Date;
+    },
     period: string;
     start: string;
     end: string;

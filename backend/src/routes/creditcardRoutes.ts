@@ -17,6 +17,15 @@
  *             period:
  *               type: string
  *               description: The billing period
+ *             filter:
+ *               type: object
+ *               properties:
+ *                 start:
+ *                   type: string
+ *                   description: The start date of the billing period
+ *                 end:
+ *                   type: string
+ *                   description: The end date of the billing period
  *             start:
  *               type: string
  *               description: The start date of the billing period

@@ -1,8 +1,6 @@
 <h1>Interest-free summary</h1>
 <div class="container">
-  <div id="paymentSummaryContainer">
-    <canvas id="paymentSummaryChart"></canvas>
-  </div>
+  <app-line-chart [data]="data" [chartHeight]="300"/>
   <div class="Details">
     <!-- Additional details can be added here -->
   </div>

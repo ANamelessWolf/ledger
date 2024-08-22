@@ -10,8 +10,8 @@ import { ICardValue } from '@moNoInt/types/monthlyNoInterest';
 import { Chart } from 'chart.js';
 import { round, toCurrency, toNumber } from '@common/utils/formatUtils';
 import { MatCardModule } from '@angular/material/card';
-import { ChartData, IChartComponent } from '@expense/types/ChartComponent';
 import { createDoughnutChart, getContext, refreshChart } from '@expense/utils/chartUtils';
+import { ChartData, IChartComponent } from '@expense/types/ChartComponent';
 @Component({
   selector: 'app-interest-free-credit-card-pie-chart',
   standalone: true,

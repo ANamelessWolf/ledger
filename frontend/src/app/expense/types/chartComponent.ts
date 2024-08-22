@@ -1,6 +1,8 @@
 export type ChartDataSet = {
-  backgroundColor: string[];
   data: number[];
+  backgroundColor?: string[];
+  color?: string;
+  legend?: string;
 };
 export type ChartData = {
   labels: string[];
@@ -14,3 +16,8 @@ export interface IChartComponent {
   chartContainer: string;
   chart: any;
 }
+
+export const EMPTY_CHART_DATA: ChartData = {
+  labels: [],
+  datasets: [],
+};

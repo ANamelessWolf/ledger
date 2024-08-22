@@ -76,6 +76,7 @@ export const getCreditCardStatus = (
       dueDate: endDate,
     },
     billing: {
+      filter: getDateRange(billingPeriod, status),
       period: periodName,
       start: formatDate(billingPeriod[0]),
       end: formatDate(billingPeriod[1]),
@@ -83,6 +84,21 @@ export const getCreditCardStatus = (
     status,
     total: formatMoney(total),
   };
+};
+
+export const getDateRange = (
+  billingPeriod: Date[],
+  status: PAYMENT_STATUS
+): { start: Date; end: Date } => {
+  const now = new Date();
+  let start = billingPeriod[0];
+  let end = billingPeriod[1];
+  const month = start.getMonth();
+  if (status === PAYMENT_STATUS.PAID || status === PAYMENT_STATUS.NOT_REQUIRED) {
+    start = new Date(now.getFullYear(), month + 1, start.getDate());
+    end = new Date(now.getFullYear(), month + 2, end.getDate());
+  }
+  return { start, end };
 };
 
 /**

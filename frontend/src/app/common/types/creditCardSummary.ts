@@ -8,6 +8,10 @@ export type PaymentStatus = {
     dueDate: string;
   };
   billing: {
+    filter: {
+      start: Date;
+      end: Date;
+    },
     period: string;
     start: string;
     end: string;
@@ -43,6 +47,10 @@ export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
     dueDate: '',
   },
   billing: {
+    filter: {
+      start: new Date(),
+      end: new Date(),
+    },
     period: '',
     start: '',
     end: '',
