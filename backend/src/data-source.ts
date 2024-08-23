@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { FinancingEntity, MonthlyNonInterest } from "./models/banking";
+import { FinancingEntity, MonthlyNonInterest, MonthlyNonInterestPayment } from "./models/banking";
 import {
   ExpenseType,
   WalletType,
@@ -42,6 +42,7 @@ export const createConnection = (): DataSource => {
     entities: [
       FinancingEntity,
       MonthlyNonInterest,
+      MonthlyNonInterestPayment,
       ExpenseType,
       WalletType,
       FinancingType,
