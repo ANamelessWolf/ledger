@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Creditcard } from "../ledger";
 import { Expense } from "../expenses";
 import { getObject } from "../../utils/dbUtils";
-import { MonthlyNonInterestPayment } from "./MonthlyNonInterestPayment";
+import { MonthlyNonInterestPayment } from "./monthlyNonInterestPayment";
 import { AppDataSource } from "../..";
 
 @Entity("Monthly_With_No_Interest", { database: process.env.DB_NAME })

@@ -1,10 +1,14 @@
-import { FindManyOptions, In } from "typeorm";
-import { MontlyInstallmentFilter as MonthlyInstallmentFilter } from "../types/filter/montlyInstallmentFilter";
+import { FindManyOptions, In, MoreThanOrEqual } from "typeorm";
+import {
+  MontlyInstallmentFilter as MonthlyInstallmentFilter,
+  MontlyInstallmentFilter,
+} from "../types/filter/montlyInstallmentFilter";
 import {
   MonthlyNonInterest,
   MonthlyNonInterestPayment,
 } from "../models/banking";
 import {
+  CreditCardInstallmentTotal,
   MonthlyInstallmentResponse,
   MonthlyPayment,
 } from "../types/response/monthlyInstallmentResponse";
@@ -16,6 +20,9 @@ import { getCurrency, getExpenseType, getVendor } from "./expenseUtils";
 import { Currency } from "../models/settings";
 import { formatMoney } from "./formatUtils";
 import { ExpenseType, Vendor } from "../models/catalogs";
+import { MonthlyCreditCardInstallments } from "../models/banking/MonthlyCreditCardInstallments";
+import { AppDataSource } from "..";
+import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
 
 /**
  *
@@ -141,6 +148,51 @@ export const getPayments = async (installment: MonthlyNonInterest) => {
     }
   }
   return sortPayments(payments);
+};
+
+export const getMonthlyInstallmentTotals = async (
+  month: number,
+  year: number,
+  filter: MontlyInstallmentFilter
+): Promise<CreditCardInstallmentTotal> => {
+  // 1: Pick the selection options
+  const options = getTotalSelOptions(month, year, filter);
+  // 2: Select the installments
+  const installments: MonthlyCreditCardInstallments[] =
+    await AppDataSource.manager.find(MonthlyCreditCardInstallments, options);
+  // 3: Calculates totals
+  const totals = new CreditCardMonthlyInstTot();
+  for (let index = 0; index < installments.length; index++) {
+    const installment = installments[index];
+    totals.updateBalance(installment);
+  }
+  // 4: Format the total response
+  const result = totals.asTotalResponse();
+  return result;
+};
+
+/**
+ * Gets the total selection option to calculate the credit
+ * card totals
+ * @param month The month index from 1 to 12.
+ * @param year A given year to use to filter
+ * @param filter The current monthly selection filter
+ * @returns The selection options.
+ */
+const getTotalSelOptions = (
+  month: number,
+  year: number,
+  filter: MontlyInstallmentFilter
+): FindManyOptions<MonthlyCreditCardInstallments> => {
+  const formattedMonth = month.toString().padStart(2, "0");
+  const period: number = +`${year}${formattedMonth}`;
+  const where: FindManyOptions<MonthlyCreditCardInstallments>["where"] = {};
+  if (filter.creditcardId && filter.creditcardId.length > 0) {
+    where.creditCardId = In(filter.creditcardId);
+  }
+  where.period = MoreThanOrEqual(period);
+  const options: FindManyOptions<MonthlyCreditCardInstallments> = { where };
+  return options;
 };
 
 /**

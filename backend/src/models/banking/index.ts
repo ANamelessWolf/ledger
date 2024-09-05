@@ -1,3 +1,3 @@
 export * from './financingEntity';
 export * from './monthlyNonInterest';
-export * from './MonthlyNonInterestPayment';
+export * from './monthlyNonInterestPayment';

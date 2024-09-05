@@ -56,8 +56,10 @@ export const getWalletExpenseFilter = (
 
   where.walletGroupId = walletGroupId;
   where.parentWalletGroupId = In([walletGroupId, 0]);
+  where.isNonIntMonthlyInstallment = In([0]);
 
   if (filter.expenseTypes && filter.expenseTypes.length > 0) {
+    where.expenseTypeId = In(filter.expenseTypes);
     where.expenseTypeId = In(filter.expenseTypes);
   }
 

@@ -11,7 +11,7 @@ import { Chart } from 'chart.js';
 import { round, toCurrency, toNumber } from '@common/utils/formatUtils';
 import { MatCardModule } from '@angular/material/card';
 import { createDoughnutChart, getContext, refreshChart } from '@expense/utils/chartUtils';
-import { ChartData, IChartComponent } from '@expense/types/ChartComponent';
+import { ChartData, IChartComponent } from '@expense/types/chartComponent';
 @Component({
   selector: 'app-interest-free-credit-card-pie-chart',
   standalone: true,

@@ -1,3 +1,6 @@
+import { PairedValue } from "../../common";
+import { CardBalance } from "../cardBalance";
+
 export type PurchaseExpense = {
   id: number;
   creditCardId: number;
@@ -37,15 +40,18 @@ export type MonthlyInstallmentResponse = {
 };
 
 export type CreditCardInstallmentTotal = {
-  creditCardId: number;
-  creditCard: string;
-  currentBalance: number;
-  paid: number;
-  total: number;
+  currentPeriod: PairedValue;
+  cards: CardBalance[];
+  totals: InstallmentTotal;
+  summary: {
+    labels: string[];
+    balance: number[];
+    payment: number[];
+  };
 };
 
 export type InstallmentTotal = {
-  currentBalance: number;
-  paid: number;
+  monthlyBalance: number;
+  balance: number;
   total: number;
 };

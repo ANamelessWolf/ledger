@@ -14,10 +14,9 @@ import { MontlyInstallmentFilter } from "../types/filter/montlyInstallmentFilter
 import {
   getMonthlyFilter,
   getMonthlyInstallmentItemResponse,
+  getMonthlyInstallmentTotals,
 } from "../utils/monthlyInstallmentUtils";
 import {
-  CreditCardInstallmentTotal,
-  InstallmentTotal,
   MonthlyInstallmentResponse,
 } from "../types/response/monthlyInstallmentResponse";
 /**
@@ -59,50 +58,16 @@ export const getMonthlyInstallments = asyncErrorHandler(
       );
 
       const result: MonthlyInstallmentResponse[] = [];
-      const totalsMap = new Map<number, CreditCardInstallmentTotal>();
       for (let index = 0; index < items.length; index++) {
         try {
           const buy: MonthlyNonInterest = items[index];
           const item: MonthlyInstallmentResponse =
             await getMonthlyInstallmentItemResponse(buy);
-          const existingTotal: CreditCardInstallmentTotal = totalsMap.get(
-            item.purchase.creditCardId
-          ) || {
-            creditCardId: item.purchase.creditCardId,
-            creditCard: item.purchase.card,
-            currentBalance: 0,
-            paid: 0,
-            total: 0,
-          };
-          item.payments.forEach((payment) => {
-            if (!payment.isPaid) {
-              existingTotal.currentBalance += payment.value;
-            } else {
-              existingTotal.paid += payment.value;
-            }
-            existingTotal.total += item.purchase.value;
-          });
-
-          totalsMap.set(item.purchase.creditCardId, existingTotal);
           result.push(item);
         } catch (error) {
           console.log(error);
         }
       }
-      const creditCardTotals = Array.from(totalsMap.values());
-      creditCardTotals.sort((a, b) => b.total - a.total);
-
-      const total: InstallmentTotal = {
-        currentBalance: 0,
-        paid: 0,
-        total: 0,
-      };
-
-      creditCardTotals.forEach((tot) => {
-        total.total += tot.total;
-        total.currentBalance += tot.currentBalance;
-        total.paid += tot.paid;
-      });
 
       const pagination = {
         page: req.query.page,
@@ -110,10 +75,12 @@ export const getMonthlyInstallments = asyncErrorHandler(
         total: count,
       };
 
+      const totals = await getMonthlyInstallmentTotals(11,2023, filter);
+
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
-          data: { result, pagination, totals: { creditCardTotals, total } },
+          data: { result, pagination, totals },
         })
       );
     } catch (error) {

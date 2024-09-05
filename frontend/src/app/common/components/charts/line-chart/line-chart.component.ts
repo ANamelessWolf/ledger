@@ -12,7 +12,7 @@ import {
   ChartData,
   ChartDataSet,
   EMPTY_CHART_DATA,
-} from '@expense/types/ChartComponent';
+} from '@expense/types/chartComponent';
 import { Chart } from 'chart.js';
 
 const ticksFormat = (value: string | number) => {

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LineChartComponent } from '../../../common/components/charts/line-chart/line-chart.component';
-import { ChartData } from '@expense/types/ChartComponent';
+import { ChartData } from '@expense/types/chartComponent';
 
 @Component({
   selector: 'app-interest-free-summary',

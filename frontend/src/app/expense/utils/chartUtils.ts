@@ -1,4 +1,4 @@
-import { IChartComponent } from '@expense/types/ChartComponent';
+import { IChartComponent } from '@expense/types/chartComponent';
 import { Chart } from 'chart.js';
 
 export const getContext = (component: IChartComponent) => {

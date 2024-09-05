@@ -50,5 +50,8 @@ export class WalletExpense {
 
   @ViewColumn()
   buyDate: Date;
+
+  @ViewColumn()
+  isNonIntMonthlyInstallment: number;
   
 }

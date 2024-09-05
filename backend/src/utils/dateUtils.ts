@@ -1,20 +1,22 @@
 import { DATE_FORMAT, EU_FORMAT, ISO_FORMAT, US_FORMAT } from "../common";
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export const getMonthName = (date: Date) => {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNames = MONTH_NAMES;
 
   const monthIndex = date.getMonth();
   return monthNames[monthIndex];
@@ -54,4 +56,11 @@ export const formatDate = (date: Date): string => {
   // Format the date using Intl.DateTimeFormat
   const dateString = new Intl.DateTimeFormat("en-US", options).format(date);
   return dateString;
+};
+
+export const getPeriodLabel = (period: number) => {
+  const monthIndex = +("" + period).substring(4) - 1;
+  const year = ("" + period).substring(0, 4);
+  const monthNames = MONTH_NAMES;
+  return `${monthNames[monthIndex]} ${year}`;
 };
