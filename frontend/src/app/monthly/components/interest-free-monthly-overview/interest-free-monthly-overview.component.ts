@@ -18,5 +18,5 @@ import { EMPTY_FREE_MONTHLY_INT, IFreeMontlyInt } from '@moNoInt/types/monthlyNo
   styleUrl: './interest-free-monthly-overview.component.scss'
 })
 export class InterestFreeMonthlyOverviewComponent {
-  @Input() intFreeMo: IFreeMontlyInt = EMPTY_FREE_MONTHLY_INT;
+  @Input() intFreeMo!: IFreeMontlyInt;
 }

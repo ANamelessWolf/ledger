@@ -75,7 +75,7 @@ export const getMonthlyInstallments = asyncErrorHandler(
         total: count,
       };
 
-      const totals = await getMonthlyInstallmentTotals(11,2023, filter);
+      const totals = await getMonthlyInstallmentTotals(11, 2023, filter);
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(

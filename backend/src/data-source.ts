@@ -28,7 +28,7 @@ import {
   Subscription,
   SubscriptionPaymentHistory,
 } from "./models/subscriptions";
-import { MonthlyCreditCardInstallments } from "./models/banking/MonthlyCreditCardInstallments";
+import { monthlyCreditCardInstallments } from "./models/banking/monthlyCreditCardInstallments";
 
 export const createConnection = (): DataSource => {
   return new DataSource({
@@ -44,7 +44,7 @@ export const createConnection = (): DataSource => {
       FinancingEntity,
       MonthlyNonInterest,
       MonthlyNonInterestPayment,
-      MonthlyCreditCardInstallments,
+      monthlyCreditCardInstallments,
       ExpenseType,
       WalletType,
       FinancingType,

@@ -19,5 +19,5 @@ export const mapNoIntMonthlyInstallments = (response: any) => {
     });
   });
   const totalItems: number = response.data.pagination.total;
-  return { installments, totalItems, total: response.data.total };
+  return { installments, totalItems, total: response.data.total, totals: response.data.totals };
 };

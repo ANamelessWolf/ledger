@@ -1,4 +1,4 @@
-import { MonthlyCreditCardInstallments } from "../models/banking/MonthlyCreditCardInstallments";
+import { monthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
 import { CardBalance } from "../types/cardBalance";
 import { PeriodBalance } from "../types/periodBalance";
 import { CreditCardInstallmentTotal } from "../types/response/monthlyInstallmentResponse";
@@ -48,17 +48,17 @@ export class CreditCardMonthlyInstTot {
     this.currentPeriod = CreditCardMonthlyInstTot.getCurrentPeriod();
   }
 
-  updateBalance(installment: MonthlyCreditCardInstallments) {
+  updateBalance(installment: monthlyCreditCardInstallments) {
     this.addPeriodBalance(installment);
     this.balance += installment.balance;
     this.total += installment.total;
     if (installment.period === this.currentPeriod) {
-      this.monthlyBalance += installment.balance;
+      this.monthlyBalance += installment.total;
     }
     this.addCardBalance(installment);
   }
 
-  addCardBalance(installment: MonthlyCreditCardInstallments) {
+  addCardBalance(installment: monthlyCreditCardInstallments) {
     const key = installment.name;
     if (this.cards[key] !== undefined) {
       this.cards[key].value += installment.balance;
@@ -68,11 +68,12 @@ export class CreditCardMonthlyInstTot {
         card: installment.name,
         color: installment.color,
         value: installment.balance,
+        percent: 0,
       };
     }
   }
 
-  addPeriodBalance(installment: MonthlyCreditCardInstallments) {
+  addPeriodBalance(installment: monthlyCreditCardInstallments) {
     const label = getPeriodLabel(installment.period);
     if (this.periods[label] !== undefined) {
       this.periods[label].balance += installment.balance;
@@ -110,11 +111,19 @@ export class CreditCardMonthlyInstTot {
   }
 
   private calculateSummary() {
-    const summary = Object.keys(this.periods).map(
+    this.summary = Object.keys(this.periods).map(
       (key: string) => this.periods[key]
     );
-    summary.sort(function (a, b) {
+    this.summary.sort(function (a, b) {
       return a.period - b.period;
+    });
+    const cardTotals: number = this.cardsBalance
+      .map((x) => x.value)
+      .reduce((pV, cV) => pV + cV);
+    Object.keys(this.cards).forEach((key: string) => {
+      this.cards[key].percent = this.cards[key].value / cardTotals;
+      this.cards[key].percent *= 100;
+      this.cards[key].percent = Math.round(this.cards[key].percent);
     });
   }
 }

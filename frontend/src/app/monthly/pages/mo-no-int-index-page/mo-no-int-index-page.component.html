@@ -19,10 +19,11 @@
   <hr />
   <div class="main-section">
     <div class="overview">
-      <app-interest-free-monthly-overview class="overview-summary" />
-      <app-interest-free-credit-card-pie-chart class="overview-chart" />
+      <app-interest-free-monthly-overview [intFreeMo]="overview" class="overview-summary" />
+      <app-interest-free-credit-card-pie-chart [cards]="cards"
+      class="overview-chart" />
     </div>
-    <app-interest-free-summary></app-interest-free-summary>
+    <app-interest-free-summary [data]="summaryChartData"></app-interest-free-summary>
     <app-interest-free-details [installments]="installments" />
   </div>
 </div>

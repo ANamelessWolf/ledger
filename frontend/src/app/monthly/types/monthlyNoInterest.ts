@@ -24,6 +24,24 @@ export const EMPTY_MONTHLY_INT_FILTER: MoNoIntFilter = {
   description: '',
 };
 
+export const EMPTY_CREDIT_CARD_INST_TOT: CreditCardInstallmentTotal = {
+  currentPeriod: {
+    label: '',
+    value: 0,
+  },
+  cards: [],
+  totals: {
+    monthlyBalance: 0,
+    balance: 0,
+    total: 0,
+  },
+  summary: {
+    labels: [],
+    balance: [],
+    payment: [],
+  },
+};
+
 export type MoNoIntFilter = {
   creditCard?: number[];
   archived?: number;
@@ -72,4 +90,32 @@ export type NoIntMonthlyInstallment = {
   buyDate: String;
   purchase: Purchase;
   payments: Payment[];
+};
+
+export type CardBalance = {
+  id: number;
+  card: string;
+  color: string;
+  value: number;
+  percent: number;
+};
+
+export type InstallmentTotal = {
+  monthlyBalance: number;
+  balance: number;
+  total: number;
+};
+
+export type CreditCardInstallmentTotal = {
+  currentPeriod: {
+    label: string;
+    value: number;
+  };
+  cards: CardBalance[];
+  totals: InstallmentTotal;
+  summary: {
+    labels: string[];
+    balance: number[];
+    payment: number[];
+  };
 };

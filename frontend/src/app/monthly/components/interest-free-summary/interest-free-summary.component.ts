@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { LineChartComponent } from '../../../common/components/charts/line-chart/line-chart.component';
 import { ChartData } from '@expense/types/chartComponent';
 
@@ -10,8 +10,5 @@ import { ChartData } from '@expense/types/chartComponent';
   styleUrl: './interest-free-summary.component.scss',
 })
 export class InterestFreeSummaryComponent {
-  data: ChartData = {
-    labels: ['January', 'February', 'March'],
-    datasets: [{ data: [5000, 4500, 6000], color: 'blue', legend: 'balance' }],
-  };
+  @Input() data!: ChartData;
 }

@@ -6,11 +6,19 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { ICardValue } from '@moNoInt/types/monthlyNoInterest';
+import {
+  CardBalance,
+  CreditCardInstallmentTotal,
+  ICardValue,
+} from '@moNoInt/types/monthlyNoInterest';
 import { Chart } from 'chart.js';
 import { round, toCurrency, toNumber } from '@common/utils/formatUtils';
 import { MatCardModule } from '@angular/material/card';
-import { createDoughnutChart, getContext, refreshChart } from '@expense/utils/chartUtils';
+import {
+  createDoughnutChart,
+  getContext,
+  refreshChart,
+} from '@expense/utils/chartUtils';
 import { ChartData, IChartComponent } from '@expense/types/chartComponent';
 @Component({
   selector: 'app-interest-free-credit-card-pie-chart',
@@ -47,21 +55,17 @@ export class InterestFreeCreditCardPieChartComponent
   }
 
   getChartData(): ChartData {
-    this.cards = [
-      { card: 'AMEX', color: 'grey', value: 20 },
-      { card: 'RAPPI', color: 'black', value: 30 },
-      { card: 'BBVA', color: 'blue', value: 50 },
-    ];
     const backgroundColor: string[] = [];
     const labels: string[] = [];
     const data: number[] = [];
-    for (let index = 0; index < this.cards.length; index++) {
-      const card = this.cards[index];
-      backgroundColor.push(card.color);
-      labels.push(card.card);
-      data.push(card.value);
+    if (this.cards) {
+      for (let index = 0; index < this.cards.length; index++) {
+        const card = this.cards[index];
+        backgroundColor.push(card.color);
+        labels.push(card.card);
+        data.push(card.value);
+      }
     }
-
     return {
       labels,
       datasets: [

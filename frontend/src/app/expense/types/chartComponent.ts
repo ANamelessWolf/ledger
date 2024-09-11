@@ -4,6 +4,7 @@ export type ChartDataSet = {
   color?: string;
   legend?: string;
 };
+
 export type ChartData = {
   labels: string[];
   datasets: ChartDataSet[];

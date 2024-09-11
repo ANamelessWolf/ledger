@@ -20,7 +20,7 @@ import { getCurrency, getExpenseType, getVendor } from "./expenseUtils";
 import { Currency } from "../models/settings";
 import { formatMoney } from "./formatUtils";
 import { ExpenseType, Vendor } from "../models/catalogs";
-import { MonthlyCreditCardInstallments } from "../models/banking/MonthlyCreditCardInstallments";
+import { monthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
 import { AppDataSource } from "..";
 import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
 
@@ -158,8 +158,8 @@ export const getMonthlyInstallmentTotals = async (
   // 1: Pick the selection options
   const options = getTotalSelOptions(month, year, filter);
   // 2: Select the installments
-  const installments: MonthlyCreditCardInstallments[] =
-    await AppDataSource.manager.find(MonthlyCreditCardInstallments, options);
+  const installments: monthlyCreditCardInstallments[] =
+    await AppDataSource.manager.find(monthlyCreditCardInstallments, options);
   // 3: Calculates totals
   const totals = new CreditCardMonthlyInstTot();
   for (let index = 0; index < installments.length; index++) {
@@ -183,15 +183,15 @@ const getTotalSelOptions = (
   month: number,
   year: number,
   filter: MontlyInstallmentFilter
-): FindManyOptions<MonthlyCreditCardInstallments> => {
+): FindManyOptions<monthlyCreditCardInstallments> => {
   const formattedMonth = month.toString().padStart(2, "0");
   const period: number = +`${year}${formattedMonth}`;
-  const where: FindManyOptions<MonthlyCreditCardInstallments>["where"] = {};
+  const where: FindManyOptions<monthlyCreditCardInstallments>["where"] = {};
   if (filter.creditcardId && filter.creditcardId.length > 0) {
     where.creditCardId = In(filter.creditcardId);
   }
   where.period = MoreThanOrEqual(period);
-  const options: FindManyOptions<MonthlyCreditCardInstallments> = { where };
+  const options: FindManyOptions<monthlyCreditCardInstallments> = { where };
   return options;
 };
 

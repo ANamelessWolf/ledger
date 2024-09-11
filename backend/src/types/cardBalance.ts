@@ -3,4 +3,5 @@ export type CardBalance = {
   card: string;
   color: string;
   value: number;
+  percent: number;
 };
