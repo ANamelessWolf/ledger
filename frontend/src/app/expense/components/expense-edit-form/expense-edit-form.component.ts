@@ -64,7 +64,7 @@ export class ExpenseEditFormComponent implements OnInit {
     this.expensesForm = this.fb.group({
       total: [
         this.data.expense.total,
-        [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)],
+        [Validators.required, Validators.pattern(/^-?\d+(\.\d{1,2})?$/)],
       ],
       expenseDate: [new Date(this.data.expense.buyDate), Validators.required],
       description: [this.data.expense.description, [Validators.required]],
