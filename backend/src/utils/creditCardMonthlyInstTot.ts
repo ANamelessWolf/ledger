@@ -1,4 +1,4 @@
-import { monthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
+import { MonthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
 import { CardBalance } from "../types/cardBalance";
 import { PeriodBalance } from "../types/periodBalance";
 import { CreditCardInstallmentTotal } from "../types/response/monthlyInstallmentResponse";
@@ -48,7 +48,7 @@ export class CreditCardMonthlyInstTot {
     this.currentPeriod = CreditCardMonthlyInstTot.getCurrentPeriod();
   }
 
-  updateBalance(installment: monthlyCreditCardInstallments) {
+  updateBalance(installment: MonthlyCreditCardInstallments) {
     this.addPeriodBalance(installment);
     this.balance += installment.balance;
     this.total += installment.total;
@@ -58,7 +58,7 @@ export class CreditCardMonthlyInstTot {
     this.addCardBalance(installment);
   }
 
-  addCardBalance(installment: monthlyCreditCardInstallments) {
+  addCardBalance(installment: MonthlyCreditCardInstallments) {
     const key = installment.name;
     if (this.cards[key] !== undefined) {
       this.cards[key].value += installment.balance;
@@ -73,7 +73,7 @@ export class CreditCardMonthlyInstTot {
     }
   }
 
-  addPeriodBalance(installment: monthlyCreditCardInstallments) {
+  addPeriodBalance(installment: MonthlyCreditCardInstallments) {
     const label = getPeriodLabel(installment.period);
     if (this.periods[label] !== undefined) {
       this.periods[label].balance += installment.balance;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMonthlyInstallments } from "../controllers/monthlyController";
+import { getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment } from "../controllers/monthlyController";
 
 /**
  * @swagger
@@ -104,6 +104,63 @@ import { getMonthlyInstallments } from "../controllers/monthlyController";
  *         total:
  *           type: number
  *           example: 1200.15
+ *     InstallmentPayment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           example: 1
+ *         paymentId:
+ *           type: number
+ *           example: 2
+ *         creditCardId:
+ *           type: number
+ *           example: 3
+ *         wallet:
+ *           type: string
+ *           example: BBVA
+ *         expenseId:
+ *           type: number
+ *           example: 2
+ *         expense:
+ *           type: string
+ *           example: Blue ray Evangelion 3.0+1.0
+ *         expenseTypeId:
+ *           type: number
+ *           example: 5
+ *         expenseType:
+ *           type: string
+ *           example: Peliculas
+ *         icon:
+ *           type: string
+ *           example: movies
+ *         vendorId:
+ *           type: number
+ *           example: 8
+ *         vendor:
+ *           type: string
+ *           example: Amazon MX
+ *         currencyId:
+ *           type: number
+ *           example: 2
+ *         currency:
+ *           type: string
+ *           example: MXN
+ *         total:
+ *           type: string
+ *           example: $958.50
+ *         value:
+ *           type: number
+ *           example: 958.5
+ *         buyDate:
+ *           type: string
+ *           example: August 22, 2024
+ *         archived:
+ *           type: boolean
+ *           example: false
+ *         isPaid:
+ *           type: boolean
+ *           example: true
  */
 
 const router = Router();
@@ -174,7 +231,34 @@ const router = Router();
  *                  type: array
  *                  items:
  *                    $ref: '#/components/schemas/MonthlyInstallmentResponse'
+ * /monthly/payments/{id}:
+ *  get:
+ *    summary: Get the payments asigned to a given monthly installment
+ *    description: Retrieves a list of monthly payments.
+ *    tags: [Monthly Installments]
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        description: The payment id.
+ *        required: true
+ *        schema:
+ *          type: integer
+ *          format: int32
+ *          example: 1
+ *    responses:
+ *      '200':
+ *        description: An array of payments asigned to a monthly installment.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/InstallmentPayment'
+ *      '404':
+ *        description: No payments found for the specified id. 
  */
 router.route("/").get(getMonthlyInstallments);
+router.route("/payments/:id").get(getMonthlyInstallmentPayment);
+router.route("/pay").put(payInstallment);
 
 export default router;

@@ -82,14 +82,15 @@ export const getWalletExpenseFilter = (
   return where;
 };
 
-export const getExpenseItemResponse = async (
+export const 
+getExpenseItemResponse = async (
   ex: Expense
 ): Promise<ExpenseItemResponse> => {
   const wallet = await getWallet(ex);
   const currency: Currency = await getCurrency(ex, wallet);
   const exType: ExpenseType = await getExpenseType(ex);
   const vendor: Vendor = await getVendor(ex);
-  // Expense date
+  // Expense date 
   const exDate: Date = parseDate(ex.buyDate.toString());
 
   const item: ExpenseItemResponse = {

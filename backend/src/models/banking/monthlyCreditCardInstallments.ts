@@ -4,7 +4,7 @@ import { ViewColumn, ViewEntity } from "typeorm";
   name: "VW_MONTHLY_CREDITCARD_INSTALLMENTS",
   expression: `SELECT * FROM VW_MONTHLY_CREDITCARD_INSTALLMENTS`,
 })
-export class monthlyCreditCardInstallments {
+export class MonthlyCreditCardInstallments {
   @ViewColumn()
   creditCardId: number;
 

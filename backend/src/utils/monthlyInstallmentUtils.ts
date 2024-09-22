@@ -20,7 +20,7 @@ import { getCurrency, getExpenseType, getVendor } from "./expenseUtils";
 import { Currency } from "../models/settings";
 import { formatMoney } from "./formatUtils";
 import { ExpenseType, Vendor } from "../models/catalogs";
-import { monthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
+import { MonthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
 import { AppDataSource } from "..";
 import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
 
@@ -158,8 +158,8 @@ export const getMonthlyInstallmentTotals = async (
   // 1: Pick the selection options
   const options = getTotalSelOptions(month, year, filter);
   // 2: Select the installments
-  const installments: monthlyCreditCardInstallments[] =
-    await AppDataSource.manager.find(monthlyCreditCardInstallments, options);
+  const installments: MonthlyCreditCardInstallments[] =
+    await AppDataSource.manager.find(MonthlyCreditCardInstallments, options);
   // 3: Calculates totals
   const totals = new CreditCardMonthlyInstTot();
   for (let index = 0; index < installments.length; index++) {
@@ -168,6 +168,42 @@ export const getMonthlyInstallmentTotals = async (
   }
   // 4: Format the total response
   const result = totals.asTotalResponse();
+  return result;
+};
+
+export const payMonthlyInstallment = async (
+  paymentId: number
+): Promise<MonthlyNonInterestPayment> => {
+  const where: any = { id: paymentId };
+  const payment: MonthlyNonInterestPayment | null =
+    await AppDataSource.manager.findOne(MonthlyNonInterestPayment, where);
+
+  // Validate id
+  if (payment === null) {
+    throw new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST);
+  }
+
+  // Check flag to pay
+  payment.isPaid = 1;
+  const result = await AppDataSource.manager.save(payment);
+  return result;
+};
+
+export const updatePaidMonths = async (
+  id: number,
+  paidMonths: number,
+): Promise<MonthlyNonInterest> => {
+  const where: any = { id: id };
+  const installment: MonthlyNonInterest | null =
+    await AppDataSource.manager.findOne(MonthlyNonInterest, where);
+
+  // Validate id
+  if (installment === null) {
+    throw new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST);
+  }
+
+  installment.paidMonths = paidMonths;
+  const result = await AppDataSource.manager.save(installment);
   return result;
 };
 
@@ -183,15 +219,15 @@ const getTotalSelOptions = (
   month: number,
   year: number,
   filter: MontlyInstallmentFilter
-): FindManyOptions<monthlyCreditCardInstallments> => {
+): FindManyOptions<MonthlyCreditCardInstallments> => {
   const formattedMonth = month.toString().padStart(2, "0");
   const period: number = +`${year}${formattedMonth}`;
-  const where: FindManyOptions<monthlyCreditCardInstallments>["where"] = {};
+  const where: FindManyOptions<MonthlyCreditCardInstallments>["where"] = {};
   if (filter.creditcardId && filter.creditcardId.length > 0) {
     where.creditCardId = In(filter.creditcardId);
   }
   where.period = MoreThanOrEqual(period);
-  const options: FindManyOptions<monthlyCreditCardInstallments> = { where };
+  const options: FindManyOptions<MonthlyCreditCardInstallments> = { where };
   return options;
 };
 

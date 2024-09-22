@@ -1,0 +1,20 @@
+export type MonthlyInsPaymentResponse = {
+  id: number;
+  paymentId: number;
+  creditCardId: number;
+  wallet: string;
+  expenseId: number;
+  expense: string;
+  expenseTypeId: number;
+  expenseType: string;
+  icon: string;
+  vendorId: number;
+  vendor: string;
+  currencyId: number;
+  currency: string;
+  total: string;
+  value: number;
+  buyDate: string;
+  archived: boolean;
+  isPaid: boolean;
+};

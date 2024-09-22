@@ -9,16 +9,23 @@ import { asyncErrorHandler } from "../middlewares";
 import QueryString from "qs";
 import { FindManyOptions } from "typeorm";
 import { AppDataSource } from "..";
-import { MonthlyNonInterest } from "../models/banking";
+import {
+  MonthlyNonInterest,
+  MonthlyNonInterestPayment,
+} from "../models/banking";
 import { MontlyInstallmentFilter } from "../types/filter/montlyInstallmentFilter";
 import {
   getMonthlyFilter,
   getMonthlyInstallmentItemResponse,
   getMonthlyInstallmentTotals,
+  payMonthlyInstallment,
+  updatePaidMonths,
 } from "../utils/monthlyInstallmentUtils";
-import {
-  MonthlyInstallmentResponse,
-} from "../types/response/monthlyInstallmentResponse";
+import { MonthlyInstallmentResponse } from "../types/response/monthlyInstallmentResponse";
+import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
+import { formatMoney } from "../utils/formatUtils";
+import { MonthlyInsPaymentResponse } from "../types/response/monthlyInstallmentPayment";
+import { formatDate } from "../utils/dateUtils";
 /**
  * Retrieves a list of all monthly free installments with his asigned payments
  * @summary Retrieves list of montly buys with payments
@@ -88,6 +95,107 @@ export const getMonthlyInstallments = asyncErrorHandler(
       return next(
         new Exception(
           `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get all payments from a monthly installments
+ * @route GET /monthly/payments/:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const getMonthlyInstallmentPayment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const where: any = { id: id };
+      const payments: MonthlyInstallmentPayment[] =
+        await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+          where,
+        });
+
+      // Validate id
+      if (payments.length === 0) {
+        return next(new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST));
+      }
+
+      // Format values
+      const response: MonthlyInsPaymentResponse[] = payments.map(
+        (x: MonthlyInstallmentPayment) => ({
+          ...x,
+          total: formatMoney(x.total),
+          buyDate: formatDate(x.buyDate),
+          archived: x.archived === 1,
+          isPaid: x.isPaid === 1,
+        })
+      );
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: response,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting installment payments`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Change an expense to a pay status
+ * @route Update /monthly/pay/:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const payInstallment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.body.id;
+      const paymentId: number = +req.body.paymentId;
+
+      const payment: MonthlyNonInterestPayment = await payMonthlyInstallment(
+        paymentId
+      );
+
+      const where: any = { id: id };
+      const payments: MonthlyInstallmentPayment[] =
+        await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+          where,
+        });
+
+      const paidMonths = payments.filter((x) => x.isPaid === 1).length;
+
+      const installment: MonthlyNonInterest = await updatePaidMonths(
+        id,
+        paidMonths
+      );
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: { payment, installment },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting installment payments`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );
