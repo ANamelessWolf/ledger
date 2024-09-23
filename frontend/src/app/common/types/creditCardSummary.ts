@@ -20,6 +20,11 @@ export type PaymentStatus = {
   total: string;
 };
 
+export type CreditCardSummaryInstallmentTotal = {
+  balance: string;
+  monthlyPayment: string;
+};
+
 export type CreditCardSummary = {
   objtype: 'CreditCard';
   id: number;
@@ -37,6 +42,7 @@ export type CreditCardSummary = {
   ending: string;
   color: string;
   cutday: number;
+  installment?: CreditCardSummaryInstallmentTotal;
 };
 
 export const EMPTY_PAYMENT_STATUS: PaymentStatus = {

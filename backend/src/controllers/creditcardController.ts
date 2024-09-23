@@ -8,7 +8,7 @@ import {
   Wallet,
 } from "../models/ledger";
 import { AppDataSource } from "..";
-import { filterCard, getCreditCardStatus } from "../utils/creditCardUtils";
+import { filterCard, getCreditCardStatus, getInstallments } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { formatMoney } from "../utils/formatUtils";
 import { CreditCardSummary } from "../types/response/creditCardSummaryResponse";
@@ -60,7 +60,7 @@ export const getCreditcardSummary = asyncErrorHandler(
             ending: cc.ending,
             color: cc.color,
             type: cc.cardType,
-            cutday: cc.cutDay
+            cutday: cc.cutDay,
           });
         }
       }
@@ -118,6 +118,8 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         );
       }
 
+      const installment = await getInstallments(cc.id);
+
       const result: CreditCardSummary = {
         id: cc.id,
         preferredWalletId: cc.preferredWalletId,
@@ -134,7 +136,8 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         ending: cc.ending,
         color: cc.color,
         type: cc.cardType,
-        cutday: cc.cutDay
+        cutday: cc.cutDay,
+        installment: installment,
       };
 
       // Ok Response

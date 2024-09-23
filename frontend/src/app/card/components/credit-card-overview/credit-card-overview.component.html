@@ -10,6 +10,10 @@
       <mat-grid-tile class="column"> Used Credit </mat-grid-tile>
       <mat-grid-tile class="value">{{ summary.credit }}</mat-grid-tile>
       <mat-grid-tile class="value"><p class="highlight">{{ summary.usedCredit }}</p></mat-grid-tile>
+      <mat-grid-tile *ngIf="summary.installment" class="column"> Installments </mat-grid-tile>
+      <mat-grid-tile *ngIf="summary.installment" class="column"> Monthly Payment </mat-grid-tile>
+      <mat-grid-tile *ngIf="summary.installment" class="value">{{ summary.installment.balance }}</mat-grid-tile>
+      <mat-grid-tile *ngIf="summary.installment" class="value">{{ summary.installment.monthlyPayment }}</mat-grid-tile>
       <mat-grid-tile class="column"> Cut date </mat-grid-tile>
       <mat-grid-tile class="column"> Due date </mat-grid-tile>
       <mat-grid-tile class="value">{{ cutDate }}</mat-grid-tile>

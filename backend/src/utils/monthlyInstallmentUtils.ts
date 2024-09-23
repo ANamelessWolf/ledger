@@ -23,6 +23,8 @@ import { ExpenseType, Vendor } from "../models/catalogs";
 import { MonthlyCreditCardInstallments } from "../models/banking/monthlyCreditCardInstallments";
 import { AppDataSource } from "..";
 import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
+import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
+import { GroupedInstallment } from "../types/groupedInstallment";
 
 /**
  *
@@ -206,6 +208,42 @@ export const updatePaidMonths = async (
   installment.paidMonths = paidMonths;
   const result = await AppDataSource.manager.save(installment);
   return result;
+};
+
+export const groupInstallmentsById = (
+  monthlyInstallments: MonthlyInstallmentPayment[]
+): GroupedInstallment[] => {
+  try {
+    // Create a map to group by 'id'
+    const groupedMap = new Map<number, GroupedInstallment>();
+
+    // Iterate through the monthlyInstallments array
+    monthlyInstallments.forEach((installment) => {
+      const existingGroup = groupedMap.get(installment.id);
+
+      if (existingGroup) {
+        // Update the balance and total for the existing group
+        existingGroup.total += installment.value;
+        if (installment.isPaid === 0) {
+          existingGroup.balance += installment.value;
+        }
+      } else {
+        // Create a new group for the current installment
+        groupedMap.set(installment.id, {
+          id: installment.id,
+          monthlyPayment: installment.value, // First monthlyPayment value is set as the installment's value
+          balance: installment.isPaid === 0 ? installment.value : 0, // Add to balance only if isPaid is 0
+          total: installment.value, // Set the initial total to the installment's value
+        });
+      }
+    });
+
+    // Convert the grouped map into an array
+    return Array.from(groupedMap.values());
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 };
 
 /**

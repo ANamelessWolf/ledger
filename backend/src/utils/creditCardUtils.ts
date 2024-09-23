@@ -2,11 +2,14 @@ import { AppDataSource } from "..";
 import { PaymentMap } from "../common";
 import { PAYMENT_STATUS } from "../common/enums";
 import { FinancingEntity } from "../models/banking";
+import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
 import { CreditcardPayment, Wallet } from "../models/ledger";
 import { CardListFilter } from "../types/filter/cardListFilter";
 import { PaymentStatus } from "../types/paymentStatus";
+import { CreditCardSummaryInstallmentTotal } from "../types/response/creditCardSummaryResponse";
 import { formatDate, getPeriodName, parseDate } from "./dateUtils";
 import { formatMoney } from "./formatUtils";
+import { groupInstallmentsById } from "./monthlyInstallmentUtils";
 
 /**
  * Calculates the status of a credit card based on the provided date, payment history, and cut-off day.
@@ -94,7 +97,10 @@ export const getDateRange = (
   let start = billingPeriod[0];
   let end = billingPeriod[1];
   const month = start.getMonth();
-  if (status === PAYMENT_STATUS.PAID || status === PAYMENT_STATUS.NOT_REQUIRED) {
+  if (
+    status === PAYMENT_STATUS.PAID ||
+    status === PAYMENT_STATUS.NOT_REQUIRED
+  ) {
     start = new Date(now.getFullYear(), month + 1, start.getDate());
     end = new Date(now.getFullYear(), month + 2, end.getDate());
   }
@@ -171,4 +177,37 @@ export const getPayments = (
     where: [{ creditcardId: creditcardId }],
   };
   return AppDataSource.manager.find(CreditcardPayment, options);
+};
+
+export const getInstallments = async (
+  creditcardId: number
+): Promise<CreditCardSummaryInstallmentTotal | undefined> => {
+  let monthlyInstallments: MonthlyInstallmentPayment[] =
+    await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+      where: { creditCardId: creditcardId, archived: 0 },
+    });
+  monthlyInstallments = monthlyInstallments.filter((x) => x.paymentId !== null);
+  if (monthlyInstallments.length > 0) {
+    const installmentTotals = groupInstallmentsById(monthlyInstallments);
+    installmentTotals.forEach((x) => {
+      if (x.balance === 0) {
+        x.monthlyPayment = 0;
+      }
+    });
+    const balance = installmentTotals.map((x) => x.balance).reduce((pV, cV) => pV + cV);
+    const installment: CreditCardSummaryInstallmentTotal = {
+      balance: formatMoney(balance),
+      monthlyPayment: formatMoney(
+        installmentTotals
+          .map((x) => x.monthlyPayment)
+          .reduce((pV, cV) => pV + cV)
+      ),
+    };
+    if (balance === 0) {
+      return undefined;
+    }
+    return installment;
+  } else {
+    return undefined;
+  }
 };
