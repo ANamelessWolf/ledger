@@ -174,10 +174,10 @@ export const getMonthlyInstallmentTotals = async (
 export const payMonthlyInstallment = async (
   paymentId: number
 ): Promise<MonthlyNonInterestPayment> => {
-  const where: any = { id: paymentId };
   const payment: MonthlyNonInterestPayment | null =
-    await AppDataSource.manager.findOne(MonthlyNonInterestPayment, where);
-
+    await AppDataSource.manager.findOne(MonthlyNonInterestPayment, {
+      where: { id: paymentId },
+    });
   // Validate id
   if (payment === null) {
     throw new Exception(`Invalid id`, HTTP_STATUS.BAD_REQUEST);
@@ -191,11 +191,12 @@ export const payMonthlyInstallment = async (
 
 export const updatePaidMonths = async (
   id: number,
-  paidMonths: number,
+  paidMonths: number
 ): Promise<MonthlyNonInterest> => {
-  const where: any = { id: id };
   const installment: MonthlyNonInterest | null =
-    await AppDataSource.manager.findOne(MonthlyNonInterest, where);
+    await AppDataSource.manager.findOne(MonthlyNonInterest, {
+      where: { id: id },
+    });
 
   // Validate id
   if (installment === null) {

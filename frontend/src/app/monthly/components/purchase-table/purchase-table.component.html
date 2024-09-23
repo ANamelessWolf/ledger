@@ -105,6 +105,10 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="showPayments(row.id, row)">
+            <mat-icon>attach_money</mat-icon>
+            <span>Payments</span>
+          </button>
           <button mat-menu-item (click)="editPurchase(row.id, row)">
             <mat-icon>edit</mat-icon>
             <span>Edit</span>

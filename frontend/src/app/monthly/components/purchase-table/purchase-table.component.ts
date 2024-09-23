@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ExpensesService } from '@expense/services/expenses.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
+  InstallmentPayment,
   NoIntMonthlyInstallment,
   Payment,
 } from '@moNoInt/types/monthlyNoInterest';
@@ -39,7 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   templateUrl: './purchase-table.component.html',
   styleUrl: './purchase-table.component.scss',
-  providers: [ExpensesService, NotificationService],
+  providers: [MoNoIntService, NotificationService],
 })
 export class PurchaseTableComponent {
   @Input() installments: NoIntMonthlyInstallment[] = [];
@@ -58,6 +59,8 @@ export class PurchaseTableComponent {
   ];
   pageSizeOptions: number[] = [5, 10, 25, 100];
   pageSize: number = 25;
+  isLoading = true;
+  error = false;
 
   public constructor(
     private moNoIntService: MoNoIntService,
@@ -115,4 +118,39 @@ export class PurchaseTableComponent {
   }
 
   editPurchase(id: number, installment: NoIntMonthlyInstallment) {}
+
+  showPayments(id: number, installment: NoIntMonthlyInstallment) {
+    this.moNoIntService.getPayments(id).subscribe(
+      (response) => {
+        const payments = response.data as InstallmentPayment[];
+        console.log(payments);
+        this.moNoIntService
+          .showPaymentsDialog(
+            'Lista de Pagos',
+            payments.filter((x) => x.paymentId !== null),
+            id,
+            this.refresh.bind(this)
+          )
+          .subscribe();
+      },
+      this.errorResponse,
+      this.completed
+    );
+  }
+
+  private getPayments() {}
+
+  private errorResponse(err: HttpErrorResponse) {
+    this.error = true;
+    this.notifService.showError(err);
+  }
+
+  private completed() {
+    this.error = true;
+    this.isLoading = false;
+  }
+
+  refresh() {
+    console.log('refreshing');
+  }
 }
