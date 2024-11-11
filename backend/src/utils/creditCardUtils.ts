@@ -4,10 +4,17 @@ import { PAYMENT_STATUS } from "../common/enums";
 import { FinancingEntity } from "../models/banking";
 import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
 import { CreditcardPayment, Wallet } from "../models/ledger";
+import { CardSpending } from "../types/cardSpending";
 import { CardListFilter } from "../types/filter/cardListFilter";
-import { PaymentStatus } from "../types/paymentStatus";
+import { CreditCardPeriod, PaymentStatus } from "../types/paymentStatus";
 import { CreditCardSummaryInstallmentTotal } from "../types/response/creditCardSummaryResponse";
-import { formatDate, getPeriodName, parseDate } from "./dateUtils";
+import {
+  adjustDueDate,
+  formatDate,
+  getMonthName,
+  getPeriodName,
+  parseDate,
+} from "./dateUtils";
 import { formatMoney } from "./formatUtils";
 import { groupInstallmentsById } from "./monthlyInstallmentUtils";
 
@@ -71,8 +78,16 @@ export const getCreditCardStatus = (
   const endDate = new Date(billingPeriod[0].getTime());
   endDate.setDate(endDate.getDate() + 50);
 
+  let labelCutdate = cutDate;
+  if (status === PAYMENT_STATUS.PAID || cutday >= 15)
+    labelCutdate = new Date(
+      cutDate.getFullYear(),
+      cutDate.getMonth() + 1,
+      cutday
+    );
+
   return {
-    cutDate: formatDate(cutDate),
+    cutDate: formatDate(labelCutdate),
     dueDate: formatDate(dueDate),
     payment: {
       startDate: billingPeriod[0],
@@ -194,7 +209,9 @@ export const getInstallments = async (
         x.monthlyPayment = 0;
       }
     });
-    const balance = installmentTotals.map((x) => x.balance).reduce((pV, cV) => pV + cV);
+    const balance = installmentTotals
+      .map((x) => x.balance)
+      .reduce((pV, cV) => pV + cV);
     const installment: CreditCardSummaryInstallmentTotal = {
       balance: formatMoney(balance),
       monthlyPayment: formatMoney(
@@ -210,4 +227,113 @@ export const getInstallments = async (
   } else {
     return undefined;
   }
+};
+
+/**
+ * Generates an array of CreditCardPeriod objects for each month of the specified year, based on the given cut day.
+ *
+ * @param {number} cutDay - The day of the month used as the cut-off date for each period.
+ * @param {number} year - The year for which the periods will be generated.
+ * @returns {CreditCardPeriod[]} An array of CreditCardPeriod objects, one for each month from January to December.
+ *
+ * The CreditCardPeriod contains:
+ * - `period`: The month and year, with a `key` formatted as `${monthName} ${year}`.
+ * - `cutDay`: The specified cut-off day as a string.
+ * - `cutDate`: The date for the cut day of the current month, formatted as an object with `dateValue` and `dateString`.
+ * - `billing`: The start and end dates for the billing period, based on the cut day and length of the month.
+ * - `dueDate`: The payment due date, calculated as 20 days after the cut date.
+ */
+export const generateCreditCardPeriods = (
+  cutDay: number,
+  year: number
+): CreditCardPeriod[] => {
+  const periods: CreditCardPeriod[] = [];
+
+  for (let month = 0; month < 12; month++) {
+    const cutDate = new Date(year, month, cutDay);
+    const cutDateString = formatDate(cutDate);
+    const monthName = getMonthName(cutDate);
+    const periodKey = `${monthName} ${year}`;
+
+    // Calculate billing start and end dates
+    const previousMonth = month === 0 ? 11 : month - 1;
+    const previousMonthYear = month === 0 ? year - 1 : year;
+    const billingStartDate = new Date(
+      previousMonthYear,
+      previousMonth,
+      cutDay + 1
+    );
+    const billingEndDate = new Date(year, month, cutDay);
+
+    // Format billing dates
+    const billingStartString = formatDate(billingStartDate);
+    const billingEndString = formatDate(billingEndDate);
+
+    // Calculate due date (20 days after billing start)
+    const dueDate = new Date(billingEndDate);
+    dueDate.setDate(dueDate.getDate() + 20);
+    const adjustedDueDate = adjustDueDate(dueDate);
+    const dueDateString = formatDate(adjustedDueDate);
+
+    const creditCardPeriod: CreditCardPeriod = {
+      period: {
+        month: month + 1,
+        year,
+        key: periodKey,
+      },
+      cutDay: cutDay.toString(),
+      cutDate: {
+        dateValue: cutDate,
+        dateString: cutDateString,
+      },
+      billing: {
+        start: {
+          dateValue: billingStartDate,
+          dateString: billingStartString,
+        },
+        end: {
+          dateValue: billingEndDate,
+          dateString: billingEndString,
+        },
+      },
+      dueDate: {
+        dateValue: adjustedDueDate,
+        dateString: dueDateString,
+      },
+    };
+
+    periods.push(creditCardPeriod);
+  }
+
+  return periods;
+};
+
+export const findCreditCardPeriod = (
+  periods: CreditCardPeriod[],
+  paymentDate: Date
+): CreditCardPeriod | undefined => {
+  return periods.find(
+    (period) =>
+      paymentDate > period.cutDate.dateValue &&
+      paymentDate <= period.dueDate.dateValue
+  );
+};
+
+export const groupSpending = (data: CardSpending[]): CardSpending[] => {
+  const groupedData = new Map<string, CardSpending>();
+
+  data.forEach((item) => {
+    const key = `${item.label}-${item.period}-${item.cutDate}`;
+
+    if (groupedData.has(key)) {
+      // If the key already exists, accumulate the spending
+      groupedData.get(key)!.spending += item.spending;
+    } else {
+      // Otherwise, add the item to the map
+      groupedData.set(key, { ...item });
+    }
+  });
+
+  // Convert the map values back to an array
+  return Array.from(groupedData.values());
 };

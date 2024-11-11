@@ -26,6 +26,9 @@ import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentP
 import { formatMoney } from "../utils/formatUtils";
 import { MonthlyInsPaymentResponse } from "../types/response/monthlyInstallmentPayment";
 import { formatDate } from "../utils/dateUtils";
+// import { NewMonthlyInstallment } from "../types/newMonthlyInstallment";
+// import { Expense } from "../models/expenses";
+// import { getExpenseById } from "../utils/expenseUtils";
 /**
  * Retrieves a list of all monthly free installments with his asigned payments
  * @summary Retrieves list of montly buys with payments
@@ -196,6 +199,66 @@ export const payInstallment = asyncErrorHandler(
       return next(
         new Exception(
           `An error occurred getting installment payments`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Create a new monthly expense buy
+ * @summary Handles adding a new zero interest monthly installment
+ * @route POST /expenses
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the payment details or an error
+ */
+export const createMonthlyExpense = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+       /*
+      // const { installment, monthlyExpenses, creditCardId } =
+      //   req.body;
+      const installment: NewMonthlyInstallment = req.body.installment;
+      let buyExpense: Expense;
+      let isNewExpense = false;
+      try {
+        buyExpense: Expense = await getExpenseById(installment.expenseId);
+      } catch (error) {
+        console.log("Buy expense was not found, creating a new one.");
+        isNewExpense = true;
+      }
+      if (isNewExpense) {
+      }
+      // Create a new instance of Expense
+
+     
+      const expense = new Expense();
+      expense.walletId = walletId;
+      expense.expenseTypeId = expenseTypeId;
+      expense.vendorId = vendorId;
+      expense.description = description;
+      expense.buyDate = buyDate;
+      expense.total = total;
+
+
+      // Save the insert record
+      const result = await AppDataSource.manager.save(expense);
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+      */
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred adding a new Expense`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

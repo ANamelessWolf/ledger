@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment } from "../controllers/monthlyController";
+import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment } from "../controllers/monthlyController";
 
 /**
  * @swagger
@@ -257,8 +257,7 @@ const router = Router();
  *      '404':
  *        description: No payments found for the specified id. 
  */
-router.route("/").get(getMonthlyInstallments);
+router.route("/").get(getMonthlyInstallments).post(createMonthlyExpense);
 router.route("/payments/:id").get(getMonthlyInstallmentPayment);
 router.route("/pay").put(payInstallment);
-
 export default router;

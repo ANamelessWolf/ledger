@@ -26,6 +26,12 @@ export const getPeriodName = (date: Date) => {
   return `${getMonthName(date)} ${date.getFullYear()}`;
 };
 
+export const getPeriodKey = (date: Date): string => {
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString();
+  return `${month}/${year}`;
+};
+
 export const parseDate = (dateString: string): Date => {
   //Configure date format on constants.ts
   if (DATE_FORMAT === ISO_FORMAT && DATE_FORMAT.test(dateString)) {
@@ -63,4 +69,16 @@ export const getPeriodLabel = (period: number) => {
   const year = ("" + period).substring(0, 4);
   const monthNames = MONTH_NAMES;
   return `${monthNames[monthIndex]} ${year}`;
+};
+
+export const adjustDueDate = (date: Date): Date => {
+  const dayOfWeek = date.getDay();
+  if (dayOfWeek === 6) {
+    // Saturday
+    date.setDate(date.getDate() + 2); // Move to Monday
+  } else if (dayOfWeek === 0) {
+    // Sunday
+    date.setDate(date.getDate() + 1); // Move to Monday
+  }
+  return date;
 };

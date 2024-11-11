@@ -8,14 +8,22 @@ import {
   Wallet,
 } from "../models/ledger";
 import { AppDataSource } from "..";
-import { filterCard, getCreditCardStatus, getInstallments } from "../utils/creditCardUtils";
+import {
+  filterCard,
+  findCreditCardPeriod,
+  generateCreditCardPeriods,
+  getCreditCardStatus,
+  getInstallments,
+  groupSpending,
+} from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { formatMoney } from "../utils/formatUtils";
 import { CreditCardSummary } from "../types/response/creditCardSummaryResponse";
 import { MoreThan } from "typeorm";
-import { getPeriodName } from "../utils/dateUtils";
 import { CardSpendingResponse } from "../types/response/cardSpendingResponse";
 import { CardSpending } from "../types/cardSpending";
+import { CreditCardPeriodResponse } from "../types/paymentStatus";
+import { getPeriodKey } from "../utils/dateUtils";
 
 /**
  * Retrieves a summary of credit cards, including their current status and details.
@@ -178,7 +186,7 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
       const id: number = +req.params.id;
       const where: any = {
         id: id,
-        cutDate: MoreThan(startDate),
+        paymentDate: MoreThan(startDate),
       };
 
       //Payments
@@ -189,21 +197,35 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
 
       // Credit card data
       const payment = payments[0];
-      const values = payments.map((p) => p.payment);
-      const payment_avg: number =
-        values.reduce((pV, cV) => pV + cV) / values.length;
-
-      const data: CardSpending[] = payments.map(
-        (p: CreditCardSpendingReport) => {
-          return {
-            label: getPeriodName(p.cutDate),
-            spending: p.payment,
-            period: p.period,
-            cutDate: p.cutDate,
-          };
-        }
+      const current = generateCreditCardPeriods(
+        payment.cutDay,
+        today.getFullYear()
+      );
+      const previous = generateCreditCardPeriods(
+        payment.cutDay,
+        today.getFullYear() - 1
       );
 
+      const periods = [...current, ...previous];
+      const spendingHistory: CardSpending[] = payments
+        .map((p: CreditCardSpendingReport) => {
+          const period = findCreditCardPeriod(periods, p.paymentDate);
+          if (period !== undefined) {
+            return {
+              label: period.period.key,
+              spending: p.payment,
+              period: getPeriodKey(period.cutDate.dateValue),
+              cutDate: period.cutDate.dateValue,
+            };
+          } else {
+            return undefined;
+          }
+        })
+        .filter((x) => x !== undefined);
+      const data = groupSpending(spendingHistory);
+      const values = data.map((p) => p.spending);
+      const payment_avg: number =
+        values.reduce((pV, cV) => pV + cV) / values.length;
       const result: CardSpendingResponse = {
         id: payment.id,
         entityId: payment.id,
@@ -224,9 +246,10 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
         })
       );
     } catch (error) {
+      console.log(error);
       return next(
         new Exception(
-          `An error occurred getting the credit card summary`,
+          `An error occurred getting the credit card payment history`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );
@@ -335,6 +358,44 @@ export const updateCreditcard = asyncErrorHandler(
       return next(
         new Exception(
           `An error occurred getting the credit card summary`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Retrieves the current credit card periods
+ * @summary Retrieves the credit card periods.
+ * @operationId getCreditCardPeriods
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getCreditCardPeriods = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard);
+      const year: number = +req.params.year;
+      const data: CreditCardPeriodResponse[] = [];
+      cards.forEach((card: Creditcard) => {
+        data.push({
+          id: card.id,
+          periods: generateCreditCardPeriods(card.cutDay, year),
+        });
+      });
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data,
+        })
+      );
+    } catch (error) {
+      return next(
+        new Exception(
+          `An error ocurred getting the card periods`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

@@ -9,6 +9,9 @@ import { Wallet, WalletExpense } from "../models/ledger";
 import { ExpenseType, Vendor } from "../models/catalogs";
 import { Currency } from "../models/settings";
 import { WalletExpenseFilter } from "../types/filter/walletExpenseFilter";
+import { AppDataSource } from "..";
+import { IsValidId } from "./validatorUtils";
+import { NewExpense } from "../models/expenses/newExpense";
 
 /**
  *
@@ -82,15 +85,14 @@ export const getWalletExpenseFilter = (
   return where;
 };
 
-export const 
-getExpenseItemResponse = async (
+export const getExpenseItemResponse = async (
   ex: Expense
 ): Promise<ExpenseItemResponse> => {
   const wallet = await getWallet(ex);
   const currency: Currency = await getCurrency(ex, wallet);
   const exType: ExpenseType = await getExpenseType(ex);
   const vendor: Vendor = await getVendor(ex);
-  // Expense date 
+  // Expense date
   const exDate: Date = parseDate(ex.buyDate.toString());
 
   const item: ExpenseItemResponse = {
@@ -147,4 +149,44 @@ export const getVendor = async (expense: Expense) => {
       HTTP_STATUS.INTERNAL_SERVER_ERROR
     );
   return vendor;
+};
+
+export const getExpenseById = async (expenseId: number): Promise<Expense> => {
+  if (!IsValidId(expenseId))
+    throw new Exception(
+      `Expense Id is invalid. Id: (${expenseId})`,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
+  // Get expense
+  const expense: Expense | null = await AppDataSource.manager.findOne<Expense>(
+    Expense,
+    { where: { id: expenseId } }
+  );
+  if (expense === null)
+    throw new Exception(
+      `Expense Id is invalid. Id: (${expenseId})`,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
+  return expense;
+};
+
+export const createExpense = async (
+  expenseData: NewExpense
+): Promise<Expense> => {
+  // Create a new instance of Expense
+  const expense = new Expense();
+  expense.walletId = expenseData.walletId;
+  expense.expenseTypeId = expenseData.expenseTypeId;
+  expense.vendorId = expenseData.vendorId;
+  expense.description = expenseData.description;
+  expense.total = expenseData.total;
+  if (expenseData.buyDate !== undefined) {
+    expense.buyDate = expenseData.buyDate;
+  } else {
+    expense.buyDate = new Date();
+  }
+
+  // Save the insert record
+  const newExpense = await AppDataSource.manager.save(expense);
+  return newExpense;
 };

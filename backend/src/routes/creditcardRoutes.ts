@@ -202,12 +202,12 @@
 import { Router } from "express";
 import {
   addCreditcardPayment,
+  getCreditCardPeriods,
   getCreditcardSpendingHistoryById,
   getCreditcardSummary,
   getCreditcardSummarybyId,
   updateCreditcard,
 } from "../controllers/creditcardController";
-
 const router = Router();
 
 /**
@@ -343,6 +343,7 @@ router.route("/payCreditcard/:id").put(addCreditcardPayment);
 router.route("/spending/:id").get(getCreditcardSpendingHistoryById);
 
 router.route("/:id").post(updateCreditcard);
+router.route("/periods/:year").get(getCreditCardPeriods)
 // .put(updateCreditcard)
 // .delete(deleteCreditcard);
 

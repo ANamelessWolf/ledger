@@ -17,6 +17,7 @@ import { AppDataSource } from "..";
 import { Equal, FindManyOptions, FindOptionsWhere } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
 import { DailyExpense } from "../models/expenses/expenseDaily";
+import { isNewExpenseRequestValid } from "../utils/validatorUtils";
 
 /**
  * Retrieves a list of expenses.
@@ -135,6 +136,8 @@ export const createExpense = asyncErrorHandler(
     try {
       const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
         req.body;
+      const newExpenseData = isNewExpenseRequestValid(req);
+      console.log(newExpenseData);
       // Create a new instance of Expense
       const expense = new Expense();
       expense.walletId = walletId;
