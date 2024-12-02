@@ -63,9 +63,9 @@
  *         cutDay:
  *           type: number
  *           description: The credit card cut day
- *         dueDay:
+ *         daysToPay:
  *           type: number
- *           description: The credit card due day
+ *           description: The credit card number of days to pay
  *         expiration:
  *           type: string
  *           description: The expiration date of the credit card

@@ -10,7 +10,6 @@ import {
 import { AppDataSource } from "..";
 import {
   filterCard,
-  findCreditCardPeriod,
   generateCreditCardPeriods,
   getCreditCardStatus,
   getInstallments,
@@ -24,6 +23,7 @@ import { CardSpendingResponse } from "../types/response/cardSpendingResponse";
 import { CardSpending } from "../types/cardSpending";
 import { CreditCardPeriodResponse } from "../types/paymentStatus";
 import { getPeriodKey } from "../utils/dateUtils";
+import { findCreditCardPeriod } from "../utils/creditCardPeriodUtils";
 
 /**
  * Retrieves a summary of credit cards, including their current status and details.
@@ -43,9 +43,12 @@ export const getCreditcardSummary = asyncErrorHandler(
       const result: CreditCardSummary[] = [];
       for (let index = 0; index < cards.length; index++) {
         const cc: Creditcard = cards[index];
+        const wallet: Wallet | null = await cc.preferredWallet;
+        console.log(wallet?.name, cc.id, cc.cutDay);
         const payments = await cc.payments;
         const status = getCreditCardStatus(today, payments, cc.cutDay);
-        const wallet: Wallet | null = await cc.preferredWallet;
+        // const status2 = getCreditCardStatus2(today, payments, cc.cutDay);
+        // console.log(status);
         const banking: FinancingEntity | null = await cc.financingEntity;
         if (
           wallet !== null &&
@@ -329,7 +332,7 @@ export const updateCreditcard = asyncErrorHandler(
         color,
         credit,
         cutDay,
-        dueDay,
+        daysToPay,
         ending,
         expiration,
         usedCredit,
@@ -340,7 +343,7 @@ export const updateCreditcard = asyncErrorHandler(
       creditcard.color = color;
       creditcard.credit = credit;
       creditcard.cutDay = cutDay;
-      creditcard.dueDay = dueDay;
+      creditcard.daysToPay = daysToPay;
       creditcard.ending = ending;
       creditcard.expiration = expiration;
       creditcard.usedCredit = usedCredit;

@@ -9,6 +9,10 @@ import { CardListFilter } from "../types/filter/cardListFilter";
 import { CreditCardPeriod, PaymentStatus } from "../types/paymentStatus";
 import { CreditCardSummaryInstallmentTotal } from "../types/response/creditCardSummaryResponse";
 import {
+  findSurroundingPeriods,
+  getPaymentStatus,
+} from "./creditCardPeriodUtils";
+import {
   adjustDueDate,
   formatDate,
   getMonthName,
@@ -19,13 +23,122 @@ import { formatMoney } from "./formatUtils";
 import { groupInstallmentsById } from "./monthlyInstallmentUtils";
 
 /**
+ * Retrieves the credit card payment status for a specific date.
+ *
+ * @param date - The target date to determine the credit card status.
+ * @param payments - Array of credit card payments to check for any existing payments in the period.
+ * @param cutday - The cut-off day of the month for generating credit card billing periods.
+ * @returns PaymentStatus - The status of the credit card payment for the specified date.
+ */
+export const getCreditCardStatus = (
+  date: Date,
+  payments: CreditcardPayment[],
+  cutday: number
+): PaymentStatus | undefined => {
+  try {
+    // Generate periods for the current year and find the relevant period for the date
+    const currentYear = date.getFullYear();
+    const periods = generateCreditCardPeriods(cutday, currentYear);
+    const { previous, current, next } = findSurroundingPeriods(date, periods);
+    console.log(date);
+    const period = current;
+    if (!period) {
+      throw new Error("No valid credit card period found for the given date.");
+    }
+
+    // Step 2: Set cutDate and dueDate from the given period
+    const cutDate = current.cutDate.dateValue;
+    let dueDate = current.dueDate.dateValue;
+    if (date <= previous.dueDate.dateValue) {
+      dueDate = previous.dueDate.dateValue;
+    }
+
+    // Define the `payment` object
+    const payment = {
+      startDate: cutDate,
+      dueDate: dueDate,
+    };
+
+    // Step 3: Check for existing payments in the specified period (cutDate + 1 to dueDate)
+    const { total, status } = getPaymentStatus(
+      date,
+      previous,
+      current,
+      next,
+      payments
+    );
+    // console.log(total, status);
+
+    // Step 5: Define the billing period details
+    let billing = {
+      period: period.period.key,
+      start: formatDate(period.billing.start.dateValue),
+      end: formatDate(period.billing.end.dateValue),
+      filter: {
+        start: period.billing.start.dateValue,
+        end: period.billing.end.dateValue,
+      },
+    };
+
+    if ( status === PAYMENT_STATUS.PENDING){
+      billing = {
+        period: previous.period.key,
+        start: formatDate(previous.billing.start.dateValue),
+        end: formatDate(previous.billing.end.dateValue),
+        filter: {
+          start: previous.billing.start.dateValue,
+          end: previous.billing.end.dateValue,
+        },
+      };
+    }
+
+    // Update filter if status is PAID or NOT_REQUIRED, using next month's period
+    // if (
+    //   status === PAYMENT_STATUS.PAID ||
+    //   status === PAYMENT_STATUS.NOT_REQUIRED
+    // ) {
+    //   const nextMonth =
+    //     period.period.month === 12 ? 1 : period.period.month + 1;
+    //   const nextYear =
+    //     period.period.month === 12 ? currentYear + 1 : currentYear;
+
+    //   // Generate periods for the next year if necessary and find the next month's period
+    //   const nextYearPeriods =
+    //     nextYear !== currentYear
+    //       ? generateCreditCardPeriods(cutday, nextYear)
+    //       : periods;
+    //   const nextMonthPeriod = nextYearPeriods.find(
+    //     (p) => p.period.month === nextMonth && p.period.year === nextYear
+    //   );
+
+    //   if (nextMonthPeriod) {
+    //     billing.filter.start = nextMonthPeriod.billing.start.dateValue;
+    //     billing.filter.end = nextMonthPeriod.billing.end.dateValue;
+    //   }
+    // }
+
+    // Return the PaymentStatus object
+    return {
+      cutDate: formatDate(cutDate),
+      dueDate: formatDate(dueDate),
+      payment,
+      status,
+      total: total.toFixed(2),
+      billing,
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+/**
  * Calculates the status of a credit card based on the provided date, payment history, and cut-off day.
  * @param date The current date for which the credit card status is to be calculated.
  * @param payments An array of CreditcardPayment objects representing payment history.
  * @param cutday The day of the month when the credit card bill is cut.
  * @returns An object containing the credit card status information including cut-off date, due date, billing period, status, and total payment.
  */
-export const getCreditCardStatus = (
+export const getCreditCardStatus2 = (
   date: Date,
   payments: CreditcardPayment[],
   cutday: number
@@ -249,74 +362,18 @@ export const generateCreditCardPeriods = (
 ): CreditCardPeriod[] => {
   const periods: CreditCardPeriod[] = [];
 
+  // Add the December period for the previous year
+  periods.push(createPeriod(cutDay, 11, year - 1));
+
+  // Add periods for the current year (January to December)
   for (let month = 0; month < 12; month++) {
-    const cutDate = new Date(year, month, cutDay);
-    const cutDateString = formatDate(cutDate);
-    const monthName = getMonthName(cutDate);
-    const periodKey = `${monthName} ${year}`;
-
-    // Calculate billing start and end dates
-    const previousMonth = month === 0 ? 11 : month - 1;
-    const previousMonthYear = month === 0 ? year - 1 : year;
-    const billingStartDate = new Date(
-      previousMonthYear,
-      previousMonth,
-      cutDay + 1
-    );
-    const billingEndDate = new Date(year, month, cutDay);
-
-    // Format billing dates
-    const billingStartString = formatDate(billingStartDate);
-    const billingEndString = formatDate(billingEndDate);
-
-    // Calculate due date (20 days after billing start)
-    const dueDate = new Date(billingEndDate);
-    dueDate.setDate(dueDate.getDate() + 20);
-    const adjustedDueDate = adjustDueDate(dueDate);
-    const dueDateString = formatDate(adjustedDueDate);
-
-    const creditCardPeriod: CreditCardPeriod = {
-      period: {
-        month: month + 1,
-        year,
-        key: periodKey,
-      },
-      cutDay: cutDay.toString(),
-      cutDate: {
-        dateValue: cutDate,
-        dateString: cutDateString,
-      },
-      billing: {
-        start: {
-          dateValue: billingStartDate,
-          dateString: billingStartString,
-        },
-        end: {
-          dateValue: billingEndDate,
-          dateString: billingEndString,
-        },
-      },
-      dueDate: {
-        dateValue: adjustedDueDate,
-        dateString: dueDateString,
-      },
-    };
-
-    periods.push(creditCardPeriod);
+    periods.push(createPeriod(cutDay, month, year));
   }
 
-  return periods;
-};
+  // Add the December period for the next year
+  periods.push(createPeriod(cutDay, 11, year + 1));
 
-export const findCreditCardPeriod = (
-  periods: CreditCardPeriod[],
-  paymentDate: Date
-): CreditCardPeriod | undefined => {
-  return periods.find(
-    (period) =>
-      paymentDate > period.cutDate.dateValue &&
-      paymentDate <= period.dueDate.dateValue
-  );
+  return periods;
 };
 
 export const groupSpending = (data: CardSpending[]): CardSpending[] => {
@@ -336,4 +393,62 @@ export const groupSpending = (data: CardSpending[]): CardSpending[] => {
 
   // Convert the map values back to an array
   return Array.from(groupedData.values());
+};
+
+export const createPeriod = (
+  cutDay: number,
+  month: number,
+  year: number
+): CreditCardPeriod => {
+  const cutDate = new Date(year, month, cutDay);
+  const cutDateString = formatDate(cutDate);
+  const monthName = getMonthName(cutDate);
+  const periodKey = `${monthName} ${year}`;
+
+  // Calculate billing start and end dates
+  const previousMonth = month === 0 ? 11 : month - 1;
+  const previousMonthYear = month === 0 ? year - 1 : year;
+  const billingStartDate = new Date(
+    previousMonthYear,
+    previousMonth,
+    cutDay + 1
+  );
+  const billingEndDate = new Date(year, month, cutDay);
+
+  // Format billing dates
+  const billingStartString = formatDate(billingStartDate);
+  const billingEndString = formatDate(billingEndDate);
+
+  // Calculate due date (20 days after billing end)
+  const dueDate = new Date(billingEndDate);
+  dueDate.setDate(dueDate.getDate() + 20);
+  const adjustedDueDate = adjustDueDate(dueDate);
+  const dueDateString = formatDate(adjustedDueDate);
+
+  return {
+    period: {
+      month: month + 1,
+      year,
+      key: periodKey,
+    },
+    cutDay: cutDay.toString(),
+    cutDate: {
+      dateValue: cutDate,
+      dateString: cutDateString,
+    },
+    billing: {
+      start: {
+        dateValue: billingStartDate,
+        dateString: billingStartString,
+      },
+      end: {
+        dateValue: billingEndDate,
+        dateString: billingEndString,
+      },
+    },
+    dueDate: {
+      dateValue: adjustedDueDate,
+      dateString: dueDateString,
+    },
+  };
 };

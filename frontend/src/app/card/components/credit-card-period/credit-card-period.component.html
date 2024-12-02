@@ -1,0 +1,11 @@
+<mat-form-field>
+  <mat-label>Credit card period</mat-label>
+  <mat-select formControlName="active">
+    <mat-option
+      *ngFor="let period of periods"
+      [value]="period"
+    >
+      {{ period }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

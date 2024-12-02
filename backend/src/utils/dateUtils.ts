@@ -82,3 +82,7 @@ export const adjustDueDate = (date: Date): Date => {
   }
   return date;
 };
+
+export const stripTime = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};

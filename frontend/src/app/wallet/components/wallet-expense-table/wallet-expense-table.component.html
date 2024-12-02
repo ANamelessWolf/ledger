@@ -2,6 +2,7 @@
   <div class="header">
     <h1>Expenses - {{ this.total | currencyFormat }}</h1>
     <div class="button-group">
+      <app-credit-card-period [walletGroupId]="WalletGroupId" (search)="onSearch($event)"></app-credit-card-period>
       <app-search-bar (search)="onSearch($event)"></app-search-bar>
       <button
         mat-icon-button
