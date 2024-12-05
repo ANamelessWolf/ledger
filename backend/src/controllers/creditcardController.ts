@@ -44,8 +44,7 @@ export const getCreditcardSummary = asyncErrorHandler(
       for (let index = 0; index < cards.length; index++) {
         const cc: Creditcard = cards[index];
         const wallet: Wallet | null = await cc.preferredWallet;
-        console.log(wallet?.name, cc.id, cc.cutDay);
-        const payments = await cc.payments;
+        const payments = await cc.payments; 
         const status = getCreditCardStatus(today, payments, cc.cutDay);
         // const status2 = getCreditCardStatus2(today, payments, cc.cutDay);
         // console.log(status);
@@ -120,7 +119,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       const today = new Date();
       const cc: Creditcard = cards[0];
       const payments = await cc.payments;
-      const status = getCreditCardStatus(today, payments, cc.cutDay);
+      const status = getCreditCardStatus(today, payments, cc.cutDay, cc.daysToPay);
       const wallet: Wallet | null = await cc.preferredWallet;
       const banking: FinancingEntity | null = await cc.financingEntity;
       if (wallet === null || banking === null) {
@@ -130,7 +129,6 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       }
 
       const installment = await getInstallments(cc.id);
-
       const result: CreditCardSummary = {
         id: cc.id,
         preferredWalletId: cc.preferredWalletId,

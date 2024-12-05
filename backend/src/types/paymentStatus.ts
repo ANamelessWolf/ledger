@@ -1,3 +1,23 @@
+export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
+  cutDate: '',
+  dueDate: '',
+  payment: {
+    startDate: new Date(),
+    dueDate: new Date(),
+  },
+  billing: {
+    filter: {
+      start: new Date(),
+      end: new Date(),
+    },
+    period: '',
+    start: '',
+    end: '',
+  },
+  status: '',
+  total: '',
+};
+
 export type PaymentStatus = {
   cutDate: string;
   dueDate: string;
