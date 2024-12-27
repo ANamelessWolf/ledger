@@ -120,7 +120,8 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
     this.getExpenses();
   }
 
-  onSearch(searchTerm: string) {
+  onSearch(searchTerm: any) {
+    debugger;
     this.options.filter.description = searchTerm;
     this.getExpenses();
   }

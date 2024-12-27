@@ -44,6 +44,7 @@ export const getCreditCardStatus = (
     // Generate periods for the current year and find the relevant period for the date
     const currentYear = date.getFullYear();
     const periods = generateCreditCardPeriods(cutday, currentYear, daysToPay);
+    
     const { previous, current, next } = findSurroundingPeriods(date, periods);
     const period = current;
     if (!period) {
@@ -105,6 +106,7 @@ export const getCreditCardStatus = (
       billing,
     };
   } catch (error) {
+    console.log(error);
     return EMPTY_PAYMENT_STATUS;
   }
 };
@@ -349,8 +351,8 @@ export const generateCreditCardPeriods = (
     periods.push(createPeriod(cutDay, month, year, daysToPay));
   }
 
-  // Add the December period for the next year
-  periods.push(createPeriod(cutDay, 11, year + 1, daysToPay));
+  // Adds January for the next year
+  periods.push(createPeriod(cutDay, 0, year + 1, daysToPay));
 
   return periods;
 };
