@@ -6,6 +6,7 @@ import {
   Creditcard,
   CreditcardPayment,
   Wallet,
+  WalletGroup,
 } from "../models/ledger";
 import { AppDataSource } from "..";
 import {
@@ -44,7 +45,7 @@ export const getCreditcardSummary = asyncErrorHandler(
       for (let index = 0; index < cards.length; index++) {
         const cc: Creditcard = cards[index];
         const wallet: Wallet | null = await cc.preferredWallet;
-        const payments = await cc.payments; 
+        const payments = await cc.payments;
         const status = getCreditCardStatus(today, payments, cc.cutDay);
         // const status2 = getCreditCardStatus2(today, payments, cc.cutDay);
         // console.log(status);
@@ -119,7 +120,12 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
       const today = new Date();
       const cc: Creditcard = cards[0];
       const payments = await cc.payments;
-      const status = getCreditCardStatus(today, payments, cc.cutDay, cc.daysToPay);
+      const status = getCreditCardStatus(
+        today,
+        payments,
+        cc.cutDay,
+        cc.daysToPay
+      );
       const wallet: Wallet | null = await cc.preferredWallet;
       const banking: FinancingEntity | null = await cc.financingEntity;
       if (wallet === null || banking === null) {
@@ -190,56 +196,89 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
         paymentDate: MoreThan(startDate),
       };
 
-      //Payments
+      // Gets the creditcard information
+      const creditcard: Creditcard | null = await AppDataSource.manager.findOne(
+        Creditcard,
+        {
+          where: { id: id },
+        }
+      );
+      if (creditcard === null) {
+        throw new Exception("Invalid Creditcard id", HTTP_STATUS.BAD_REQUEST);
+      }
+
+      // Gets the payment information
+      let payment = null;
       const payments: CreditCardSpendingReport[] =
         await AppDataSource.manager.find(CreditCardSpendingReport, {
           where,
         });
+      let cutDay;
+      if (payments.length === 0) {
+        cutDay = creditcard.cutDay;
+      } else {
+        payment = payments[0];
+        cutDay = payment.cutDay;
+      }
 
-      // Credit card data
-      const payment = payments[0];
-      const current = generateCreditCardPeriods(
-        payment.cutDay,
-        today.getFullYear()
-      );
+      // Gets the credit card periods
+      const current = generateCreditCardPeriods(cutDay, today.getFullYear());
       const previous = generateCreditCardPeriods(
-        payment.cutDay,
+        cutDay,
         today.getFullYear() - 1
       );
 
       const periods = [...current, ...previous];
-      const spendingHistory: CardSpending[] = payments
-        .map((p: CreditCardSpendingReport) => {
-          const period = findCreditCardPeriod(periods, p.paymentDate);
-          if (period !== undefined) {
-            return {
-              label: period.period.key,
-              spending: p.payment,
-              period: getPeriodKey(period.cutDate.dateValue),
-              cutDate: period.cutDate.dateValue,
-            };
-          } else {
-            return undefined;
-          }
-        })
-        .filter((x) => x !== undefined);
-      const data = groupSpending(spendingHistory);
-      const values = data.map((p) => p.spending);
-      const payment_avg: number =
-        values.reduce((pV, cV) => pV + cV) / values.length;
-      const result: CardSpendingResponse = {
-        id: payment.id,
-        entityId: payment.id,
-        name: payment.name,
-        banking: payment.entity,
-        ending: payment.ending,
-        active: payment.active,
-        average: formatMoney(payment_avg),
-        max: formatMoney(Math.max(...values)),
-        min: formatMoney(Math.min(...values)),
-        spending: data,
-      };
-
+      let result: CardSpendingResponse;
+      if (payment !== null) {
+        const spendingHistory: CardSpending[] = payments
+          .map((p: CreditCardSpendingReport) => {
+            const period = findCreditCardPeriod(periods, p.paymentDate);
+            if (period !== undefined) {
+              return {
+                label: period.period.key,
+                spending: p.payment,
+                period: getPeriodKey(period.cutDate.dateValue),
+                cutDate: period.cutDate.dateValue,
+              };
+            } else {
+              return undefined;
+            }
+          })
+          .filter((x) => x !== undefined);
+        const data = groupSpending(spendingHistory);
+        const values = data.map((p) => p.spending);
+        const payment_avg: number =
+          values.reduce((pV, cV) => pV + cV) / values.length;
+        result = {
+          id: id,
+          entityId: payment.id,
+          name: payment.name,
+          banking: payment.entity,
+          ending: payment.ending,
+          active: payment.active,
+          average: formatMoney(payment_avg),
+          max: formatMoney(Math.max(...values)),
+          min: formatMoney(Math.min(...values)),
+          spending: data,
+        };
+      } else {
+        const banking: FinancingEntity | null =
+          await creditcard.financingEntity;
+        const wallet: WalletGroup | null = await creditcard.walletGroup;
+        result = {
+          id: id,
+          entityId: banking?.id || 0,
+          name: wallet?.name || "",
+          banking: banking?.name || "",
+          ending: creditcard.ending,
+          active: creditcard.active,
+          average: formatMoney(0),
+          max: formatMoney(0),
+          min: formatMoney(0),
+          spending: [],
+        };
+      }
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({

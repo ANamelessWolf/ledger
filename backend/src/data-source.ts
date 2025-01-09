@@ -21,6 +21,7 @@ import {
   WalletExpense,
   WalletGroup,
   WalletMember,
+  WalletList,
 } from "./models/ledger";
 import { Beneficiary, LendMoney } from "./models/lend";
 import { Currency, Owner, PaymentFrequency } from "./models/settings";
@@ -67,6 +68,7 @@ export const createConnection = (): DataSource => {
       WalletExpense,
       WalletGroup,
       WalletMember,
+      WalletList,
       Beneficiary,
       LendMoney,
       Currency,
