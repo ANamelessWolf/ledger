@@ -37,7 +37,7 @@ import {
   SubscriptionPaymentHistory,
 } from "../models/subscriptions";
 import { ExcelExpenseUploader } from "../utils/expenseUploader";
-import { ExpenseRow } from "../types/excelTypes";
+import { ExpenseRow, UploadResult } from "../types/excelTypes";
 
 dotenv.config();
 
@@ -110,8 +110,12 @@ const init = async () => {
     );
 
     const expensesData: ExpenseRow[] = expenseUploader.process();
-
-    console.log(expensesData);
+    //console.log(expensesData);
+     const result: UploadResult = await expenseUploader.upload(
+       AppDataSource,
+       expensesData
+     );
+    console.log(result.succed, result.failed);
 
     console.log("Closing...");
     process.exit(1);

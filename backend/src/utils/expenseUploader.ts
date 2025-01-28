@@ -12,8 +12,13 @@ import {
   EXPENSE_WALLET_COLUMN_MAPPING,
   ExpenseRow,
   EXPENSES_SHEET,
+  FailedExpenseRow,
+  UploadResult,
 } from "../types/excelTypes";
 import { WalletList } from "../models/ledger";
+import { Expense } from "../models/expenses";
+import { parseDate } from "./dateUtils";
+import { DataSource } from "typeorm";
 
 /**
  * Class to handle uploading and processing expense data from an Excel file.
@@ -208,5 +213,45 @@ export class ExcelExpenseUploader {
     const expenses = this.getExpenses(expensesSheet);
 
     return expenses;
+  }
+
+  /**
+   * Upload the expenses to the database
+   * @param dataSource - Current data source
+   * @param data - The Excel processed data
+   * @returns An array of formatted expense data.
+   * @throws An error if the file or required sheets are missing.
+   */
+  public async upload(
+    dataSource: DataSource,
+    data: ExpenseRow[]
+  ): Promise<UploadResult> {
+    const result: UploadResult = {
+      succed: [] as Expense[],
+      failed: [] as FailedExpenseRow[],
+    };
+    console.log(`Uploading ${data.length} expenses...`)
+    for (let index = 0; index < data.length; index++) {
+      const row: ExpenseRow = data[index];
+      try {
+        // Create a new instance of Expense
+        const expense = new Expense();
+        expense.walletId = row.wallet_id;
+        expense.expenseTypeId = row.expense_type_id;
+        expense.vendorId = row.vendor_id;
+        expense.description = row.description;
+        expense.buyDate = parseDate(row.buy_date);
+        expense.total = row.total;
+        //Save
+        const saveResult = await dataSource.manager.save(expense);
+        result.succed.push(saveResult);
+      } catch (error) {
+        const errMsg = "Something went wrong uploading expense";
+        console.error(`${errMsg}: ${row.description}`, error);
+        result.failed.push({ data: row, error: errMsg });
+      }
+    }
+
+    return result;
   }
 }

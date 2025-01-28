@@ -1,3 +1,5 @@
+import { Expense } from "../models/expenses";
+
 export type ExcelTableMapping = {
   idColumn: string;
   valueColumn: string;
@@ -28,6 +30,16 @@ export type ExpenseRow = {
   description: string;
   total: number;
   buy_date: string;
+};
+
+export type FailedExpenseRow = {
+  data: ExpenseRow;
+  error: string;
+};
+
+export type UploadResult = {
+  succed: Expense[];
+  failed: FailedExpenseRow[];
 };
 
 export const EXPENSE_TYPE_COLUMN_MAPPING: ExcelTableMapping = {
