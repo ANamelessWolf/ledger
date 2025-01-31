@@ -1,9 +1,10 @@
+import { In } from "typeorm";
 import { AppDataSource } from "..";
 import { PaymentMap } from "../common";
 import { PAYMENT_STATUS } from "../common/enums";
-import { FinancingEntity } from "../models/banking";
+import { FinancingEntity, MonthlyNonInterest } from "../models/banking";
 import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
-import { CreditcardPayment, Wallet } from "../models/ledger";
+import { Creditcard, CreditcardPayment, Wallet } from "../models/ledger";
 import { CardSpending } from "../types/cardSpending";
 import { CardListFilter } from "../types/filter/cardListFilter";
 import {
@@ -24,7 +25,10 @@ import {
   parseDate,
 } from "./dateUtils";
 import { formatMoney } from "./formatUtils";
-import { groupInstallmentsById } from "./monthlyInstallmentUtils";
+import {
+  classifyMonthlyPayments,
+  getCurrentMonthlyPayment,
+} from "./monthlyInstallmentUtils";
 
 /**
  * Retrieves the credit card payment status for a specific date.
@@ -44,7 +48,7 @@ export const getCreditCardStatus = (
     // Generate periods for the current year and find the relevant period for the date
     const currentYear = date.getFullYear();
     const periods = generateCreditCardPeriods(cutday, currentYear, daysToPay);
-    
+
     const { previous, current, next } = findSurroundingPeriods(date, periods);
     const period = current;
     if (!period) {
@@ -288,38 +292,52 @@ export const getPayments = (
 };
 
 export const getInstallments = async (
-  creditcardId: number
+  creditcard: Creditcard
 ): Promise<CreditCardSummaryInstallmentTotal | undefined> => {
-  let monthlyInstallments: MonthlyInstallmentPayment[] =
-    await AppDataSource.manager.find(MonthlyInstallmentPayment, {
-      where: { creditCardId: creditcardId, archived: 0 },
-    });
-  monthlyInstallments = monthlyInstallments.filter((x) => x.paymentId !== null);
-  if (monthlyInstallments.length > 0) {
-    const installmentTotals = groupInstallmentsById(monthlyInstallments);
-    installmentTotals.forEach((x) => {
-      if (x.balance === 0) {
-        x.monthlyPayment = 0;
-      }
-    });
-    const balance = installmentTotals
-      .map((x) => x.balance)
-      .reduce((pV, cV) => pV + cV);
-    const installment: CreditCardSummaryInstallmentTotal = {
-      balance: formatMoney(balance),
-      monthlyPayment: formatMoney(
-        installmentTotals
-          .map((x) => x.monthlyPayment)
-          .reduce((pV, cV) => pV + cV)
-      ),
-    };
-    if (balance === 0) {
-      return undefined;
+  const EMPTY_INSTALLMENT: CreditCardSummaryInstallmentTotal = {
+    balance: formatMoney(0),
+    monthlyPayment: formatMoney(0),
+  };
+  try {
+    const creditcardId: number = creditcard.id;
+    const cutDay: number = creditcard.cutDay;
+    const installments: MonthlyNonInterest[] = await AppDataSource.manager.find(
+      MonthlyNonInterest,
+      { where: { creditcardId: creditcardId, archived: 0 } }
+    );
+    //
+    // const expenses = await Promise.all(installments.map(async (x) => await x.expense));
+    // console.log(expenses);
+    //
+    const ids = installments.map((x) => x.id);
+    const monthlyInstallments: MonthlyInstallmentPayment[] =
+      await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+        where: { id: In(ids) },
+      });
+    const hasBalance = monthlyInstallments.filter((x) => x.isPaid === 0);
+    if (hasBalance.length > 0) {
+      // Balance
+      const balance = monthlyInstallments
+        .filter((x) => x.isPaid === 0)
+        .map((x) => x.value)
+        .reduce((pV, cV) => pV + cV);
+      // Calculate Monthly Payments
+      const classifiedPayments = classifyMonthlyPayments(
+        monthlyInstallments,
+        cutDay
+      );
+      const monthlyPayment = getCurrentMonthlyPayment(classifiedPayments);
+      //Format the installment summary
+      const installment: CreditCardSummaryInstallmentTotal = {
+        balance: formatMoney(balance),
+        monthlyPayment: formatMoney(monthlyPayment),
+      };
+      return installment;
     }
-    return installment;
-  } else {
-    return undefined;
+  } catch (error) {
+    console.log(error);
   }
+  return EMPTY_INSTALLMENT;
 };
 
 /**

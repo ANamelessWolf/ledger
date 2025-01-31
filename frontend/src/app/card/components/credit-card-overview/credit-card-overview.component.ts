@@ -25,6 +25,13 @@ export class CreditCardOverviewComponent {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
   chartSize = '300px';
 
+  get isPending() {
+    if (this.summary && this.summary.status && this.summary.status.status) {
+      this.summary.status.status === 'Pending';
+    }
+    return false;
+  }
+
   get daysToPay() {
     try {
       if (this.summary.status) {
@@ -71,5 +78,4 @@ export class CreditCardOverviewComponent {
     }
     return '';
   }
-
 }

@@ -32,6 +32,7 @@
       "@moNoInt/*": ["app/monthly/*"],
       "@common/*": ["app/common/*"],
       "@config/*": ["app/config/*"],
+      "@subscription/*": ["app/subscription/*"],
     }
   },
   "angularCompilerOptions": {

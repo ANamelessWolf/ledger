@@ -13,4 +13,9 @@ import { PurchaseTableComponent } from '../purchase-table/purchase-table.compone
 })
 export class InterestFreeDetailsComponent {
   @Input() installments: NoIntMonthlyInstallment[] = [];
+
+  get activeInstallments(){
+    return this.installments.filter(installment => installment.months !== installment.paidMonths);
+  }
+
 }

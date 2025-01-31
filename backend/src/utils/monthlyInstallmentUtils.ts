@@ -25,6 +25,7 @@ import { AppDataSource } from "..";
 import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
 import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
 import { GroupedInstallment } from "../types/groupedInstallment";
+import { ClassifiedPayments } from "../types/newMonthlyInstallment";
 
 /**
  *
@@ -243,6 +244,64 @@ export const groupInstallmentsById = (
   } catch (error) {
     console.log(error);
     return [];
+  }
+};
+
+export const classifyMonthlyPayments = (
+  payments: MonthlyInstallmentPayment[],
+  cutDay: number
+): ClassifiedPayments => {
+  const classifiedPayments: ClassifiedPayments = {};
+  try {
+    for (const payment of payments) {
+      const buyDate = new Date(payment.buyDate);
+      let targetMonth = buyDate.getMonth() + 1; // Month is 0-based in JS
+      let targetYear = buyDate.getFullYear();
+
+      // Determine the classification month
+      if (buyDate.getDate() > cutDay) {
+        targetMonth += 1; // Move to next month
+        if (targetMonth > 12) {
+          targetMonth = 1;
+          targetYear += 1;
+        }
+      }
+
+      // Format key as MMYYYY
+      const formattedKey = `${targetYear}${targetMonth
+        .toString()
+        .padStart(2, "0")}`;
+
+      // Sum the values for that month
+      if (!classifiedPayments[formattedKey]) {
+        classifiedPayments[formattedKey] = 0;
+      }
+      classifiedPayments[formattedKey] += payment.value;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return classifiedPayments;
+};
+
+export const getCurrentMonthlyPayment = (
+  classifiedPayments: ClassifiedPayments
+): number => {
+  try {
+    // Get today's month and year
+    const today = new Date();
+    const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
+    const currentYear = today.getFullYear().toString();
+
+    // Get the formatted key for this month
+    const currentMonthKey = `${currentYear}${currentMonth}`;
+
+    // Return the total sum for the current month or 0 if not found
+    return classifiedPayments[currentMonthKey] || 0;
+  } catch (error) {
+    console.log(error);
+    return 0;
   }
 };
 

@@ -62,6 +62,9 @@ export const getMonthlyInstallments = asyncErrorHandler(
       const count = await AppDataSource.manager.count(MonthlyNonInterest, {
         where,
       });
+
+      console.log(options);
+
       const items: MonthlyNonInterest[] = await AppDataSource.manager.find(
         MonthlyNonInterest,
         options

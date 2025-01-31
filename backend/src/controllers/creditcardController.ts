@@ -134,7 +134,7 @@ export const getCreditcardSummarybyId = asyncErrorHandler(
         );
       }
 
-      const installment = await getInstallments(cc.id);
+      const installment = await getInstallments(cc);
       const result: CreditCardSummary = {
         id: cc.id,
         preferredWalletId: cc.preferredWalletId,

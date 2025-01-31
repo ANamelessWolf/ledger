@@ -34,6 +34,6 @@
   />
 
   <div class="card-notes">
-    <p *ngIf="summary.status.status === 'Pending' ">Dias para pagar {{ daysToPay }}</p>
+    <p *ngIf="isPending">Dias para pagar {{ daysToPay }}</p>
   </div>
 </div>

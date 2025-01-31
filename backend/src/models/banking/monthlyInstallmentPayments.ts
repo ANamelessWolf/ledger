@@ -19,6 +19,12 @@ export class MonthlyInstallmentPayment {
   wallet: string;
 
   @ViewColumn()
+  expenseBuyId: number;
+  
+  @ViewColumn()
+  buyTotalValue: number;
+
+  @ViewColumn()
   expenseId: number;
 
   @ViewColumn()
