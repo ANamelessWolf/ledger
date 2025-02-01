@@ -15,9 +15,14 @@ import {
 } from "../models/banking";
 import { MontlyInstallmentFilter } from "../types/filter/montlyInstallmentFilter";
 import {
+  calculateCreditCardTotals,
+  calculateInstallmentTotals,
+  classifyInstallments,
+  getCurrentMonthlyCreditTotals,
   getMonthlyFilter,
   getMonthlyInstallmentItemResponse,
-  getMonthlyInstallmentTotals,
+  // getMonthlyInstallmentTotals,
+  // getMonthlyInstallmentTotals2,
   payMonthlyInstallment,
   updatePaidMonths,
 } from "../utils/monthlyInstallmentUtils";
@@ -25,7 +30,13 @@ import { MonthlyInstallmentResponse } from "../types/response/monthlyInstallment
 import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
 import { formatMoney } from "../utils/formatUtils";
 import { MonthlyInsPaymentResponse } from "../types/response/monthlyInstallmentPayment";
-import { formatDate } from "../utils/dateUtils";
+import {
+  formatDate,
+  formatMonthKey,
+  getCurrentMonthlyKey,
+} from "../utils/dateUtils";
+import { Creditcard } from "../models/ledger";
+import { CreditCardCutDays } from "../types/newMonthlyInstallment";
 // import { NewMonthlyInstallment } from "../types/newMonthlyInstallment";
 // import { Expense } from "../models/expenses";
 // import { getExpenseById } from "../utils/expenseUtils";
@@ -40,6 +51,17 @@ import { formatDate } from "../utils/dateUtils";
 export const getMonthlyInstallments = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      //ToDo: Implement this method
+      // 1: Select all credit cards with a mapping cut day
+      const creditCards: Creditcard[] = await AppDataSource.manager.find(
+        Creditcard
+      );
+      const cutDaysByCreditCard: CreditCardCutDays = {};
+      creditCards.forEach((card: Creditcard) => {
+        cutDaysByCreditCard[card.id] = card.cutDay;
+      });
+      // 2: Get filter from query
+      // TODO : Implement getMonthlyFilter
       const filter = buildFilter(req.query);
       const where = getMonthlyFilter(filter);
       const options: FindManyOptions<MonthlyNonInterest> = { where };
@@ -59,17 +81,59 @@ export const getMonthlyInstallments = asyncErrorHandler(
       options.skip = skip;
       options.take = take;
 
-      const count = await AppDataSource.manager.count(MonthlyNonInterest, {
-        where,
-      });
-
-      console.log(options);
-
+      // 3: Select all monthly non interest with the filter
       const items: MonthlyNonInterest[] = await AppDataSource.manager.find(
-        MonthlyNonInterest,
-        options
+        MonthlyNonInterest
       );
+      const count = await AppDataSource.manager.count(MonthlyNonInterest);
+      const payments: MonthlyInstallmentPayment[] =
+        await AppDataSource.manager.find(MonthlyInstallmentPayment);
 
+      // 4: Calculate the totals
+      const installments = classifyInstallments(payments, cutDaysByCreditCard);
+      const installmentTotals = calculateInstallmentTotals(
+        11,
+        2023,
+        installments
+      );
+      const creditCardTotals = await calculateCreditCardTotals(
+        11,
+        2023,
+        installments,
+        creditCards
+      );
+      const currentCreditCardTotals =
+        getCurrentMonthlyCreditTotals(creditCardTotals);
+      const monthlyTotal = currentCreditCardTotals.reduce(
+        (sum, card) => sum + card.monthly,
+        0
+      );
+      const balanceTotal = payments
+        .filter((x) => x.isPaid === 0)
+        .reduce((sum, payment) => sum + payment.total, 0);
+      const expendedTotal = payments.reduce((sum, payment) => sum + payment.total, 0);
+      const monthKey = getCurrentMonthlyKey();
+      const currentPeriod = {
+        label: formatMonthKey(monthKey),
+        value: monthKey,
+      };
+      const totalValues = {
+        monthlyBalance: monthlyTotal,
+        balance: balanceTotal,
+        total: expendedTotal,
+      };
+      const labels = installmentTotals.map((x) => x.label);
+      const balance = installmentTotals.map((x) => x.balance);
+      const payment = installmentTotals.map((x) => x.payment);
+
+      const totals = {
+        currentPeriod,
+        cards: currentCreditCardTotals,
+        totals: totalValues,
+        summary: { labels, balance, payment },
+      };
+
+      //5: Format the response
       const result: MonthlyInstallmentResponse[] = [];
       for (let index = 0; index < items.length; index++) {
         try {
@@ -88,8 +152,11 @@ export const getMonthlyInstallments = asyncErrorHandler(
         total: count,
       };
 
-      const totals = await getMonthlyInstallmentTotals(11, 2023, filter);
+      // let totals = await getMonthlyInstallmentTotals(11, 2023, installments);
+      // totals = await getMonthlyInstallmentTotals2(11, 2023, filter);
 
+      // console.log(installments, result, pagination, totals);
+      // console.log(totals, installmentTotals, currentCreditCardTotals);
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({
@@ -221,7 +288,7 @@ export const payInstallment = asyncErrorHandler(
 export const createMonthlyExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-       /*
+      /*
       // const { installment, monthlyExpenses, creditCardId } =
       //   req.body;
       const installment: NewMonthlyInstallment = req.body.installment;

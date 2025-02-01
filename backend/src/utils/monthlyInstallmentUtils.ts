@@ -13,7 +13,7 @@ import {
   MonthlyPayment,
 } from "../types/response/monthlyInstallmentResponse";
 import { Exception, HTTP_STATUS } from "../common";
-import { formatDate, parseDate } from "./dateUtils";
+import { formatDate, formatMonthKey, parseDate } from "./dateUtils";
 import { Expense } from "../models/expenses";
 import { Creditcard, WalletGroup } from "../models/ledger";
 import { getCurrency, getExpenseType, getVendor } from "./expenseUtils";
@@ -25,7 +25,14 @@ import { AppDataSource } from "..";
 import { CreditCardMonthlyInstTot } from "./creditCardMonthlyInstTot";
 import { MonthlyInstallmentPayment } from "../models/banking/monthlyInstallmentPayments";
 import { GroupedInstallment } from "../types/groupedInstallment";
-import { ClassifiedPayments } from "../types/newMonthlyInstallment";
+import {
+  ClassifiedInstallment,
+  ClassifiedPayments,
+  CreditCardCutDays,
+  CreditCardInstallmentTotals,
+  MonthlyInstallmentTotal,
+} from "../types/newMonthlyInstallment";
+import { CardBalance } from "../types/cardBalance";
 
 /**
  *
@@ -174,6 +181,27 @@ export const getMonthlyInstallmentTotals = async (
   return result;
 };
 
+export const getMonthlyInstallmentTotals2 = async (
+  month: number,
+  year: number,
+  filter: MontlyInstallmentFilter
+): Promise<CreditCardInstallmentTotal> => {
+  // 1: Pick the selection options
+  const options = getTotalSelOptions(month, year, filter);
+  // 2: Select the installments
+  const installments: MonthlyCreditCardInstallments[] =
+    await AppDataSource.manager.find(MonthlyCreditCardInstallments, options);
+  // 3: Calculates totals
+  const totals = new CreditCardMonthlyInstTot();
+  for (let index = 0; index < installments.length; index++) {
+    const installment = installments[index];
+    totals.updateBalance(installment);
+  }
+  // 4: Format the total response
+  const result = totals.asTotalResponse();
+  return result;
+};
+
 export const payMonthlyInstallment = async (
   paymentId: number
 ): Promise<MonthlyNonInterestPayment> => {
@@ -302,6 +330,194 @@ export const getCurrentMonthlyPayment = (
   } catch (error) {
     console.log(error);
     return 0;
+  }
+};
+
+export function classifyInstallments(
+  installments: MonthlyInstallmentPayment[],
+  cutDays: CreditCardCutDays
+): ClassifiedInstallment {
+  const classifiedInstallments: ClassifiedInstallment = {};
+  try {
+    for (const installment of installments) {
+      // Default cut day as 1 if missing
+      const cutDay = cutDays[installment.creditCardId] ?? 1;
+      const buyDate = new Date(installment.buyDate);
+      let targetMonth = buyDate.getMonth() + 1; // JS Months are 0-based
+      let targetYear = buyDate.getFullYear();
+
+      // Determine the classification month
+      if (buyDate.getDate() > cutDay) {
+        targetMonth += 1;
+        if (targetMonth > 12) {
+          targetMonth = 1;
+          targetYear += 1;
+        }
+      }
+
+      // Format key as YYYYMM
+      const formattedKey = `${targetYear}${targetMonth
+        .toString()
+        .padStart(2, "0")}`;
+
+      // Check if the installment is already classified, if not, add it
+      if (!classifiedInstallments[installment.id]) {
+        classifiedInstallments[installment.id] = {
+          creditCardId: installment.creditCardId,
+          buyTotalValue: installment.buyTotalValue,
+          payments: {},
+          burnOutPayments: {},
+        };
+      }
+
+      const record = classifiedInstallments[installment.id];
+
+      // Update Payments
+      if (!record.payments[formattedKey]) {
+        record.payments[formattedKey] = 0;
+        record.burnOutPayments[formattedKey] = 0;
+      }
+      record.payments[formattedKey] += installment.value;
+    }
+
+    // Calculate burnOutPayments
+    for (const installmentId in classifiedInstallments) {
+      const record = classifiedInstallments[parseInt(installmentId)];
+      const sortedKeys = Object.keys(record.payments).sort();
+
+      let remainingValue = record.buyTotalValue;
+      for (const key of sortedKeys) {
+        record.burnOutPayments[key] = remainingValue;
+        remainingValue -= record.payments[key];
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return classifiedInstallments;
+}
+
+export function calculateInstallmentTotals(
+  month: number,
+  year: number,
+  classifiedInstallments: ClassifiedInstallment
+): MonthlyInstallmentTotal[] {
+  const totalsMap: Record<string, MonthlyInstallmentTotal> = {};
+
+  // Format filter key as YYYYMM
+  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+
+  for (const installmentId in classifiedInstallments) {
+    const installment = classifiedInstallments[parseInt(installmentId)];
+
+    for (const monthKey in installment.payments) {
+      if (monthKey < filterMonthKey) continue; // Skip months earlier than filter
+
+      if (!totalsMap[monthKey]) {
+        totalsMap[monthKey] = {
+          label: formatMonthKey(monthKey),
+          monthKey,
+          balance: 0,
+          payment: 0,
+        };
+      }
+
+      totalsMap[monthKey].payment += installment.payments[monthKey];
+      totalsMap[monthKey].balance += installment.burnOutPayments[monthKey];
+    }
+  }
+
+  return Object.values(totalsMap).sort((a, b) =>
+    a.monthKey.localeCompare(b.monthKey)
+  );
+}
+
+export async function calculateCreditCardTotals(
+  month: number,
+  year: number,
+  classifiedInstallments: ClassifiedInstallment,
+  creditCards: Creditcard[]
+): Promise<CreditCardInstallmentTotals> {
+  const totals: CreditCardInstallmentTotals = {};
+  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+  const creditCardName: Record<number, string> = {};
+  // Map Credit Cards by ID for quick lookup
+  const creditCardMap: Record<number, Creditcard> = {};
+  for (const card of creditCards) {
+    creditCardMap[card.id] = card;
+    creditCardName[card.id] = (await card.walletGroup)?.name || "Unknown";
+  }
+
+  for (const installmentId in classifiedInstallments) {
+    const installment = classifiedInstallments[parseInt(installmentId)];
+
+    for (const monthKey in installment.payments) {
+      if (monthKey < filterMonthKey) continue; // Skip previous months
+
+      if (!totals[monthKey]) {
+        totals[monthKey] = [];
+      }
+
+      const card = creditCardMap[installment.creditCardId] || {
+        id: installment.creditCardId,
+        color: "gray",
+        card: "Unknown",
+      };
+      const cardName = creditCardName[card.id] || "Unknown";
+
+      let cardBalance = totals[monthKey].find(
+        (cb) => cb.id === installment.creditCardId
+      );
+      if (!cardBalance) {
+        cardBalance = {
+          id: installment.creditCardId,
+          card: cardName,
+          color: card.color || "gray",
+          value: 0,
+          percent: 0,
+          monthly: 0,
+        };
+        totals[monthKey].push(cardBalance);
+      }
+      cardBalance.value += installment.burnOutPayments[monthKey];
+      cardBalance.monthly += installment.payments[monthKey];
+    }
+  }
+
+  // Calculate percentage per month
+  for (const monthKey in totals) {
+    const monthTotal = totals[monthKey].reduce(
+      (sum, card) => sum + card.value,
+      0
+    );
+
+    if (monthTotal > 0) {
+      for (const card of totals[monthKey]) {
+        card.percent = parseFloat(((card.value / monthTotal) * 100).toFixed(2));
+      }
+    }
+  }
+
+  return totals;
+}
+
+export const getCurrentMonthlyCreditTotals = (
+  totals: CreditCardInstallmentTotals
+): CardBalance[] => {
+  try {
+    // Get today's month and year
+    const today = new Date();
+    const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
+    const currentYear = today.getFullYear().toString();
+
+    // Get the formatted key for this month
+    const currentMonthKey = `${currentYear}${currentMonth}`;
+
+    // Return the total sum for the current month or 0 if not found
+    return totals[currentMonthKey] || [];
+  } catch (error) {
+    console.log(error);
+    return [];
   }
 };
 

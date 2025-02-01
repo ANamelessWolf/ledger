@@ -22,6 +22,12 @@ export const getMonthName = (date: Date) => {
   return monthNames[monthIndex];
 };
 
+export const formatMonthKey = (monthKey: string) => {
+  const year = monthKey.substring(0, 4);
+  const monthIndex = parseInt(monthKey.substring(4, 6), 10) - 1;
+  return `${MONTH_NAMES[monthIndex]} ${year}`;
+};
+
 export const getPeriodName = (date: Date) => {
   return `${getMonthName(date)} ${date.getFullYear()}`;
 };
@@ -85,4 +91,14 @@ export const adjustDueDate = (date: Date): Date => {
 
 export const stripTime = (date: Date): Date => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+export const getCurrentMonthlyKey = (): string => {
+  const today = new Date();
+  const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
+  const currentYear = today.getFullYear().toString();
+
+  // Get the formatted key for this month
+  const currentMonthKey = `${currentYear}${currentMonth}`;
+  return currentMonthKey;
 };

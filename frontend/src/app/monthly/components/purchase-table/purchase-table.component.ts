@@ -80,7 +80,13 @@ export class PurchaseTableComponent {
   }
 
   monthlyPayment(row: NoIntMonthlyInstallment) {
-    return row.purchase.value / row.months;
+    const payments = row.payments.filter((x) => x.isPaid === false);
+    if (payments.length > 0) {
+      return payments[0].value;
+    } else {
+      return row.payments[payments.length - 1].value;
+    }
+    // return row.purchase.value / row.months;
   }
 
   statusTooltip(row: NoIntMonthlyInstallment) {

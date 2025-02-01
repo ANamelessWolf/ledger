@@ -92,9 +92,14 @@ export class MoNoIntIndexPageComponent implements OnInit {
           labels: this.totals.summary.labels,
           datasets: [
             {
+              data: this.totals.summary.balance,
+              color: 'green',
+              legend: 'balance',
+            },
+            {
               data: this.totals.summary.payment,
               color: 'red',
-              legend: 'balance',
+              legend: 'payment',
             },
           ],
         };

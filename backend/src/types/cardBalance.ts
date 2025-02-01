@@ -2,6 +2,7 @@ export type CardBalance = {
   id: number;
   card: string;
   color: string;
-  value: number;
+  value: number;  
   percent: number;
+  monthly: number;
 };

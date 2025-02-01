@@ -69,6 +69,7 @@ export class CreditCardMonthlyInstTot {
         color: installment.color,
         value: installment.balance,
         percent: 0,
+        monthly: 0,
       };
     }
   }
