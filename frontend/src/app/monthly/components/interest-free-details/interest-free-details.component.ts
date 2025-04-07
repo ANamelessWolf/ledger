@@ -9,13 +9,15 @@ import { PurchaseTableComponent } from '../purchase-table/purchase-table.compone
   standalone: true,
   imports: [CommonModule, MatCardModule, PurchaseTableComponent],
   templateUrl: './interest-free-details.component.html',
-  styleUrl: './interest-free-details.component.scss'
+  styleUrl: './interest-free-details.component.scss',
 })
 export class InterestFreeDetailsComponent {
   @Input() installments: NoIntMonthlyInstallment[] = [];
 
-  get activeInstallments(){
-    return this.installments.filter(installment => installment.months !== installment.paidMonths);
+  get activeInstallments() {
+    return this.installments?.filter(
+      (installment) =>
+        installment.payments.filter((payment) => !payment.isPaid).length > 0
+    ); //.filter(installment => installment.months !== installment.paidMonths);
   }
-
 }

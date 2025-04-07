@@ -69,8 +69,10 @@ export class PurchaseTableComponent {
 
   monthsPayment(row: NoIntMonthlyInstallment) {
     const mP = [];
-    for (let index = 1; index <= row.months; index++) {
-      if (index <= row.paidMonths) {
+    const payments = row.payments.length;
+    const paidPayments = row.payments.filter((x) => x.isPaid).length;
+    for (let index = 1; index <= payments; index++) {
+      if (index <= paidPayments) {
         mP.push('green');
       } else {
         mP.push('gray');
@@ -80,13 +82,18 @@ export class PurchaseTableComponent {
   }
 
   monthlyPayment(row: NoIntMonthlyInstallment) {
-    const payments = row.payments.filter((x) => x.isPaid === false);
-    if (payments.length > 0) {
-      return payments[0].value;
-    } else {
-      return row.payments[payments.length - 1].value;
+    try {
+      const payments = row.payments.filter((x) => x.isPaid === false);
+      if (payments.length > 0) {
+        return payments[0].value;
+      } else {
+        const totalPayments = row.payments.length;
+        return row.payments[totalPayments - 1].value;
+      }
+    } catch (error) {
+      console.log(error);
+      return 0;
     }
-    // return row.purchase.value / row.months;
   }
 
   statusTooltip(row: NoIntMonthlyInstallment) {
@@ -94,9 +101,6 @@ export class PurchaseTableComponent {
   }
 
   getBalance(row: NoIntMonthlyInstallment) {
-    if (row.paidMonths === row.months) {
-      return 0;
-    }
     const sum = row.payments
       .filter((payment: Payment) => payment.isPaid)
       .reduce(

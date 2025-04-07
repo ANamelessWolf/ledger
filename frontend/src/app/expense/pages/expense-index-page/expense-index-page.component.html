@@ -1,42 +1,29 @@
-<div class="expense-index-page">
-  <div class="header-section">
-    <h1>Expenses</h1>
-    <div class="button-group">
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
-      <button mat-icon-button (click)="goToDaily()">
-        <mat-icon>calendar_month</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        aria-label="Open filter window"
-        (click)="openFilter()"
-      >
-        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
-        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
-      </button>
-      <button mat-icon-button (click)="addExpense()">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+<app-page-layout
+  [title]="'Expenses'"
+  [hasFilter]="true"
+  [hasWidget]="true"
+  (onSearch)="onSearch($event)"
+  (add)="addExpense()"
+  (openFilter)="openFilter()">
+  <ng-container buttons>
+    <button mat-icon-button (click)="goToDaily()">
+      <mat-icon>calendar_month</mat-icon>
+    </button>
+  </ng-container>
+  <div widget>
+    <p>Widget Content</p>
   </div>
-  <hr />
 
-  <!-- Second Section: Widget Area -->
-  <div class="widget-area">
-    <!-- Widget content goes here -->
-  </div>
-  <hr />
-
-  <!-- Third Section: Table Area -->
-  <div class="table-area">
+  <div main>
     <app-expense-table
-      [header]="tableHeader"
-      [expenses]="expenses"
-      [totalItems]="totalItems"
-      [catalog]="catalog"
-      (pageChange)="loadExpenses($event)"
-      (sortChange)="sortExpenses($event)"
-      (expenseEdited)="refresh($event)"
-    ></app-expense-table>
+    [header]="tableHeader"
+    [expenses]="expenses"
+    [totalItems]="totalItems"
+    [catalog]="catalog"
+    (pageChange)="loadExpenses($event)"
+    (sortChange)="sortExpenses($event)"
+    (expenseEdited)="refresh($event)"
+  ></app-expense-table>
   </div>
-</div>
+</app-page-layout>
+

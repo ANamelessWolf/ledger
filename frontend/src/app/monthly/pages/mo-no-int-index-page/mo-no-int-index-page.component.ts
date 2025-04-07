@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { NotificationService } from '@common/services/notification.service';
+import { getCurrentMonthYear, sliceMonthLabels } from '@common/utils/dateUtils';
 import { EMPTY_PAGINATION } from '@config/commonTypes';
 import { ChartData, EMPTY_CHART_DATA } from '@expense/types/chartComponent';
 import { InterestFreeCreditCardPieChartComponent } from '@moNoInt/components/interest-free-credit-card-pie-chart/interest-free-credit-card-pie-chart.component';
@@ -88,16 +89,17 @@ export class MoNoIntIndexPageComponent implements OnInit {
           color: c.color,
           value: c.percent,
         }));
+        const { startIndex, endIndex } = sliceMonthLabels(this.totals.summary.labels);
         this.summaryChartData = {
-          labels: this.totals.summary.labels,
+          labels: this.totals.summary.labels.slice(startIndex, endIndex),
           datasets: [
             {
-              data: this.totals.summary.balance,
+              data: this.totals.summary.balance.slice(startIndex, endIndex),
               color: 'green',
               legend: 'balance',
             },
             {
-              data: this.totals.summary.payment,
+              data: this.totals.summary.payment.slice(startIndex, endIndex),
               color: 'red',
               legend: 'payment',
             },
