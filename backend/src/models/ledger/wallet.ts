@@ -3,7 +3,7 @@ import { Currency, Owner } from "../settings";
 import { WalletType } from "../catalogs";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Wallet", { database: process.env.DB_NAME })
+@Entity("wallet", { database: process.env.DB_NAME })
 export class Wallet {
   @PrimaryGeneratedColumn("increment")
   id: number;

@@ -5,7 +5,7 @@ import { getObject } from "../../utils/dbUtils";
 import { MonthlyNonInterestPayment } from "./monthlyNonInterestPayment";
 import { AppDataSource } from "../..";
 
-@Entity("Monthly_With_No_Interest", { database: process.env.DB_NAME })
+@Entity("monthly_with_no_interest", { database: process.env.DB_NAME })
 export class MonthlyNonInterest {
   @PrimaryGeneratedColumn("increment")
   id: number;

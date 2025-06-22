@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Creditcard } from "./creditcard";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Credit_Card_Payment", { database: process.env.DB_NAME })
+@Entity("credit_card_payment", { database: process.env.DB_NAME })
 export class CreditcardPayment {
   @PrimaryGeneratedColumn("increment")
   id: number;

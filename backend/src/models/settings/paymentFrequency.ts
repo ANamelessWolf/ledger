@@ -1,7 +1,7 @@
 
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 
-@Entity('Payment_Frequency', { database: process.env.DB_NAME })
+@Entity('payment_frequency', { database: process.env.DB_NAME })
 export class PaymentFrequency {
   @PrimaryGeneratedColumn("increment")
   id: number;

@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Owner } from "../settings";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Beneficiary", { database: process.env.DB_NAME })
+@Entity("beneficiary", { database: process.env.DB_NAME })
 export class Beneficiary {
   @PrimaryGeneratedColumn("increment")
   id: number;

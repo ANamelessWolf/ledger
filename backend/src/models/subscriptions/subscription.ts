@@ -3,7 +3,7 @@ import { Wallet } from "../ledger";
 import { Currency, PaymentFrequency } from "../settings";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Subscription", { database: process.env.DB_NAME })
+@Entity("subscription", { database: process.env.DB_NAME })
 export class Subscription {
   @PrimaryGeneratedColumn("increment")
   id: number;

@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Subscription } from "./subscription";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("SubscriptionPaymentHistory", { database: process.env.DB_NAME })
+@Entity("subscription_payment_history", { database: process.env.DB_NAME })
 export class SubscriptionPaymentHistory {
   @PrimaryGeneratedColumn("increment")
   id: number;

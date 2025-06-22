@@ -3,7 +3,7 @@ import { Wallet } from "../ledger";
 import { ExpenseType, Vendor } from "../catalogs";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Expense", { database: process.env.DB_NAME })
+@Entity("expense", { database: process.env.DB_NAME })
 export class Expense {
   @PrimaryGeneratedColumn("increment")
   id: number;

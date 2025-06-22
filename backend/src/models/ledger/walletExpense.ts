@@ -1,8 +1,8 @@
 import { ViewColumn, ViewEntity } from "typeorm";
 
 @ViewEntity({
-  name: "VW_Wallet_Expense",
-  expression: `SELECT * FROM VW_Wallet_Expense`,
+  name: "vw_wallet_expense",
+  expression: `SELECT * FROM vw_wallet_expense`,
 })
 export class WalletExpense {
 

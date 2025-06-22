@@ -3,7 +3,7 @@ import { Expense } from "../expenses";
 import { getObject } from "../../utils/dbUtils";
 import { MonthlyNonInterest } from "./monthlyNonInterest";
 
-@Entity("Monthly_With_No_Interest_Payments", { database: process.env.DB_NAME })
+@Entity("monthly_with_no_interest_payments", { database: process.env.DB_NAME })
 export class MonthlyNonInterestPayment {
   @PrimaryGeneratedColumn("increment")
   id: number;

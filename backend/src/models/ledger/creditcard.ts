@@ -6,7 +6,7 @@ import { CreditcardPayment } from "./creditcardPayment";
 import { getObject } from "../../utils/dbUtils";
 import { WalletGroup } from "./walletGroup";
 
-@Entity("Credit_Card", { database: process.env.DB_NAME })
+@Entity("credit_card", { database: process.env.DB_NAME })
 export class Creditcard {
   @PrimaryGeneratedColumn("increment")
   id: number;

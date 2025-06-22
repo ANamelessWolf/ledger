@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Wallet } from "./wallet";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Cash", { database: process.env.DB_NAME })
+@Entity("cash", { database: process.env.DB_NAME })
 export class Cash {
   @PrimaryGeneratedColumn("increment")
   id: number;

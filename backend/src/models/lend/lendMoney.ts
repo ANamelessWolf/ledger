@@ -4,7 +4,7 @@ import { Beneficiary } from "./beneficiary";
 import { Owner, PaymentFrequency } from "../settings";
 import { getObject } from "../../utils/dbUtils";
 
-@Entity("Lend_Money", { database: process.env.DB_NAME })
+@Entity("lend_money", { database: process.env.DB_NAME })
 export class LendMoney {
   @PrimaryGeneratedColumn("increment")
   id: number;
