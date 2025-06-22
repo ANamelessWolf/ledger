@@ -35,6 +35,7 @@ import { MonthlyInstallmentPayment } from "./models/banking/monthlyInstallmentPa
 export const createConnection = (): DataSource => {
   return new DataSource({
     type: "mysql",
+    driver: require("mysql2"),
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     username: process.env.DB_USER,
