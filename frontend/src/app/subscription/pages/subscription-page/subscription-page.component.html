@@ -1,0 +1,14 @@
+<app-page-layout
+  [title]="'Subscriptions'"
+  [hasFilter]="true"
+  (onSearch)="onSearch($event)"
+  (add)="addSubscription()"
+  (openFilter)="openFilter()">
+  <div widget>
+    <p>Widget Content</p>
+  </div>
+
+  <div main>
+    <app-subscription-dashboard></app-subscription-dashboard>
+  </div>
+</app-page-layout>

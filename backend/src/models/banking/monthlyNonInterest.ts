@@ -2,6 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Creditcard } from "../ledger";
 import { Expense } from "../expenses";
 import { getObject } from "../../utils/dbUtils";
+import { MonthlyNonInterestPayment } from "./monthlyNonInterestPayment";
+import { AppDataSource } from "../..";
 
 @Entity("Monthly_With_No_Interest", { database: process.env.DB_NAME })
 export class MonthlyNonInterest {
@@ -32,5 +34,12 @@ export class MonthlyNonInterest {
 
   get expense() {
     return getObject(Expense, this.expenseId);
+  }
+
+  get payments(): Promise<MonthlyNonInterestPayment[]> {
+    const filter: any = {
+      where: [{ buyId : this.id }],
+    };
+    return AppDataSource.manager.find(MonthlyNonInterestPayment, filter);
   }
 }

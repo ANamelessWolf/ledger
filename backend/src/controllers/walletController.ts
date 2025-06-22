@@ -37,9 +37,15 @@ export const getExpensesById = asyncErrorHandler(
       if (orderBy !== undefined) {
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
-        options.order = { [field]: sortBy };
+        options.order = { 
+          [field]: sortBy,
+          sortId: "ASC", 
+        };
       } else {
-        options.order = { ["buyDate"]: "DESC" };
+        options.order = { 
+          ["buyDate"]: "DESC",
+          sortId: "ASC", 
+        };
       }
 
       // Add pagination
@@ -153,7 +159,7 @@ const getPagination = (query: QueryString.ParsedQs) => {
 const getTotalSum = async (where: any): Promise<number> => {
   const sumResult = await AppDataSource.getRepository(WalletExpense)
     .createQueryBuilder("VW_Wallet_Expense")
-    .select("SUM(VW_Wallet_Expense.total)", "sum")
+    .select("SUM(VW_Wallet_Expense.value)", "sum")
     .where(where)
     .getRawOne();
 

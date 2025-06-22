@@ -35,6 +35,7 @@ import {
   validateFilter,
 } from '@expense/utils/expenseUtils';
 import { WalletService } from '@wallet/services/wallet.service';
+import { CreditCardPeriodComponent } from "../../../card/components/credit-card-period/credit-card-period.component";
 
 @Component({
   selector: 'app-wallet-expense-table',
@@ -46,7 +47,8 @@ import { WalletService } from '@wallet/services/wallet.service';
     ExpenseTableComponent,
     SearchBarComponent,
     CurrencyFormatPipe,
-  ],
+    CreditCardPeriodComponent
+],
   templateUrl: './wallet-expense-table.component.html',
   styleUrl: './wallet-expense-table.component.scss',
   providers: [
@@ -118,7 +120,7 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
     this.getExpenses();
   }
 
-  onSearch(searchTerm: string) {
+  onSearch(searchTerm: any) {
     this.options.filter.description = searchTerm;
     this.getExpenses();
   }

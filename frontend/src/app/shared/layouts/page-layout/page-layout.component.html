@@ -1,0 +1,33 @@
+<div class="page-layout">
+  <div class="header-section">
+    <h1>{{ title }}</h1>
+    <div class="button-group">
+      <app-search-bar (search)="handleSearch($event)"></app-search-bar>
+      <!-- Dynamic Widget Section -->
+      <ng-content select="[buttons]"></ng-content>
+      <button
+        mat-icon-button
+        aria-label="Open filter window"
+        (click)="handleOpenFilter()"
+      >
+        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
+        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
+      </button>
+      <button mat-icon-button (click)="handleAdd()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Widget Section -->
+  <hr *ngIf="hasWidget"/>
+  <div class="widget-area" *ngIf="hasWidget">
+    <ng-content select="[widget]"></ng-content>
+  </div>
+  <hr />
+
+  <!-- Dynamic Main Section -->
+  <div class="main-section">
+    <ng-content select="[main]"></ng-content>
+  </div>
+</div>

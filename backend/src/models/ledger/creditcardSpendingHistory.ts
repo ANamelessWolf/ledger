@@ -1,12 +1,15 @@
 import { ViewColumn, ViewEntity } from "typeorm";
 
 @ViewEntity({
-  name: "VW_Spending_Report_Credit_Card",
-  expression: `SELECT * FROM VW_Spending_Report_Credit_Card`,
+  name: "VW_creditcard_payments",
+  expression: `SELECT * FROM VW_creditcard_payments`,
 })
 export class CreditCardSpendingReport {
   @ViewColumn()
   id: number;
+
+  @ViewColumn()
+  cutDay: number;
 
   @ViewColumn({ name: "entity_id" })
   entityId: number;
@@ -23,11 +26,8 @@ export class CreditCardSpendingReport {
   @ViewColumn()
   active: number;
 
-  @ViewColumn({ name: "period_cut_date" })
-  cutDate: Date;
-  
-  @ViewColumn()
-  period: string;
+  @ViewColumn({ name: "payment_date" })
+  paymentDate: Date;
 
   @ViewColumn()
   payment: number;

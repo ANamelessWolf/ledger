@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { isValidDate } from '@common/utils/dateUtils';
+import { QueryBuilder } from '@common/utils/filterUtils';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
@@ -98,57 +99,21 @@ export class ExpensesService {
     filter: ExpenseFilter,
     sorting?: SortType
   ): string => {
-    let query = '';
+    const query = new QueryBuilder();
 
     // Pagination
-    if (pagination.page) {
-      query += `page=${pagination.page}`;
-    } else {
-      query += 'page=1';
-    }
-
-    if (pagination.pageSize) {
-      query += `&pageSize=${pagination.pageSize}`;
-    } else {
-      query += `&pageSize=10`;
-    }
+    query.addPagination(pagination);
 
     // Filter
-    if (filter.wallet) {
-      query += `&wallet=${filter.wallet.join(',')}`;
-    }
-
-    if (filter.expenseTypes) {
-      query += `&expenseTypes=${filter.expenseTypes.join(',')}`;
-    }
-
-    if (filter.vendors) {
-      query += `&vendors=${filter.vendors.join(',')}`;
-    }
-
-    if (filter.period && isValidDate(filter.period.start) && isValidDate(filter.period.end)) {
-      query += `&start=${filter.period.start.toISOString()}`;
-      query += `&end=${filter.period.end.toISOString()}`;
-    }
-
-    if (filter.expenseRange) {
-      query += `&min=${filter.expenseRange.min}`;
-      query += `&max=${filter.expenseRange.max}`;
-    }
-
-    if (filter.description) {
-      query += `&description=${filter.description}`;
-    }
+    query.appendArrFilterProp('wallet', filter.wallet);
+    query.appendArrFilterProp('expenseTypes', filter.expenseTypes);
+    query.appendArrFilterProp('vendors', filter.vendors);
+    query.appendDateFilter(filter.period);
+    query.appendRangeFilter(filter.expenseRange);
+    query.appendFilterProperty('description', filter.description);
 
     // Sorting
-    if (sorting && sorting.orderBy) {
-      query += `&orderBy=${sorting.orderBy}`;
-      if (sorting.orderDirection) {
-        query += `&orderDirection=${sorting.orderDirection}`;
-      } else {
-        query += '&orderDirection=ASC';
-      }
-    }
-    return query;
+    query.addSorting(sorting);
+    return query.queryAsString;
   };
 }

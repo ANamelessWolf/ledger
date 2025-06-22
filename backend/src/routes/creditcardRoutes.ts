@@ -17,6 +17,15 @@
  *             period:
  *               type: string
  *               description: The billing period
+ *             filter:
+ *               type: object
+ *               properties:
+ *                 start:
+ *                   type: string
+ *                   description: The start date of the billing period
+ *                 end:
+ *                   type: string
+ *                   description: The end date of the billing period
  *             start:
  *               type: string
  *               description: The start date of the billing period
@@ -54,9 +63,9 @@
  *         cutDay:
  *           type: number
  *           description: The credit card cut day
- *         dueDay:
+ *         daysToPay:
  *           type: number
- *           description: The credit card due day
+ *           description: The credit card number of days to pay
  *         expiration:
  *           type: string
  *           description: The expiration date of the credit card
@@ -193,12 +202,12 @@
 import { Router } from "express";
 import {
   addCreditcardPayment,
+  getCreditCardPeriods,
   getCreditcardSpendingHistoryById,
   getCreditcardSummary,
   getCreditcardSummarybyId,
   updateCreditcard,
 } from "../controllers/creditcardController";
-
 const router = Router();
 
 /**
@@ -334,6 +343,7 @@ router.route("/payCreditcard/:id").put(addCreditcardPayment);
 router.route("/spending/:id").get(getCreditcardSpendingHistoryById);
 
 router.route("/:id").post(updateCreditcard);
+router.route("/periods/:year").get(getCreditCardPeriods)
 // .put(updateCreditcard)
 // .delete(deleteCreditcard);
 

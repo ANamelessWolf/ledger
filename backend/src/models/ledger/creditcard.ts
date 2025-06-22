@@ -29,8 +29,8 @@ export class Creditcard {
   @Column({ type: "int", name: "cut_day" })
   cutDay: number;
 
-  @Column({ type: "int", name: "due_day" })
-  dueDay: number;
+  @Column({ type: "int", name: "days_to_pay" })
+  daysToPay: number;
 
   @Column({ type: "varchar", length: 7 })
   expiration: string;

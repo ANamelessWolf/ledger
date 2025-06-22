@@ -1,5 +1,10 @@
 import { PaymentStatus } from "../paymentStatus";
 
+export type CreditCardSummaryInstallmentTotal = {
+  balance: string;
+  monthlyPayment: string;
+};
+
 export type CreditCardSummary = {
   id: number;
   preferredWalletId: number;
@@ -17,4 +22,5 @@ export type CreditCardSummary = {
   color: string;
   type: number;
   cutday: number;
+  installment?: CreditCardSummaryInstallmentTotal;
 };

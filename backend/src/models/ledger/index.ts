@@ -10,3 +10,4 @@ export * from './walletExpense';
 export * from './creditcardSpendingHistory';
 export * from './walletGroup';
 export * from './walletMember';
+export * from './walletList';

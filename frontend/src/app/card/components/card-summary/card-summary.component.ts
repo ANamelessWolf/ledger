@@ -121,7 +121,11 @@ export class CardSummaryComponent {
       let status = '';
       if ((this.summary as any).status) {
         status = (this.summary as CreditCardSummary).status?.status || '';
-        return getDateRange(this.cutDate, this.summary.cutday, status);
+        const filter = (this.summary as CreditCardSummary).status?.billing.filter;
+        return {
+          start: new Date(filter.start),
+          end: new Date(filter.end),
+        };
       } else {
         const today = new Date();
         const period = {

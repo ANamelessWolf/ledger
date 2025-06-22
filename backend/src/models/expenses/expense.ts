@@ -26,6 +26,9 @@ export class Expense {
   @Column({ type: "date", name: "buy_date" })
   buyDate: Date;
 
+  @Column({ type: "int", name: "sort_id" })
+  sortId: number;
+
   get expenseType(){
     return getObject(ExpenseType, this.expenseTypeId);
   }

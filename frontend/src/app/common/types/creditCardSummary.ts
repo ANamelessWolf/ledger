@@ -8,12 +8,21 @@ export type PaymentStatus = {
     dueDate: string;
   };
   billing: {
+    filter: {
+      start: Date;
+      end: Date;
+    },
     period: string;
     start: string;
     end: string;
   };
   status: string;
   total: string;
+};
+
+export type CreditCardSummaryInstallmentTotal = {
+  balance: string;
+  monthlyPayment: string;
 };
 
 export type CreditCardSummary = {
@@ -33,6 +42,7 @@ export type CreditCardSummary = {
   ending: string;
   color: string;
   cutday: number;
+  installment?: CreditCardSummaryInstallmentTotal;
 };
 
 export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
@@ -43,6 +53,10 @@ export const EMPTY_PAYMENT_STATUS: PaymentStatus = {
     dueDate: '',
   },
   billing: {
+    filter: {
+      start: new Date(),
+      end: new Date(),
+    },
     period: '',
     start: '',
     end: '',

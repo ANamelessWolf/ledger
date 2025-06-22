@@ -17,6 +17,7 @@ import { AppDataSource } from "..";
 import { Equal, FindManyOptions, FindOptionsWhere } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
 import { DailyExpense } from "../models/expenses/expenseDaily";
+import { isNewExpenseRequestValid } from "../utils/validatorUtils";
 
 /**
  * Retrieves a list of expenses.
@@ -38,9 +39,15 @@ export const getExpenses = asyncErrorHandler(
       if (orderBy !== undefined) {
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
-        options.order = { [field]: sortBy };
+        options.order = { 
+          [field]: sortBy,
+          sortId: "ASC",
+        };
       } else {
-        options.order = { ["buyDate"]: "DESC" };
+        options.order = { 
+          ["buyDate"]: "DESC",
+          sortId: "ASC", 
+        };
       }
 
       // Add pagination
@@ -135,6 +142,8 @@ export const createExpense = asyncErrorHandler(
     try {
       const { total, buyDate, description, walletId, expenseTypeId, vendorId } =
         req.body;
+      const newExpenseData = isNewExpenseRequestValid(req);
+      console.log(newExpenseData);
       // Create a new instance of Expense
       const expense = new Expense();
       expense.walletId = walletId;

@@ -34,6 +34,17 @@ export const toCurrency = (value: number): string => {
   }).format(value);
 };
 
+export const removeLetters = (str: string): string => {
+  return str.replace(/[a-zA-Z]/g, '');
+};
+
+export const toRangeCurrency = (start: number, end: number): string => {
+  const q1 = toCurrency(start);
+  const q2 = toCurrency(end);
+  const symbol = q1.replace(removeLetters(q1), '');
+  return `${symbol}${removeLetters(q1)} / ${removeLetters(q2)}`;
+};
+
 export const toIds = (items: CatalogItem[] | undefined): number[] => {
   const ids: number[] = items ? (items as CatalogItem[]).map((x) => x.id) : [];
   return ids;
@@ -64,4 +75,8 @@ export const getDaysOfMonth = (date: Date): number[] => {
   }
 
   return daysArray;
+};
+
+export const formatBreakLine = (content: string): string => {
+  return content.replace('\n', '<br>');
 };

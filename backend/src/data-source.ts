@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { FinancingEntity, MonthlyNonInterest } from "./models/banking";
+import { FinancingEntity, MonthlyNonInterest, MonthlyNonInterestPayment } from "./models/banking";
 import {
   ExpenseType,
   WalletType,
@@ -21,6 +21,7 @@ import {
   WalletExpense,
   WalletGroup,
   WalletMember,
+  WalletList,
 } from "./models/ledger";
 import { Beneficiary, LendMoney } from "./models/lend";
 import { Currency, Owner, PaymentFrequency } from "./models/settings";
@@ -28,6 +29,8 @@ import {
   Subscription,
   SubscriptionPaymentHistory,
 } from "./models/subscriptions";
+import { MonthlyCreditCardInstallments } from "./models/banking/monthlyCreditCardInstallments";
+import { MonthlyInstallmentPayment } from "./models/banking/monthlyInstallmentPayments";
 
 export const createConnection = (): DataSource => {
   return new DataSource({
@@ -42,6 +45,9 @@ export const createConnection = (): DataSource => {
     entities: [
       FinancingEntity,
       MonthlyNonInterest,
+      MonthlyNonInterestPayment,
+      MonthlyCreditCardInstallments,
+      MonthlyInstallmentPayment,
       ExpenseType,
       WalletType,
       FinancingType,
@@ -62,6 +68,7 @@ export const createConnection = (): DataSource => {
       WalletExpense,
       WalletGroup,
       WalletMember,
+      WalletList,
       Beneficiary,
       LendMoney,
       Currency,

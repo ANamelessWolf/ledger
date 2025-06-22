@@ -1,0 +1,16 @@
+.subscription-dashboard {
+  table {
+    width: 100%;
+  }
+
+  th.mat-header-cell,
+  td.mat-cell {
+    text-align: center;
+  }
+
+  mat-slide-toggle {
+    display: inline-flex;
+    justify-content: center;
+  }
+
+}

@@ -8,3 +8,8 @@ export type HttpResponseProps = {
 export interface PaymentMap {
   [key: string]: { date: Date; total: number };
 }
+
+export interface PairedValue {
+  label: string;
+  value: number;
+}

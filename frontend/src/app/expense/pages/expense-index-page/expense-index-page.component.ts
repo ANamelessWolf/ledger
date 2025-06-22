@@ -28,6 +28,7 @@ import {
   mapExpense,
   validateFilter,
 } from '@expense/utils/expenseUtils';
+import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-expense-index-page',
@@ -38,6 +39,7 @@ import {
     MatIconModule,
     ExpenseTableComponent,
     SearchBarComponent,
+    PageLayoutComponent,
   ],
   templateUrl: './expense-index-page.component.html',
   styleUrl: './expense-index-page.component.scss',

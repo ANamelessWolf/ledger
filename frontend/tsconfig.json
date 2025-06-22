@@ -29,8 +29,10 @@
       "@card/*": ["app/card/*"],
       "@expense/*": ["app/expense/*"],
       "@wallet/*": ["app/wallet/*"],
+      "@moNoInt/*": ["app/monthly/*"],
       "@common/*": ["app/common/*"],
       "@config/*": ["app/config/*"],
+      "@subscription/*": ["app/subscription/*"],
     }
   },
   "angularCompilerOptions": {

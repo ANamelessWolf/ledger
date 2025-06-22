@@ -8,6 +8,7 @@ import debitcardRoutes from './debitcardRoutes';
 import catalogRoutes from './catalogRoutes';
 import expenseRoutes from './expenseRoutes';
 import walletRoutes from './walletRoutes';
+import monthlyRoute from './monthlyRoute';
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.use('/debitcard', debitcardRoutes);
 router.use('/catalog', catalogRoutes);
 router.use('/expenses', expenseRoutes);
 router.use('/wallet', walletRoutes);
+router.use('/monthly', monthlyRoute);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

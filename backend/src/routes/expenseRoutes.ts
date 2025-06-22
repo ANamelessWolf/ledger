@@ -88,7 +88,6 @@
  *         weekDay:
  *           type: integer
  *           example: 5
-
  */
 import { Router } from "express";
 import {

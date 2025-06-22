@@ -228,10 +228,7 @@ export const getVendorList = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const sort = DESC_FILTER;
-      const vendors: Vendor[] = await AppDataSource.manager.find(
-        Vendor,
-        sort
-      );
+      const vendors: Vendor[] = await AppDataSource.manager.find(Vendor, sort);
       let result: CatalogItem[] = [];
       if (vendors)
         result = vendors.map((v: Vendor) => {

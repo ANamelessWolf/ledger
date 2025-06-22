@@ -1,27 +1,41 @@
 import { DATE_FORMAT, EU_FORMAT, ISO_FORMAT, US_FORMAT } from "../common";
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export const getMonthName = (date: Date) => {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNames = MONTH_NAMES;
 
   const monthIndex = date.getMonth();
   return monthNames[monthIndex];
 };
 
+export const formatMonthKey = (monthKey: string) => {
+  const year = monthKey.substring(0, 4);
+  const monthIndex = parseInt(monthKey.substring(4, 6), 10) - 1;
+  return `${MONTH_NAMES[monthIndex]} ${year}`;
+};
+
 export const getPeriodName = (date: Date) => {
   return `${getMonthName(date)} ${date.getFullYear()}`;
+};
+
+export const getPeriodKey = (date: Date): string => {
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString();
+  return `${month}/${year}`;
 };
 
 export const parseDate = (dateString: string): Date => {
@@ -54,4 +68,37 @@ export const formatDate = (date: Date): string => {
   // Format the date using Intl.DateTimeFormat
   const dateString = new Intl.DateTimeFormat("en-US", options).format(date);
   return dateString;
+};
+
+export const getPeriodLabel = (period: number) => {
+  const monthIndex = +("" + period).substring(4) - 1;
+  const year = ("" + period).substring(0, 4);
+  const monthNames = MONTH_NAMES;
+  return `${monthNames[monthIndex]} ${year}`;
+};
+
+export const adjustDueDate = (date: Date): Date => {
+  const dayOfWeek = date.getDay();
+  if (dayOfWeek === 6) {
+    // Saturday
+    date.setDate(date.getDate() + 2); // Move to Monday
+  } else if (dayOfWeek === 0) {
+    // Sunday
+    date.setDate(date.getDate() + 1); // Move to Monday
+  }
+  return date;
+};
+
+export const stripTime = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+export const getCurrentMonthlyKey = (): string => {
+  const today = new Date();
+  const currentMonth = (today.getMonth() + 1).toString().padStart(2, "0");
+  const currentYear = today.getFullYear().toString();
+
+  // Get the formatted key for this month
+  const currentMonthKey = `${currentYear}${currentMonth}`;
+  return currentMonthKey;
 };
