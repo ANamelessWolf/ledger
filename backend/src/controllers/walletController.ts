@@ -37,9 +37,15 @@ export const getExpensesById = asyncErrorHandler(
       if (orderBy !== undefined) {
         const field = orderBy.toString();
         const sortBy = orderDirection !== undefined ? orderDirection : "ASC";
-        options.order = { [field]: sortBy };
+        options.order = { 
+          [field]: sortBy,
+          sortId: "ASC", 
+        };
       } else {
-        options.order = { ["buyDate"]: "DESC" };
+        options.order = { 
+          ["buyDate"]: "DESC",
+          sortId: "ASC", 
+        };
       }
 
       // Add pagination

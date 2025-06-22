@@ -53,5 +53,8 @@ export class WalletExpense {
 
   @ViewColumn()
   isNonIntMonthlyInstallment: number;
+
+  @ViewColumn()
+  sortId: number;
   
 }
