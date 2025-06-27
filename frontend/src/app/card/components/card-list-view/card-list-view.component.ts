@@ -131,7 +131,7 @@ export class CardListViewComponent implements OnInit {
           return {
             ...row,
             active: row.active as CARD_STATUS,
-            isCreditCard: row.isCreditCard === 1,
+            isCreditCard: row.isCreditCard === '1',
           };
         });
         if (this.cards.length > 0) {
