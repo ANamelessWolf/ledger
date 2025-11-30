@@ -100,6 +100,9 @@
  *         totalMxn:
  *           type: number
  *           example: 96000.0
+ *         total:
+ *          type: string
+ *          example: "MXN $96,000.00"
  *     ExpensesByVendor:
  *       type: object
  *       properties:
@@ -112,6 +115,9 @@
  *         totalMxn:
  *           type: number
  *           example: 12299.0
+ *         total:
+ *          type: string
+ *          example: "MXN $12,299.00"
  */
 import { Router } from "express";
 import {

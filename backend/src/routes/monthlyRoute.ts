@@ -171,6 +171,9 @@ import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallme
  *         totalMxn:
  *           type: number
  *           example: 73923.4
+ *         total:
+ *          type: string
+ *          example: "MXN $73,299.40"
  *         paymentsCount:
  *           type: integer
  *           example: 69
