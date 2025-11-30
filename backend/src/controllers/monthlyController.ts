@@ -37,6 +37,7 @@ import {
 } from "../utils/dateUtils";
 import { Creditcard } from "../models/ledger";
 import { CreditCardCutDays } from "../types/newMonthlyInstallment";
+import { MonthlyInterestPaymentsSummary } from "../models/banking/summary";
 // import { NewMonthlyInstallment } from "../types/newMonthlyInstallment";
 // import { Expense } from "../models/expenses";
 // import { getExpenseById } from "../utils/expenseUtils";
@@ -111,7 +112,10 @@ export const getMonthlyInstallments = asyncErrorHandler(
       const balanceTotal = payments
         .filter((x) => x.isPaid === 0)
         .reduce((sum, payment) => sum + payment.total, 0);
-      const expendedTotal = payments.reduce((sum, payment) => sum + payment.total, 0);
+      const expendedTotal = payments.reduce(
+        (sum, payment) => sum + payment.total,
+        0
+      );
       const monthKey = getCurrentMonthlyKey();
       const currentPeriod = {
         label: formatMonthKey(monthKey),
@@ -279,7 +283,7 @@ export const payInstallment = asyncErrorHandler(
 /**
  * Create a new monthly expense buy
  * @summary Handles adding a new zero interest monthly installment
- * @route POST /expenses
+ * @route POST /monthly
  * @param {Request} req - The request object
  * @param {Response} res - The response object
  * @param {NextFunction} next - The next middleware function
@@ -288,34 +292,43 @@ export const payInstallment = asyncErrorHandler(
 export const createMonthlyExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      /*
-      // const { installment, monthlyExpenses, creditCardId } =
+      // const { total, buyDate, description, walletId, expenseTypeId, vendorId, months } =
       //   req.body;
-      const installment: NewMonthlyInstallment = req.body.installment;
-      let buyExpense: Expense;
-      let isNewExpense = false;
-      try {
-        buyExpense: Expense = await getExpenseById(installment.expenseId);
-      } catch (error) {
-        console.log("Buy expense was not found, creating a new one.");
-        isNewExpense = true;
-      }
-      if (isNewExpense) {
-      }
-      // Create a new instance of Expense
+      // TO DO: Implement createMonthlyExpense
 
-     
-      const expense = new Expense();
-      expense.walletId = walletId;
-      expense.expenseTypeId = expenseTypeId;
-      expense.vendorId = vendorId;
-      expense.description = description;
-      expense.buyDate = buyDate;
-      expense.total = total;
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred adding a new Expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
 
+/**
+ * Get monthly interest payments summary for fixed time windows.
+ * @route GET /monthly/payments/summary
+ * @param {Request} _req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the summary data or an error
+ */
+export const getMonthlyInterestPaymentsSummary = asyncErrorHandler(
+  async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // CALL GetMonthlyInterestPaymentsSummary()
+      const rawResult: any = await AppDataSource.query(
+        "CALL GetMonthlyInterestPaymentsSummary();"
+      );
 
-      // Save the insert record
-      const result = await AppDataSource.manager.save(expense);
+      const result: MonthlyInterestPaymentsSummary[] = rawResult[0] ?? rawResult;
+      result.sort((a, b) => b.totalMxn - a.totalMxn);
+      result.forEach((item) => {
+        item.total = formatMoney(item.totalMxn, ` $`);
+      });
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(
@@ -323,12 +336,11 @@ export const createMonthlyExpense = asyncErrorHandler(
           data: result,
         })
       );
-      */
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return next(
         new Exception(
-          `An error occurred adding a new Expense`,
+          "An error occurred getting monthly interest payments summary.",
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

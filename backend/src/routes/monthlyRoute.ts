@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment } from "../controllers/monthlyController";
+import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment, getMonthlyInterestPaymentsSummary } from "../controllers/monthlyController";
 
 /**
  * @swagger
@@ -161,6 +161,19 @@ import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallme
  *         isPaid:
  *           type: boolean
  *           example: true
+ *     MonthlyInterestPaymentsSummary:
+ *       type: object
+ *       properties:
+ *         frequency:
+ *           type: integer
+ *           description: Number of months in the summary window
+ *           example: 6
+ *         totalMxn:
+ *           type: number
+ *           example: 73923.4
+ *         paymentsCount:
+ *           type: integer
+ *           example: 69
  */
 
 const router = Router();
@@ -256,8 +269,30 @@ const router = Router();
  *                $ref: '#/components/schemas/InstallmentPayment'
  *      '404':
  *        description: No payments found for the specified id. 
+ * /monthly/payments/summary:
+ *   get:
+ *     summary: Get monthly interest payments summary
+ *     description: >
+ *       Returns a summary of monthly interest payments in MXN for
+ *       different time windows (e.g., 1, 6, 12 months).
+ *     tags: [Monthly Installments]
+ *     responses:
+ *       '200':
+ *         description: Summary data of monthly interest payments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MonthlyInterestPaymentsSummary'
+ *       '500':
+ *         description: Error processing the request
  */
 router.route("/").get(getMonthlyInstallments).post(createMonthlyExpense);
 router.route("/payments/:id").get(getMonthlyInstallmentPayment);
 router.route("/pay").put(payInstallment);
+router.route("/payments/summary").get(getMonthlyInterestPaymentsSummary);
 export default router;

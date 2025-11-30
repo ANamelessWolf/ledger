@@ -18,6 +18,8 @@ import { Equal, FindManyOptions, FindOptionsWhere } from "typeorm";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
 import { DailyExpense } from "../models/expenses/expenseDaily";
 import { isNewExpenseRequestValid } from "../utils/validatorUtils";
+import { ExpensesByExpenseType, ExpensesByVendor } from "../models/expenses/summary";
+import { formatMoney } from "../utils/formatUtils";
 
 /**
  * Retrieves a list of expenses.
@@ -222,6 +224,115 @@ export const updateExpense = asyncErrorHandler(
       return next(
         new Exception(
           `An error occurred updating a new Expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get expenses grouped by expense type for the last N months.
+ * @route GET /expenses/summary/type/:frequency
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the summary data or an error
+ */
+export const getExpenseSummaryByType = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const frequencyParam = req.params.frequency;
+      const frequency = parseInt(frequencyParam, 10);
+
+      if (isNaN(frequency) || frequency <= 0) {
+        return next(
+          new Exception(
+            "Invalid frequency parameter. It must be a positive integer.",
+            HTTP_STATUS.BAD_REQUEST
+          )
+        );
+      }
+
+      // CALL GetExpensesByExpenseType(months)
+      const rawResult: any = await AppDataSource.query(
+        "CALL GetExpensesByExpenseType(?);",
+        [frequency]
+      );
+
+      // MySQL CALL suele regresar [rows, metadata]
+      const result: ExpensesByExpenseType[] = rawResult[0] ?? rawResult;
+      result.sort((a, b) => b.totalMxn - a.totalMxn);
+      result.forEach((item) => {
+        item.total = formatMoney(item.totalMxn, `$ `);
+      });
+
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+
+    } catch (error) {
+      console.error(error);
+      return next(
+        new Exception(
+          "An error occurred getting expenses by expense type.",
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get expenses grouped by vendor type for the last N months.
+ * @route GET /expenses/summary/vendor/:frequency
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>} - The response with the summary data or an error
+ */
+export const getExpenseSummaryByVendor = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const frequencyParam = req.params.frequency;
+      const frequency = parseInt(frequencyParam, 10);
+
+      if (isNaN(frequency) || frequency <= 0) {
+        return next(
+          new Exception(
+            "Invalid frequency parameter. It must be a positive integer.",
+            HTTP_STATUS.BAD_REQUEST
+          )
+        );
+      }
+
+      // CALL GetExpensesByVendor(months)
+      const rawResult: any = await AppDataSource.query(
+        "CALL GetExpensesByVendor(?);",
+        [frequency]
+      );
+
+      // MySQL CALL suele regresar [rows, metadata]
+      const result: ExpensesByVendor[] = rawResult[0] ?? rawResult;
+      result.sort((a, b) => b.totalMxn - a.totalMxn);
+      result.forEach((item) => {
+        item.total = formatMoney(item.totalMxn, `$ `);
+      });
+      // Ok Response
+      res.status(HTTP_STATUS.OK).json(
+        new HttpResponse({
+          data: result,
+        })
+      );
+
+    } catch (error) {
+      console.error(error);
+      return next(
+        new Exception(
+          "An error occurred getting expenses by expense type.",
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

@@ -88,12 +88,38 @@
  *         weekDay:
  *           type: integer
  *           example: 5
+ *     ExpensesByExpenseType:
+ *       type: object
+ *       properties:
+ *         expenseTypeId:
+ *           type: integer
+ *           example: 59
+ *         expenseType:
+ *           type: string
+ *           example: "PPR"
+ *         totalMxn:
+ *           type: number
+ *           example: 96000.0
+ *     ExpensesByVendor:
+ *       type: object
+ *       properties:
+ *         vendorId:
+ *           type: integer
+ *           example: 10
+ *         vendor:
+ *           type: string
+ *           example: "Mercado Libre México"
+ *         totalMxn:
+ *           type: number
+ *           example: 12299.0
  */
 import { Router } from "express";
 import {
   createExpense,
   getDailyExpenses,
   getExpenses,
+  getExpenseSummaryByType,
+  getExpenseSummaryByVendor,
   updateExpense,
 } from "../controllers/expenseController";
 
@@ -258,10 +284,76 @@ const router = Router();
  *              items:
  *                $ref: '#/components/schemas/DailyExpense'
  *      '404':
- *        description: No expenses found for the specified month and year. 
+ *        description: No expenses found for the specified month and year.
+ * /expenses/summary/type/{frequency}:
+ *   get:
+ *     summary: Get total expenses grouped by expense type
+ *     description: >
+ *       Returns the total expenses grouped by expense type in MXN for the last N months.
+ *       Excludes parent monthly purchases and their installment payments.
+ *     tags: [Expenses]
+ *     parameters:
+ *       - name: frequency
+ *         in: path
+ *         description: Number of months to look back (e.g., 1, 6, 12)
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           format: int32
+ *           example: 6
+ *     responses:
+ *       '200':
+ *         description: Expense summary grouped by type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ExpensesByExpenseType'
+ *       '400':
+ *         description: Invalid frequency parameter.
+ *       '500':
+ *         description: Error processing the request
+ * /expenses/summary/vendor/{frequency}:
+ *   get:
+ *     summary: Get total expenses grouped by vendor
+ *     description: >
+ *       Returns the total expenses grouped by vendor in MXN for the last N months.
+ *       Excludes parent monthly purchases and their installment payments.
+ *     tags: [Expenses]
+ *     parameters:
+ *       - name: frequency
+ *         in: path
+ *         description: Number of months to look back (e.g., 1, 6, 12)
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           format: int32
+ *           example: 12
+ *     responses:
+ *       '200':
+ *         description: Expense summary grouped by vendor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ExpensesByVendor'
+ *       '400':
+ *         description: Invalid frequency parameter.
+ *       '500':
+ *         description: Error processing the request.
  */
 router.route("/").get(getExpenses).post(createExpense);
 router.route("/:id").put(updateExpense);
 router.route("/daily/:month/:year").get(getDailyExpenses);
+router.route("/summary/type/:frequency").get(getExpenseSummaryByType);
+router.route("/summary/vendor/:frequency").get(getExpenseSummaryByVendor);
 
 export default router;
