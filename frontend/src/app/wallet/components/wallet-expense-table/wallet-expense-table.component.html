@@ -19,8 +19,10 @@
       [header]="tableHeader"
       [expenses]="expenses"
       [totalItems]="totalItems"
+      [catalog]="catalog"
       (pageChange)="loadExpenses($event)"
       (sortChange)="sortExpenses($event)"
+      (expenseEdited)="onExpenseEdited($event)"
     ></app-expense-table>
   </div>
 </div>

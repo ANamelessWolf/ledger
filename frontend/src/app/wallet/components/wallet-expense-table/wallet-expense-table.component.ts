@@ -147,6 +147,10 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
     this.getExpenses();
   }
 
+  onExpenseEdited(_id: number) {
+    this.getExpenses();
+  }
+
   get hasFilter() {
     return validateFilter(this.options.filter);
   }
