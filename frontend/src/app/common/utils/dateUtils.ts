@@ -74,6 +74,47 @@ export const getCurrentMonthYear = (): string => {
   return currentMonthKey;
 };
 
+const shiftDateByMonths = (date: Date, months: number): Date => {
+  const totalMonths = date.getFullYear() * 12 + date.getMonth() + months;
+  const year = Math.floor(totalMonths / 12);
+  const month = totalMonths % 12;
+  return new Date(year, month, date.getDate());
+};
+
+export interface CardPeriodsResult {
+  periods: Map<string, DateRange>;
+  currentKey: string;
+}
+
+export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
+  const { start, end } = period;
+
+  // Count days each month owns within the period
+  const lastDayOfStartMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+  const daysInStartMonth = lastDayOfStartMonth - start.getDate() + 1;
+  const daysInEndMonth = end.getDate();
+
+  // The "current" key is the month with more days in the range
+  const keyIsStart = daysInStartMonth >= daysInEndMonth;
+  const keyMonth = keyIsStart ? start.getMonth() : end.getMonth();
+  const keyYear = keyIsStart ? start.getFullYear() : end.getFullYear();
+  const keyBase = new Date(keyYear, keyMonth, 1);
+
+  const periods = new Map<string, DateRange>();
+  let currentKey = '';
+
+  for (let offset = -12; offset <= 5; offset++) {
+    const newStart = shiftDateByMonths(start, offset);
+    const newEnd = shiftDateByMonths(end, offset);
+    const keyDate = shiftDateByMonths(keyBase, offset);
+    const key = `${getMonthName(keyDate)} ${keyDate.getFullYear()}`;
+    if (offset === 0) currentKey = key;
+    periods.set(key, { start: newStart, end: newEnd });
+  }
+
+  return { periods, currentKey };
+};
+
 export const sliceMonthLabels = (
   sliceMonthLabels: string[]
 ): { startIndex: number; endIndex: number } => {

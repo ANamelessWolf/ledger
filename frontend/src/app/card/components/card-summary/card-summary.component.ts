@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import {
   CardItem,
   EMPTY_CARD_ITEM,
@@ -54,7 +54,7 @@ import { getDateRange } from '@common/utils/dateUtils';
   templateUrl: './card-summary.component.html',
   styleUrl: './card-summary.component.scss',
 })
-export class CardSummaryComponent {
+export class CardSummaryComponent implements OnChanges {
   @Input() card: CardItem = EMPTY_CARD_ITEM;
   @Input() summary: CreditCardSummary | DebitCardSummary | null = null;
   @Input() creditCardSpending: CreditCardSpending = EMPTY_CREDIT_CARD_SPENDING;
@@ -76,6 +76,12 @@ export class CardSummaryComponent {
     private notifService: NotificationService,
     private router: Router
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['summary'] && this.summary) {
+      this.cardService.updateCardPeriods(this.period);
+    }
+  }
 
   refreshPage() {
     let url = `/${CARD_BASE}}`;

@@ -74,6 +74,8 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   isLoading = true;
   error = false;
 
+
+
   constructor(
     private expenseService: ExpensesService,
     private walletExpenseService: WalletService,
@@ -91,6 +93,7 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+
     this.getCatalog();
   }
 
@@ -122,6 +125,11 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
 
   onSearch(searchTerm: any) {
     this.options.filter.description = searchTerm;
+    this.getExpenses();
+  }
+
+  onPeriodChange(period: DateRange) {
+    this.options.filter.period = period;
     this.getExpenses();
   }
 

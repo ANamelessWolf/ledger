@@ -21,13 +21,26 @@ import {
 import { CreditCardSummary } from '@common/types/creditCardSummary';
 import { DebitCardSummary } from '@common/types/debitCardSummary';
 import { APP_CATALOGS, LEDGER_API } from '@config/constants';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { DateRange } from '@expense/types/expensesTypes';
+import { generateCardPeriods } from '@common/utils/dateUtils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CardService {
+  private _cardPeriods$ = new BehaviorSubject<Map<string, DateRange>>(new Map());
+  private _currentPeriodKey$ = new BehaviorSubject<string>('');
+  readonly cardPeriods$ = this._cardPeriods$.asObservable();
+  readonly currentPeriodKey$ = this._currentPeriodKey$.asObservable();
+
   constructor(private http: HttpClient, private dialog: MatDialog) {}
+
+  updateCardPeriods(period: DateRange): void {
+    const { periods, currentKey } = generateCardPeriods(period);
+    this._cardPeriods$.next(periods);
+    this._currentPeriodKey$.next(currentKey);
+  }
 
   getCreditCardSummaryById(id: number): Observable<any> {
     return this.http.get(`${LEDGER_API.CREDIT_CARD}/summary/${id}`);
