@@ -23,7 +23,7 @@ import { MoreThan } from "typeorm";
 import { CardSpendingResponse } from "../types/response/cardSpendingResponse";
 import { CardSpending } from "../types/cardSpending";
 import { CreditCardPeriodResponse } from "../types/paymentStatus";
-import { getPeriodKey } from "../utils/dateUtils";
+import { getPeriodKey, getPeriodName } from "../utils/dateUtils";
 import { findCreditCardPeriod } from "../utils/creditCardPeriodUtils";
 
 /**
@@ -236,9 +236,9 @@ export const getCreditcardSpendingHistoryById = asyncErrorHandler(
             const period = findCreditCardPeriod(periods, p.paymentDate);
             if (period !== undefined) {
               return {
-                label: period.period.key,
+                label: getPeriodName(period.billing.start.dateValue),
                 spending: p.payment,
-                period: getPeriodKey(period.cutDate.dateValue),
+                period: getPeriodKey(period.billing.start.dateValue),
                 cutDate: period.cutDate.dateValue,
               };
             } else {

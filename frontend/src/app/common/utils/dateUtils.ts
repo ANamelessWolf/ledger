@@ -89,16 +89,7 @@ export interface CardPeriodsResult {
 export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
   const { start, end } = period;
 
-  // Count days each month owns within the period
-  const lastDayOfStartMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
-  const daysInStartMonth = lastDayOfStartMonth - start.getDate() + 1;
-  const daysInEndMonth = end.getDate();
-
-  // The "current" key is the month with more days in the range
-  const keyIsStart = daysInStartMonth >= daysInEndMonth;
-  const keyMonth = keyIsStart ? start.getMonth() : end.getMonth();
-  const keyYear = keyIsStart ? start.getFullYear() : end.getFullYear();
-  const keyBase = new Date(keyYear, keyMonth, 1);
+  const keyBase = new Date(start.getFullYear(), start.getMonth(), 1);
 
   const periods = new Map<string, DateRange>();
   let currentKey = '';
