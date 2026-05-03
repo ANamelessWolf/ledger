@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="budget-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" maxlength="100" placeholder="e.g. Monthly Groceries" />
+      <mat-error *ngIf="form.get('description')?.hasError('required')">Description is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Icon (Material icon name)</mat-label>
+      <input matInput formControlName="icon" placeholder="account_balance_wallet" />
+      <mat-icon matSuffix>{{ form.get('icon')?.value || 'account_balance_wallet' }}</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Budget Total</mat-label>
+      <input matInput type="number" formControlName="total" min="0.01" step="0.01" />
+      <mat-error *ngIf="form.get('total')?.hasError('required')">Total is required</mat-error>
+      <mat-error *ngIf="form.get('total')?.hasError('min')">Must be greater than 0</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId">
+        <mat-option *ngFor="let c of data.currencies" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()">
+    {{ isEdit ? 'Update' : 'Create' }}
+  </button>
+</mat-dialog-actions>

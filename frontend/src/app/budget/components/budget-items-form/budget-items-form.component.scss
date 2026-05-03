@@ -1,0 +1,23 @@
+.items-content {
+  min-height: 320px;
+}
+
+.tab-body {
+  padding: 16px 0;
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .select-field {
+    flex: 1;
+  }
+}
+
+.empty-msg {
+  padding: 16px;
+  color: #888;
+  text-align: center;
+}

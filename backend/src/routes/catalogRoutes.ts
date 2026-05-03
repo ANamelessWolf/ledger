@@ -40,7 +40,7 @@
  *           description: Catalog item name
  */
 import { Router } from "express";
-import { getCardList, getExpensesTypesList, getFinancingEnityList, getVendorList, getWalletList } from "../controllers/catalogController";
+import { getCardList, getCurrencyList, getExpenseYearRange, getExpensesTypesList, getFinancingEnityList, getVendorList, getWalletList } from "../controllers/catalogController";
 
 const router = Router();
 /**
@@ -137,10 +137,12 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/CatalogItem' 
  */ 
+router.route('/currencies').get(getCurrencyList);
 router.route('/cards').get(getCardList);
 router.route('/financing_entities').get(getFinancingEnityList);
 router.route('/wallets').get(getWalletList);
 router.route('/expenseTypes').get(getExpensesTypesList);
 router.route('/vendors').get(getVendorList);
+router.route('/expense-year-range').get(getExpenseYearRange);
 
 export default router;

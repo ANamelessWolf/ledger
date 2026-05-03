@@ -33,6 +33,7 @@
       "@common/*": ["app/common/*"],
       "@config/*": ["app/config/*"],
       "@subscription/*": ["app/subscription/*"],
+      "@budget/*": ["app/budget/*"],
     }
   },
   "angularCompilerOptions": {

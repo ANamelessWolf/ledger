@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { Budget, BudgetItemDetail } from "./models/budget";
 import { FinancingEntity, MonthlyNonInterest, MonthlyNonInterestPayment } from "./models/banking";
 import {
   ExpenseType,
@@ -44,6 +45,8 @@ export const createConnection = (): DataSource => {
     synchronize: false,
     logging: false,
     entities: [
+      Budget,
+      BudgetItemDetail,
       FinancingEntity,
       MonthlyNonInterest,
       MonthlyNonInterestPayment,

@@ -3,6 +3,7 @@ import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
 import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
+import { Currency } from "../models/settings";
 import {
   getCardListFilter,
   getCreditCardStatus,
@@ -249,6 +250,39 @@ export const getVendorList = asyncErrorHandler(
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );
+    }
+  }
+);
+
+export const getCurrencyList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const currencies: Currency[] = await AppDataSource.manager.find(Currency, {
+        order: { name: "ASC" },
+      });
+      const result: CatalogItem[] = currencies.map((c) => ({
+        id: c.id,
+        name: `${c.name} (${c.symbol})`,
+      }));
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      return next(
+        new Exception("An error occurred getting the currency list", HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      );
+    }
+  }
+);
+
+export const getExpenseYearRange = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const raw: any[] = await AppDataSource.query(
+        "SELECT MIN(YEAR(buy_date)) AS minYear, MAX(YEAR(buy_date)) AS maxYear FROM Expense"
+      );
+      const { minYear, maxYear } = raw[0] ?? { minYear: new Date().getFullYear(), maxYear: new Date().getFullYear() };
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { minYear: +minYear, maxYear: +maxYear } }));
+    } catch (error) {
+      return next(new Exception("An error occurred getting the expense year range", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }
 );

@@ -1,0 +1,63 @@
+<div class="summary-wrapper">
+
+  <!-- Period toggle + sub-selector row -->
+  <div class="controls-row">
+    <mat-button-toggle-group [value]="activePeriod" (change)="onPeriodChange($event.value)">
+      <mat-button-toggle *ngFor="let p of periods" [value]="p">
+        {{ periodLabels[p] }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <!-- Week sub-selector -->
+    <mat-form-field *ngIf="activePeriod === 'week'" appearance="outline" class="sub-selector">
+      <mat-select [(ngModel)]="selectedWeekIndex" (ngModelChange)="onWeekChange()">
+        <mat-option *ngFor="let w of availableWeeks; let i = index" [value]="i">
+          {{ w.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Month sub-selector -->
+    <mat-form-field *ngIf="activePeriod === 'month'" appearance="outline" class="sub-selector">
+      <mat-select [(ngModel)]="selectedMonthIndex" (ngModelChange)="onMonthChange()">
+        <mat-option *ngFor="let m of availableMonths; let i = index" [value]="i">
+          {{ m.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Year sub-selector -->
+    <mat-form-field *ngIf="activePeriod === 'year'" appearance="outline" class="sub-selector">
+      <mat-select [(ngModel)]="selectedYear" (ngModelChange)="onYearChange()">
+        <mat-option *ngFor="let y of availableYears" [value]="y">{{ y }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Summary cards -->
+  <p *ngIf="summaries.length === 0" class="no-data">No budgets to display.</p>
+
+  <div class="cards-grid">
+    <mat-card *ngFor="let s of summaries" class="summary-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>{{ s.icon || 'account_balance_wallet' }}</mat-icon>
+        <mat-card-title>{{ s.description }}</mat-card-title>
+        <mat-card-subtitle>
+          Spent: {{ s.spentTotal | number:'1.2-2' }} / {{ s.budgetTotal | number:'1.2-2' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-progress-bar
+          [mode]="'determinate'"
+          [value]="getProgressValue(s)"
+          [color]="getProgressColor(s)">
+        </mat-progress-bar>
+        <div class="remaining" [class.over-budget]="s.remaining < 0">
+          <span *ngIf="s.remaining >= 0">Remaining: {{ s.remaining | number:'1.2-2' }}</span>
+          <span *ngIf="s.remaining < 0">Over budget: {{ (-s.remaining) | number:'1.2-2' }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>

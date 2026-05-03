@@ -42,4 +42,12 @@ export class CatalogService {
   getVendors(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/vendors`);
   }
+
+  getCurrencies(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/currencies`);
+  }
+
+  getExpenseYearRange(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/expense-year-range`);
+  }
 }

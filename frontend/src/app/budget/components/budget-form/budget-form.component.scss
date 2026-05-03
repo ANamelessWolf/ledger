@@ -1,0 +1,15 @@
+.budget-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 8px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .half-width {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 180px;
+  }
+}

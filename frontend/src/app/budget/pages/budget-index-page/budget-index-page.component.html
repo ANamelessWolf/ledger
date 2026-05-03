@@ -1,0 +1,30 @@
+<app-page-layout
+  [title]="'Budget'"
+  [hasFilter]="false"
+  [hasWidget]="true"
+  (onSearch)="onSearch($event)"
+  (add)="addBudget()">
+
+  <div widget>
+    <app-budget-summary-card
+      [summaries]="summaries"
+      [yearRange]="yearRange"
+      (summaryRequested)="onSummaryRequested($event)">
+    </app-budget-summary-card>
+  </div>
+
+  <div main>
+    <app-budget-list
+      [budgets]="budgets"
+      [selectedBudget]="selectedBudget"
+      [budgetItems]="budgetItems"
+      [expenseTypes]="expenseTypes"
+      [vendors]="vendors"
+      (budgetSelected)="onBudgetSelected($event)"
+      (editBudget)="onEditBudget($event)"
+      (deleteBudget)="onDeleteBudget($event)"
+      (manageItems)="onManageItems($event)">
+    </app-budget-list>
+  </div>
+
+</app-page-layout>

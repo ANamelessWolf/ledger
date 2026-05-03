@@ -9,6 +9,7 @@ import catalogRoutes from './catalogRoutes';
 import expenseRoutes from './expenseRoutes';
 import walletRoutes from './walletRoutes';
 import monthlyRoute from './monthlyRoute';
+import budgetRoutes from './budgetRoutes';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/catalog', catalogRoutes);
 router.use('/expenses', expenseRoutes);
 router.use('/wallet', walletRoutes);
 router.use('/monthly', monthlyRoute);
+router.use('/budget', budgetRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

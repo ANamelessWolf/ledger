@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Budget Items</h2>
+
+<mat-dialog-content class="items-content">
+  <mat-tab-group>
+
+    <!-- Expense Types Tab -->
+    <mat-tab label="Expense Types">
+      <div class="tab-body">
+        <div class="add-row">
+          <mat-form-field appearance="outline" class="select-field">
+            <mat-label>Add Expense Type</mat-label>
+            <mat-select [(ngModel)]="selectedExpenseTypeId">
+              <mat-option *ngFor="let et of data.expenseTypes" [value]="et.id">{{ et.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="addExpenseType()" [disabled]="!selectedExpenseTypeId">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        <mat-list>
+          <mat-list-item *ngFor="let item of expenseTypeItems">
+            <mat-icon matListItemIcon>label</mat-icon>
+            <span matListItemTitle>{{ getExpenseTypeName(item.itemId) }}</span>
+            <button matListItemMeta mat-icon-button color="warn" matTooltip="Remove" (click)="removeItem(item)">
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </mat-list-item>
+          <p *ngIf="expenseTypeItems.length === 0" class="empty-msg">No expense types added yet.</p>
+        </mat-list>
+      </div>
+    </mat-tab>
+
+    <!-- Vendors Tab -->
+    <mat-tab label="Vendors">
+      <div class="tab-body">
+        <div class="add-row">
+          <mat-form-field appearance="outline" class="select-field">
+            <mat-label>Add Vendor</mat-label>
+            <mat-select [(ngModel)]="selectedVendorId">
+              <mat-option *ngFor="let v of data.vendors" [value]="v.id">{{ v.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="addVendor()" [disabled]="!selectedVendorId">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        <mat-list>
+          <mat-list-item *ngFor="let item of vendorItems">
+            <mat-icon matListItemIcon>store</mat-icon>
+            <span matListItemTitle>{{ getVendorName(item.itemId) }}</span>
+            <button matListItemMeta mat-icon-button color="warn" matTooltip="Remove" (click)="removeItem(item)">
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </mat-list-item>
+          <p *ngIf="vendorItems.length === 0" class="empty-msg">No vendors added yet.</p>
+        </mat-list>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="close()">Done</button>
+</mat-dialog-actions>

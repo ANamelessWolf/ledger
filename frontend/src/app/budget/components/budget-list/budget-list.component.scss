@@ -1,0 +1,53 @@
+.budget-list {
+  width: 100%;
+
+  .no-data {
+    padding: 16px;
+    color: #888;
+    text-align: center;
+  }
+
+  mat-list-item.selected {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.budget-items-panel {
+  padding: 8px 16px 12px 56px;
+  background-color: rgba(0, 0, 0, 0.02);
+
+  .no-items {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #999;
+  }
+
+  .items-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 8px 0 4px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    .label-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  mat-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}

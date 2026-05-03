@@ -1,0 +1,53 @@
+<div class="budget-list">
+  <p *ngIf="budgets.length === 0" class="no-data">No budgets found. Click + to create one.</p>
+
+  <mat-selection-list [multiple]="false">
+    <ng-container *ngFor="let budget of budgets">
+      <mat-list-item
+        [class.selected]="isSelected(budget)"
+        (click)="select(budget)">
+        <mat-icon matListItemIcon>{{ budget.icon || 'account_balance_wallet' }}</mat-icon>
+        <span matListItemTitle>{{ budget.description }}</span>
+        <span matListItemLine>Budget: {{ budget.total | number:'1.2-2' }}</span>
+        <div matListItemMeta class="actions">
+          <button type="button" mat-icon-button matTooltip="Manage items" (click)="manageItemsFor($event, budget)">
+            <mat-icon>playlist_add</mat-icon>
+          </button>
+          <button type="button" mat-icon-button matTooltip="Edit" (click)="edit($event, budget)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button type="button" mat-icon-button matTooltip="Delete" color="warn" (click)="delete($event, budget)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-list-item>
+
+      <!-- Items panel shown only for the selected budget -->
+      <div *ngIf="isSelected(budget)" class="budget-items-panel">
+        <p *ngIf="!hasItems" class="no-items">No items assigned. Use the playlist button to add some.</p>
+
+        <ng-container *ngIf="selectedExpenseTypeItems.length > 0">
+          <p class="items-label">
+            <mat-icon class="label-icon">label</mat-icon>
+            Expense types
+          </p>
+          <mat-chip-set>
+            <mat-chip *ngFor="let et of selectedExpenseTypeItems">{{ et.name }}</mat-chip>
+          </mat-chip-set>
+        </ng-container>
+
+        <ng-container *ngIf="selectedVendorItems.length > 0">
+          <p class="items-label">
+            <mat-icon class="label-icon">store</mat-icon>
+            Vendors
+          </p>
+          <mat-chip-set>
+            <mat-chip *ngFor="let v of selectedVendorItems">{{ v.name }}</mat-chip>
+          </mat-chip-set>
+        </ng-container>
+      </div>
+
+      <mat-divider></mat-divider>
+    </ng-container>
+  </mat-selection-list>
+</div>
