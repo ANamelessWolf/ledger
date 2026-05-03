@@ -56,7 +56,48 @@
           <span *ngIf="s.remaining >= 0">Remaining: {{ s.remaining | number:'1.2-2' }}</span>
           <span *ngIf="s.remaining < 0">Over budget: {{ (-s.remaining) | number:'1.2-2' }}</span>
         </div>
+
+        <!-- Chips panel -->
+        <div *ngIf="isExpanded(s.budgetId)" class="chips-panel">
+          <div *ngIf="getExpenseTypeChips(s.budgetId).length > 0" class="chips-group">
+            <span class="chips-label">
+              <mat-icon class="chips-label-icon">label</mat-icon>
+              Expense types
+            </span>
+            <mat-chip-set>
+              <mat-chip *ngFor="let et of getExpenseTypeChips(s.budgetId)" [disableRipple]="true">
+                {{ et.name }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div *ngIf="getVendorChips(s.budgetId).length > 0" class="chips-group">
+            <span class="chips-label">
+              <mat-icon class="chips-label-icon">store</mat-icon>
+              Vendors
+            </span>
+            <mat-chip-set>
+              <mat-chip *ngFor="let v of getVendorChips(s.budgetId)" [disableRipple]="true">
+                {{ v.name }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <p *ngIf="!hasChips(s.budgetId)" class="no-chips">No items assigned.</p>
+        </div>
       </mat-card-content>
+      <mat-card-actions align="end">
+        <button type="button" mat-icon-button
+          [matTooltip]="isExpanded(s.budgetId) ? 'Hide filters' : 'Show filters'"
+          (click)="toggleExpand(s.budgetId, $event)">
+          <mat-icon>{{ isExpanded(s.budgetId) ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+        <button type="button" mat-icon-button matTooltip="Manage items"
+          (click)="onManageItemsClick(s.budgetId, $event)">
+          <mat-icon>playlist_add</mat-icon>
+        </button>
+        <button type="button" mat-button color="primary" (click)="onDetailsClick(s.budgetId)">
+          Details
+        </button>
+      </mat-card-actions>
     </mat-card>
   </div>
 

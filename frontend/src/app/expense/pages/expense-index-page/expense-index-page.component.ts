@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
@@ -62,7 +62,8 @@ export class ExpenseIndexPageComponent implements OnInit {
     private expenseService: ExpensesService,
     private catalogService: CatalogService,
     private notifService: NotificationService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     const today = new Date();
     const monthlyPeriod: DateRange = {
@@ -84,8 +85,25 @@ export class ExpenseIndexPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.applyQueryParams();
     this.getExpenses();
     this.getCatalog();
+  }
+
+  private applyQueryParams(): void {
+    const p = this.route.snapshot.queryParams;
+    if (p['start'] && p['end']) {
+      this.options.filter.period = {
+        start: new Date(p['start'] + 'T00:00:00'),
+        end: new Date(p['end'] + 'T00:00:00'),
+      };
+    }
+    if (p['expenseTypes']) {
+      this.options.filter.expenseTypes = p['expenseTypes'].split(',').map(Number);
+    }
+    if (p['vendors']) {
+      this.options.filter.vendors = p['vendors'].split(',').map(Number);
+    }
   }
 
   loadExpenses(e: PaginationEvent) {

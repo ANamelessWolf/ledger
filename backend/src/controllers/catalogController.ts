@@ -3,6 +3,7 @@ import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
 import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
+import { Expense } from "../models/expenses";
 import { Currency } from "../models/settings";
 import {
   getCardListFilter,
@@ -276,12 +277,17 @@ export const getCurrencyList = asyncErrorHandler(
 export const getExpenseYearRange = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const raw: any[] = await AppDataSource.query(
-        "SELECT MIN(YEAR(buy_date)) AS minYear, MAX(YEAR(buy_date)) AS maxYear FROM Expense"
-      );
-      const { minYear, maxYear } = raw[0] ?? { minYear: new Date().getFullYear(), maxYear: new Date().getFullYear() };
-      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { minYear: +minYear, maxYear: +maxYear } }));
+      const result = await AppDataSource.getRepository(Expense)
+        .createQueryBuilder("e")
+        .select("MIN(YEAR(e.buyDate))", "minYear")
+        .addSelect("MAX(YEAR(e.buyDate))", "maxYear")
+        .getRawOne();
+      const currentYear = new Date().getFullYear();
+      const minYear = result?.minYear ? +result.minYear : currentYear;
+      const maxYear = result?.maxYear ? +result.maxYear : currentYear;
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { minYear, maxYear } }));
     } catch (error) {
+      console.error(error);
       return next(new Exception("An error occurred getting the expense year range", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }

@@ -1,0 +1,33 @@
+<div class="overview-card">
+  <h2 class="overview-title">Budget Overview</h2>
+
+  <div class="overview-main">
+    <div class="main-value" [class.over-budget]="isOverBudget">
+      <span class="value-label">{{ isOverBudget ? 'Over Budget' : 'Available' }}</span>
+      <span class="value-amount">{{ totalAvailable | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <div class="overview-grid">
+    <div class="grid-item">
+      <span class="grid-label">Total Budget</span>
+      <span class="grid-value">{{ totalBudget | number:'1.2-2' }}</span>
+    </div>
+    <div class="grid-item">
+      <span class="grid-label">Total Spent</span>
+      <span class="grid-value">{{ totalSpent | number:'1.2-2' }}</span>
+    </div>
+    <div class="grid-item">
+      <span class="grid-label">Budgets</span>
+      <span class="grid-value">{{ summaries.length }}</span>
+    </div>
+    <div class="grid-item">
+      <span class="grid-label">Usage</span>
+      <span class="grid-value" [class.over-budget]="isOverBudget">{{ spentPercent | number:'1.0-1' }}%</span>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrapper" *ngIf="summaries.length > 0">
+    <div class="progress-bar-fill" [style.width.%]="spentPercent" [class.over-budget]="isOverBudget"></div>
+  </div>
+</div>

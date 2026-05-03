@@ -1,0 +1,18 @@
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 24px 8px;
+
+  .dialog-icon {
+    color: var(--mat-sys-primary, #1976d2);
+  }
+}
+
+mat-dialog-content {
+  min-width: 480px;
+  max-width: 640px;
+  padding: 0 24px;
+  max-height: 70vh;
+}

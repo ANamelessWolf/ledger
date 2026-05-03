@@ -46,6 +46,21 @@ export type BudgetFormData = {
   onSaved: (budget: AddBudget) => void;
 };
 
+export type BudgetManageDialogData = {
+  budgets: Budget[];
+  currencies: CatalogItem[];
+  expenseTypes: CatalogItem[];
+  vendors: CatalogItem[];
+  onBudgetSelected: (budget: Budget, setItems: (items: BudgetItemDetail[]) => void) => void;
+  onEditBudget: (budget: Budget, onDone: (updatedBudgets: Budget[]) => void) => void;
+  onDeleteBudget: (budget: Budget, onDone: (updatedBudgets: Budget[]) => void) => void;
+  onManageItems: (
+    budget: Budget,
+    currentItems: BudgetItemDetail[],
+    onDone: (updatedItems: BudgetItemDetail[]) => void
+  ) => void;
+};
+
 export type BudgetItemsFormData = {
   budgetId: number;
   expenseTypes: CatalogItem[];

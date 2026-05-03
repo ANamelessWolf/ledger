@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>
+  <mat-icon class="dialog-icon">settings</mat-icon>
+  Manage Budgets
+</h2>
+
+<mat-dialog-content>
+  <app-budget-list
+    [budgets]="budgets"
+    [selectedBudget]="selectedBudget"
+    [budgetItems]="budgetItems"
+    [expenseTypes]="data.expenseTypes"
+    [vendors]="data.vendors"
+    (budgetSelected)="onBudgetSelected($event)"
+    (editBudget)="onEditBudget($event)"
+    (deleteBudget)="onDeleteBudget($event)"
+    (manageItems)="onManageItems($event)">
+  </app-budget-list>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -7,13 +7,14 @@
     <mat-tab label="Expense Types">
       <div class="tab-body">
         <div class="add-row">
-          <mat-form-field appearance="outline" class="select-field">
-            <mat-label>Add Expense Type</mat-label>
-            <mat-select [(ngModel)]="selectedExpenseTypeId">
-              <mat-option *ngFor="let et of data.expenseTypes" [value]="et.id">{{ et.name }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-icon-button color="primary" (click)="addExpenseType()" [disabled]="!selectedExpenseTypeId">
+          <app-catalog-item-select
+            header="Add Expense Type"
+            [items]="data.expenseTypes"
+            [control]="expenseTypeControl">
+          </app-catalog-item-select>
+          <button type="button" mat-icon-button color="primary"
+            [disabled]="!expenseTypeControl.value"
+            (click)="addExpenseType()">
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
@@ -22,7 +23,8 @@
           <mat-list-item *ngFor="let item of expenseTypeItems">
             <mat-icon matListItemIcon>label</mat-icon>
             <span matListItemTitle>{{ getExpenseTypeName(item.itemId) }}</span>
-            <button matListItemMeta mat-icon-button color="warn" matTooltip="Remove" (click)="removeItem(item)">
+            <button matListItemMeta type="button" mat-icon-button color="warn"
+              matTooltip="Remove" (click)="removeItem(item)">
               <mat-icon>remove_circle</mat-icon>
             </button>
           </mat-list-item>
@@ -35,13 +37,14 @@
     <mat-tab label="Vendors">
       <div class="tab-body">
         <div class="add-row">
-          <mat-form-field appearance="outline" class="select-field">
-            <mat-label>Add Vendor</mat-label>
-            <mat-select [(ngModel)]="selectedVendorId">
-              <mat-option *ngFor="let v of data.vendors" [value]="v.id">{{ v.name }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-icon-button color="primary" (click)="addVendor()" [disabled]="!selectedVendorId">
+          <app-catalog-item-select
+            header="Add Vendor"
+            [items]="data.vendors"
+            [control]="vendorControl">
+          </app-catalog-item-select>
+          <button type="button" mat-icon-button color="primary"
+            [disabled]="!vendorControl.value"
+            (click)="addVendor()">
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
@@ -50,7 +53,8 @@
           <mat-list-item *ngFor="let item of vendorItems">
             <mat-icon matListItemIcon>store</mat-icon>
             <span matListItemTitle>{{ getVendorName(item.itemId) }}</span>
-            <button matListItemMeta mat-icon-button color="warn" matTooltip="Remove" (click)="removeItem(item)">
+            <button matListItemMeta type="button" mat-icon-button color="warn"
+              matTooltip="Remove" (click)="removeItem(item)">
               <mat-icon>remove_circle</mat-icon>
             </button>
           </mat-list-item>

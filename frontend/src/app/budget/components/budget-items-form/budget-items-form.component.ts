@@ -1,38 +1,36 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormsModule } from '@angular/forms';
 import { BudgetItemDetail, BudgetItemsFormData } from '@budget/types/budgetTypes';
 import { CatalogItem } from '@common/types/catalogTypes';
+import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
 
 @Component({
   selector: 'app-budget-items-form',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
-    MatSelectModule,
-    MatFormFieldModule,
     MatTabsModule,
     MatTooltipModule,
+    CatalogItemSelectComponent,
   ],
   templateUrl: './budget-items-form.component.html',
   styleUrl: './budget-items-form.component.scss',
 })
 export class BudgetItemsFormComponent {
-  selectedExpenseTypeId: number | null = null;
-  selectedVendorId: number | null = null;
+  expenseTypeControl = new FormControl<CatalogItem | null>(null);
+  vendorControl = new FormControl<CatalogItem | null>(null);
 
   get expenseTypeItems(): BudgetItemDetail[] {
     return this.data.currentItems.filter((i) => i.itemType === 1);
@@ -47,23 +45,25 @@ export class BudgetItemsFormComponent {
     @Inject(MAT_DIALOG_DATA) public data: BudgetItemsFormData
   ) {}
 
-  addExpenseType() {
-    if (!this.selectedExpenseTypeId) return;
-    const alreadyAdded = this.expenseTypeItems.some((i) => i.itemId === this.selectedExpenseTypeId);
+  addExpenseType(): void {
+    const item = this.expenseTypeControl.value;
+    if (!item) return;
+    const alreadyAdded = this.expenseTypeItems.some((i) => i.itemId === item.id);
     if (alreadyAdded) return;
-    this.data.onItemAdded({ itemType: 1, itemId: this.selectedExpenseTypeId });
-    this.selectedExpenseTypeId = null;
+    this.data.onItemAdded({ itemType: 1, itemId: item.id });
+    this.expenseTypeControl.reset();
   }
 
-  addVendor() {
-    if (!this.selectedVendorId) return;
-    const alreadyAdded = this.vendorItems.some((i) => i.itemId === this.selectedVendorId);
+  addVendor(): void {
+    const item = this.vendorControl.value;
+    if (!item) return;
+    const alreadyAdded = this.vendorItems.some((i) => i.itemId === item.id);
     if (alreadyAdded) return;
-    this.data.onItemAdded({ itemType: 2, itemId: this.selectedVendorId });
-    this.selectedVendorId = null;
+    this.data.onItemAdded({ itemType: 2, itemId: item.id });
+    this.vendorControl.reset();
   }
 
-  removeItem(item: BudgetItemDetail) {
+  removeItem(item: BudgetItemDetail): void {
     this.data.onItemRemoved(item.id);
   }
 
@@ -75,7 +75,7 @@ export class BudgetItemsFormComponent {
     return this.data.vendors.find((v) => v.id === itemId)?.name ?? `ID ${itemId}`;
   }
 
-  close() {
+  close(): void {
     this.dialogRef.close();
   }
 }

@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { BudgetSummary, PERIOD_LABELS, PeriodType, SummaryRequest } from '@budget/types/budgetTypes';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BudgetItemDetail, BudgetSummary, PERIOD_LABELS, PeriodType, SummaryRequest } from '@budget/types/budgetTypes';
+import { CatalogItem } from '@common/types/catalogTypes';
 import {
   WeekOption,
   MonthOption,
@@ -24,18 +28,24 @@ import {
   imports: [
     CommonModule,
     FormsModule,
+    MatButtonModule,
     MatCardModule,
     MatProgressBarModule,
     MatButtonToggleModule,
     MatSelectModule,
     MatFormFieldModule,
     MatIconModule,
+    MatChipsModule,
+    MatTooltipModule,
   ],
   templateUrl: './budget-summary-card.component.html',
   styleUrl: './budget-summary-card.component.scss',
 })
 export class BudgetSummaryCardComponent implements OnInit {
   @Input() summaries: BudgetSummary[] = [];
+  @Input() allBudgetItems: BudgetItemDetail[] = [];
+  @Input() expenseTypes: CatalogItem[] = [];
+  @Input() vendors: CatalogItem[] = [];
   @Input() set yearRange(value: { minYear: number; maxYear: number } | null) {
     if (value) {
       this.availableYears = buildYearRange(value.minYear, value.maxYear);
@@ -43,10 +53,13 @@ export class BudgetSummaryCardComponent implements OnInit {
   }
 
   @Output() summaryRequested = new EventEmitter<SummaryRequest>();
+  @Output() detailsRequested = new EventEmitter<{ budgetId: number; start: string; end: string }>();
+  @Output() manageItemsRequested = new EventEmitter<number>();
 
   periodLabels = PERIOD_LABELS;
   periods: PeriodType[] = ['week', 'month', 'year'];
   activePeriod: PeriodType = 'month';
+  expandedCards = new Set<number>();
 
   // Week
   availableWeeks: WeekOption[] = [];
@@ -114,6 +127,64 @@ export class BudgetSummaryCardComponent implements OnInit {
     if (this.availableYears.length === 0) {
       this.availableYears = [this.selectedYear];
     }
+  }
+
+  onManageItemsClick(budgetId: number, event: Event): void {
+    event.stopPropagation();
+    this.manageItemsRequested.emit(budgetId);
+  }
+
+  toggleExpand(budgetId: number, event: Event): void {
+    event.stopPropagation();
+    if (this.expandedCards.has(budgetId)) {
+      this.expandedCards.delete(budgetId);
+    } else {
+      this.expandedCards.add(budgetId);
+    }
+  }
+
+  isExpanded(budgetId: number): boolean {
+    return this.expandedCards.has(budgetId);
+  }
+
+  getExpenseTypeChips(budgetId: number): CatalogItem[] {
+    return this.allBudgetItems
+      .filter((i) => i.budgetId === budgetId && i.itemType === 1)
+      .map((i) => this.expenseTypes.find((et) => et.id === i.itemId))
+      .filter((et): et is CatalogItem => !!et);
+  }
+
+  getVendorChips(budgetId: number): CatalogItem[] {
+    return this.allBudgetItems
+      .filter((i) => i.budgetId === budgetId && i.itemType === 2)
+      .map((i) => this.vendors.find((v) => v.id === i.itemId))
+      .filter((v): v is CatalogItem => !!v);
+  }
+
+  hasChips(budgetId: number): boolean {
+    return this.allBudgetItems.some((i) => i.budgetId === budgetId);
+  }
+
+  onDetailsClick(budgetId: number): void {
+    let start: string;
+    let end: string;
+
+    if (this.activePeriod === 'week') {
+      const week = this.availableWeeks[this.selectedWeekIndex];
+      if (!week) return;
+      start = toSqlDate(week.start);
+      end = toSqlDate(week.end);
+    } else if (this.activePeriod === 'month') {
+      const month = this.availableMonths[this.selectedMonthIndex];
+      if (!month) return;
+      start = toSqlDate(month.start);
+      end = toSqlDate(month.end);
+    } else {
+      start = `${this.selectedYear}-01-01`;
+      end = `${this.selectedYear}-12-31`;
+    }
+
+    this.detailsRequested.emit({ budgetId, start, end });
   }
 
   private emit(): void {
