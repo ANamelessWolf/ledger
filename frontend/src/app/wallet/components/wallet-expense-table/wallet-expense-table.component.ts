@@ -88,6 +88,8 @@ export class WalletExpenseTableComponent implements OnInit, OnChanges {
       this.options.filter.wallet = [];
       this.options.filter.description = '';
       this.options.filter.period = this.Period;
+      this.options.filter.expenseTypes = undefined;
+      this.options.filter.vendors = undefined;
       this.getExpenses();
     }
   }
