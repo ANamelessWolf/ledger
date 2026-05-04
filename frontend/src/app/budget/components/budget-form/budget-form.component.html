@@ -30,12 +30,32 @@
       <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
     </mat-form-field>
 
+    <div class="full-width toggle-row">
+      <mat-slide-toggle formControlName="annualBudget" color="primary">
+        Annual budget <span class="toggle-hint">(shown only in the Year tab)</span>
+      </mat-slide-toggle>
+    </div>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Start Date (optional)</mat-label>
+      <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="MM/DD/YYYY" />
+      <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+      <mat-datepicker #startPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>End Date (optional)</mat-label>
+      <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="MM/DD/YYYY" />
+      <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+      <mat-datepicker #endPicker></mat-datepicker>
+    </mat-form-field>
+
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()">Cancel</button>
-  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()">
+  <button type="button" mat-button (click)="cancel()">Cancel</button>
+  <button type="button" mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()">
     {{ isEdit ? 'Update' : 'Create' }}
   </button>
 </mat-dialog-actions>

@@ -165,37 +165,44 @@ export class BudgetIndexPageComponent implements OnInit {
               currentItems: BudgetItemDetail[],
               onDone: (updated: BudgetItemDetail[]) => void
             ) => {
-              const reload = () =>
-                this.budgetService.getBudgetItems(budget.id).subscribe(
-                  (r) => onDone(r.data ?? []),
-                  (err: HttpErrorResponse) => this.notifService.showError(err)
-                );
-              this.budgetService
-                .showBudgetItemsFormDialog({
-                  budgetId: budget.id,
-                  expenseTypes: this.expenseTypes,
-                  vendors: this.vendors,
-                  currentItems,
-                  onItemAdded: (item: AddBudgetItem) => {
-                    this.budgetService.addBudgetItem(budget.id, item).subscribe(
-                      () => {
-                        this.notifService.showNotification('Item added', 'success');
-                        reload();
-                      },
+              this.budgetService.getBudgetItems(budget.id).subscribe(
+                (r) => {
+                  const freshItems: BudgetItemDetail[] = r.data ?? [];
+                  currentItems.splice(0, currentItems.length, ...freshItems);
+                  const reload = () =>
+                    this.budgetService.getBudgetItems(budget.id).subscribe(
+                      (r2) => onDone(r2.data ?? []),
                       (err: HttpErrorResponse) => this.notifService.showError(err)
                     );
-                  },
-                  onItemRemoved: (itemId: number) => {
-                    this.budgetService.removeBudgetItem(budget.id, itemId).subscribe(
-                      () => {
-                        this.notifService.showNotification('Item removed', 'success');
-                        reload();
+                  this.budgetService
+                    .showBudgetItemsFormDialog({
+                      budgetId: budget.id,
+                      expenseTypes: this.expenseTypes,
+                      vendors: this.vendors,
+                      currentItems,
+                      onItemAdded: (item: AddBudgetItem) => {
+                        this.budgetService.addBudgetItem(budget.id, item).subscribe(
+                          () => {
+                            this.notifService.showNotification('Item added', 'success');
+                            reload();
+                          },
+                          (err: HttpErrorResponse) => this.notifService.showError(err)
+                        );
                       },
-                      (err: HttpErrorResponse) => this.notifService.showError(err)
-                    );
-                  },
-                })
-                .subscribe();
+                      onItemRemoved: (itemId: number) => {
+                        this.budgetService.removeBudgetItem(budget.id, itemId).subscribe(
+                          () => {
+                            this.notifService.showNotification('Item removed', 'success');
+                            reload();
+                          },
+                          (err: HttpErrorResponse) => this.notifService.showError(err)
+                        );
+                      },
+                    })
+                    .subscribe();
+                },
+                (err: HttpErrorResponse) => this.notifService.showError(err)
+              );
             },
           },
         });
@@ -208,48 +215,52 @@ export class BudgetIndexPageComponent implements OnInit {
   }
 
   onManageItemsRequested(budgetId: number): void {
-    const localItems: BudgetItemDetail[] = this.allBudgetItems
-      .filter((i) => i.budgetId === budgetId);
+    this.budgetService.getBudgetItems(budgetId).subscribe(
+      (r) => {
+        const localItems: BudgetItemDetail[] = r.data ?? [];
 
-    const reload = () =>
-      this.budgetService.getBudgetItems(budgetId).subscribe(
-        (r) => {
-          const newItems: BudgetItemDetail[] = r.data ?? [];
-          localItems.splice(0, localItems.length, ...newItems);
-          this.allBudgetItems = [
-            ...this.allBudgetItems.filter((i) => i.budgetId !== budgetId),
-            ...newItems,
-          ];
-        },
-        (err: HttpErrorResponse) => this.notifService.showError(err)
-      );
-
-    this.budgetService
-      .showBudgetItemsFormDialog({
-        budgetId,
-        expenseTypes: this.expenseTypes,
-        vendors: this.vendors,
-        currentItems: localItems,
-        onItemAdded: (item: AddBudgetItem) => {
-          this.budgetService.addBudgetItem(budgetId, item).subscribe(
-            () => {
-              this.notifService.showNotification('Item added', 'success');
-              reload();
+        const reload = () =>
+          this.budgetService.getBudgetItems(budgetId).subscribe(
+            (r2) => {
+              const newItems: BudgetItemDetail[] = r2.data ?? [];
+              localItems.splice(0, localItems.length, ...newItems);
+              this.allBudgetItems = [
+                ...this.allBudgetItems.filter((i) => i.budgetId !== budgetId),
+                ...newItems,
+              ];
             },
             (err: HttpErrorResponse) => this.notifService.showError(err)
           );
-        },
-        onItemRemoved: (itemId: number) => {
-          this.budgetService.removeBudgetItem(budgetId, itemId).subscribe(
-            () => {
-              this.notifService.showNotification('Item removed', 'success');
-              reload();
+
+        this.budgetService
+          .showBudgetItemsFormDialog({
+            budgetId,
+            expenseTypes: this.expenseTypes,
+            vendors: this.vendors,
+            currentItems: localItems,
+            onItemAdded: (item: AddBudgetItem) => {
+              this.budgetService.addBudgetItem(budgetId, item).subscribe(
+                () => {
+                  this.notifService.showNotification('Item added', 'success');
+                  reload();
+                },
+                (err: HttpErrorResponse) => this.notifService.showError(err)
+              );
             },
-            (err: HttpErrorResponse) => this.notifService.showError(err)
-          );
-        },
-      } as BudgetItemsFormData)
-      .subscribe();
+            onItemRemoved: (itemId: number) => {
+              this.budgetService.removeBudgetItem(budgetId, itemId).subscribe(
+                () => {
+                  this.notifService.showNotification('Item removed', 'success');
+                  reload();
+                },
+                (err: HttpErrorResponse) => this.notifService.showError(err)
+              );
+            },
+          } as BudgetItemsFormData)
+          .subscribe();
+      },
+      (err: HttpErrorResponse) => this.notifService.showError(err)
+    );
   }
 
   onSearch(searchTerm: string): void {}

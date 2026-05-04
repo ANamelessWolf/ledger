@@ -19,4 +19,13 @@ export class Budget {
 
   @Column({ type: "double" })
   total: number;
+
+  @Column({ type: "date", name: "start_date", nullable: true })
+  startDate: string | null;
+
+  @Column({ type: "date", name: "end_date", nullable: true })
+  endDate: string | null;
+
+  @Column({ type: "tinyint", name: "annual_budget", default: 0 })
+  annualBudget: number;
 }

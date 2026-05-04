@@ -8,6 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Budget, BudgetItemDetail } from '@budget/types/budgetTypes';
 import { CatalogItem } from '@common/types/catalogTypes';
+import { MoneyPipe } from '@common/pipes/money.pipe';
 
 @Component({
   selector: 'app-budget-list',
@@ -20,6 +21,7 @@ import { CatalogItem } from '@common/types/catalogTypes';
     MatTooltipModule,
     MatChipsModule,
     MatDividerModule,
+    MoneyPipe,
   ],
   templateUrl: './budget-list.component.html',
   styleUrl: './budget-list.component.scss',

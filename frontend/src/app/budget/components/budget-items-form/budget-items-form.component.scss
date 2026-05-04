@@ -1,19 +1,52 @@
 .items-content {
-  min-height: 320px;
+  height: 60vh;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 !important;
+
+  // Make the tab group fill all available height
+  ::ng-deep .mat-mdc-tab-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  ::ng-deep .mat-mdc-tab-body-content {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 .tab-body {
-  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 12px 24px;
 }
 
 .add-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
 
-  .select-field {
-    flex: 1;
-  }
+mat-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .empty-msg {

@@ -7,6 +7,9 @@ export type Budget = {
   description: string;
   icon: string;
   total: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  annualBudget?: number;
 };
 
 export type BudgetItemDetail = {
@@ -22,6 +25,9 @@ export type AddBudget = {
   description: string;
   icon: string;
   total: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  annualBudget?: number;
 };
 
 export type UpdateBudget = AddBudget & { id: number };
@@ -90,4 +96,7 @@ export const EMPTY_ADD_BUDGET: AddBudget = {
   description: '',
   icon: 'account_balance_wallet',
   total: 0,
+  startDate: null,
+  endDate: null,
+  annualBudget: 0,
 };

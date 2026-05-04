@@ -43,7 +43,7 @@
         <mat-icon mat-card-avatar>{{ s.icon || 'account_balance_wallet' }}</mat-icon>
         <mat-card-title>{{ s.description }}</mat-card-title>
         <mat-card-subtitle>
-          Spent: {{ s.spentTotal | number:'1.2-2' }} / {{ s.budgetTotal | number:'1.2-2' }}
+          Spent: {{ s.spentTotal | money }} / {{ s.budgetTotal | money }}
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
@@ -53,8 +53,8 @@
           [color]="getProgressColor(s)">
         </mat-progress-bar>
         <div class="remaining" [class.over-budget]="s.remaining < 0">
-          <span *ngIf="s.remaining >= 0">Remaining: {{ s.remaining | number:'1.2-2' }}</span>
-          <span *ngIf="s.remaining < 0">Over budget: {{ (-s.remaining) | number:'1.2-2' }}</span>
+          <span *ngIf="s.remaining >= 0">Remaining: {{ s.remaining | money }}</span>
+          <span *ngIf="s.remaining < 0">Over budget: {{ (-s.remaining) | money }}</span>
         </div>
 
         <!-- Chips panel -->

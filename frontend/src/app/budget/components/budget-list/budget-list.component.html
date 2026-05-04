@@ -8,7 +8,7 @@
         (click)="select(budget)">
         <mat-icon matListItemIcon>{{ budget.icon || 'account_balance_wallet' }}</mat-icon>
         <span matListItemTitle>{{ budget.description }}</span>
-        <span matListItemLine>Budget: {{ budget.total | number:'1.2-2' }}</span>
+        <span matListItemLine>Budget: {{ budget.total | money }}</span>
         <div matListItemMeta class="actions">
           <button type="button" mat-icon-button matTooltip="Manage items" (click)="manageItemsFor($event, budget)">
             <mat-icon>playlist_add</mat-icon>

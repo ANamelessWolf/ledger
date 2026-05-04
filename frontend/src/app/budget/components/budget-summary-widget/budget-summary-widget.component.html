@@ -4,18 +4,18 @@
   <div class="overview-main">
     <div class="main-value" [class.over-budget]="isOverBudget">
       <span class="value-label">{{ isOverBudget ? 'Over Budget' : 'Available' }}</span>
-      <span class="value-amount">{{ totalAvailable | number:'1.2-2' }}</span>
+      <span class="value-amount">{{ totalAvailable | money }}</span>
     </div>
   </div>
 
   <div class="overview-grid">
     <div class="grid-item">
       <span class="grid-label">Total Budget</span>
-      <span class="grid-value">{{ totalBudget | number:'1.2-2' }}</span>
+      <span class="grid-value">{{ totalBudget | money }}</span>
     </div>
     <div class="grid-item">
       <span class="grid-label">Total Spent</span>
-      <span class="grid-value">{{ totalSpent | number:'1.2-2' }}</span>
+      <span class="grid-value">{{ totalSpent | money }}</span>
     </div>
     <div class="grid-item">
       <span class="grid-label">Budgets</span>

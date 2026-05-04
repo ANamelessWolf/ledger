@@ -74,6 +74,8 @@ export class BudgetService {
   showBudgetItemsFormDialog(data: BudgetItemsFormData) {
     const dialogRef = this.dialog.open(BudgetItemsFormComponent, {
       width: '700px',
+      maxHeight: '60vh',
+      position: { top: '20vh' },
       data,
     });
     return dialogRef.afterClosed();

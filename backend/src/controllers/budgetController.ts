@@ -40,13 +40,16 @@ export const getBudgetById = asyncErrorHandler(
 export const createBudget = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { ownerId, currencyId, description, icon, total } = req.body;
+      const { ownerId, currencyId, description, icon, total, startDate, endDate, annualBudget } = req.body;
       const budget = new Budget();
       budget.ownerId = ownerId ?? 1;
       budget.currencyId = currencyId;
       budget.description = description;
       budget.icon = icon ?? null;
       budget.total = total;
+      budget.startDate = startDate ?? null;
+      budget.endDate = endDate ?? null;
+      budget.annualBudget = annualBudget ? 1 : 0;
       const result = await AppDataSource.manager.save(budget);
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
@@ -64,11 +67,14 @@ export const updateBudget = asyncErrorHandler(
       if (!budget) {
         return next(new Exception("Budget not found", HTTP_STATUS.NOT_FOUND));
       }
-      const { currencyId, description, icon, total } = req.body;
+      const { currencyId, description, icon, total, startDate, endDate, annualBudget } = req.body;
       budget.currencyId = currencyId;
       budget.description = description;
       budget.icon = icon ?? null;
       budget.total = total;
+      budget.startDate = startDate ?? null;
+      budget.endDate = endDate ?? null;
+      budget.annualBudget = annualBudget ? 1 : 0;
       const result = await AppDataSource.manager.save(budget);
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
@@ -159,7 +165,7 @@ export const getWeekSummaryByOwnerId = asyncErrorHandler(
       } else {
         ({ monday, sunday, start, end } = getWeekRange());
       }
-      const raw = await callGetBudgetSummary(ownerId, start, end);
+      const raw = await callGetBudgetSummary(ownerId, start, end, 0);
       const result = raw.map((row: any) => {
         const weeklyBudget = round2(calcWeeklyBudget(row.budgetTotal, monday, sunday));
         return { ...row, budgetTotal: weeklyBudget, remaining: round2(weeklyBudget - row.spentTotal) };
@@ -179,7 +185,7 @@ export const getMonthSummaryByOwnerId = asyncErrorHandler(
       const { start, end } = req.query.start && req.query.end
         ? { start: req.query.start.toString(), end: req.query.end.toString() }
         : getMonthRange();
-      const result = await callGetBudgetSummary(ownerId, start, end);
+      const result = await callGetBudgetSummary(ownerId, start, end, 0);
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
       console.error(error);
@@ -195,10 +201,9 @@ export const getYearSummaryByOwnerId = asyncErrorHandler(
       const { start, end } = req.query.start && req.query.end
         ? { start: req.query.start.toString(), end: req.query.end.toString() }
         : getYearRange();
-      const raw = await callGetBudgetSummary(ownerId, start, end);
+      const raw = await callGetBudgetSummary(ownerId, start, end, 1);
       const result = raw.map((row: any) => {
-        const yearlyBudget = round2(row.budgetTotal * 12);
-        return { ...row, budgetTotal: yearlyBudget, remaining: round2(yearlyBudget - row.spentTotal) };
+        return { ...row, remaining: round2(row.budgetTotal - row.spentTotal) };
       });
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
@@ -208,10 +213,10 @@ export const getYearSummaryByOwnerId = asyncErrorHandler(
   }
 );
 
-const callGetBudgetSummary = async (ownerId: number, start: string, end: string) => {
+const callGetBudgetSummary = async (ownerId: number, start: string, end: string, annualBudget: 0 | 1) => {
   const rawResult: any = await AppDataSource.query(
-    "CALL GetBudgetSummary(?, ?, ?);",
-    [ownerId, start, end]
+    "CALL GetBudgetSummary(?, ?, ?, ?);",
+    [ownerId, start, end, annualBudget]
   );
   const rows: any[] = rawResult[0] ?? rawResult;
   return rows.map((row) => ({

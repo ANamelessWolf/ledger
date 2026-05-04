@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MoneyPipe } from '@common/pipes/money.pipe';
 import { BudgetItemDetail, BudgetSummary, PERIOD_LABELS, PeriodType, SummaryRequest } from '@budget/types/budgetTypes';
 import { CatalogItem } from '@common/types/catalogTypes';
 import {
@@ -37,6 +38,7 @@ import {
     MatIconModule,
     MatChipsModule,
     MatTooltipModule,
+    MoneyPipe,
   ],
   templateUrl: './budget-summary-card.component.html',
   styleUrl: './budget-summary-card.component.scss',

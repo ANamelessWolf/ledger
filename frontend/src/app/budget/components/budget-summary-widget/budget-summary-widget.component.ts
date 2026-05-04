@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { BudgetSummary } from '@budget/types/budgetTypes';
+import { MoneyPipe } from '@common/pipes/money.pipe';
 
 @Component({
   selector: 'app-budget-summary-widget',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, MoneyPipe],
   templateUrl: './budget-summary-widget.component.html',
   styleUrl: './budget-summary-widget.component.scss',
 })
