@@ -20,6 +20,7 @@ export const LEDGER_API = {
   WALLET: `${LEDGER_API_URL}/wallet`,
   MO_NO_INT: `${LEDGER_API_URL}/monthly`,
   BUDGET: `${LEDGER_API_URL}/budget`,
+  SUBSCRIPTION: `${LEDGER_API_URL}/subscription`,
 };
 
 export const APP_CATALOGS = {

@@ -1,0 +1,117 @@
+<h2 mat-dialog-title>Add Payment — {{ data.subscriptionName }}</h2>
+
+<mat-dialog-content class="add-payment-content">
+  <mat-tab-group animationDuration="200ms">
+
+    <!-- Tab: Search existing expenses -->
+    <mat-tab label="Link Existing Expense">
+      <div class="tab-body">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search by description</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="e.g. Netflix" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div *ngIf="searchResults.length > 0" class="bulk-actions">
+          <mat-checkbox
+            [checked]="allResultsSelected"
+            [indeterminate]="someResultsSelected"
+            (change)="$event.checked ? selectAll() : unselectAll()"
+            color="primary">
+            Select all
+          </mat-checkbox>
+        </div>
+
+        <div class="search-results-container">
+          <div *ngIf="isSearching" class="spinner-wrapper">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+          <div *ngIf="!isSearching && searchResults.length === 0 && searchControl.value && searchControl.value.length >= 2" class="empty-state">
+            No expenses found.
+          </div>
+          <div
+            *ngFor="let expense of searchResults"
+            class="expense-row"
+            [class.already-linked]="isLinked(expense.id)"
+            (click)="toggleSelection(expense.id)">
+            <mat-checkbox
+              [checked]="isSelected(expense.id)"
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="toggleSelection(expense.id)">
+            </mat-checkbox>
+            <div class="expense-info">
+              <div class="expense-desc-row">
+                <span class="expense-desc">{{ expense.description }}</span>
+                <span *ngIf="isLinked(expense.id)" class="linked-badge" matTooltip="Already linked">
+                  <mat-icon>link</mat-icon> Linked
+                </span>
+              </div>
+              <span class="expense-meta">{{ expense.wallet }} · {{ expense.buyDate | date:'mediumDate' }}</span>
+            </div>
+            <span class="expense-total">${{ expense.total | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Create new expense -->
+    <mat-tab label="Create New Expense">
+      <div class="tab-body">
+        <form [formGroup]="expenseForm">
+          <div class="form-group">
+            <app-catalog-item-select header="Wallet" [items]="data.expenseOptions.wallets" [control]="walletControl" [isRequired]="true"></app-catalog-item-select>
+            <mat-form-field appearance="fill">
+              <mat-label>Total</mat-label>
+              <input matInput formControlName="total" type="number" placeholder="0.00" required />
+              <mat-error *ngIf="expenseForm.get('total')?.invalid">Valid amount required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <app-catalog-item-select header="Type" [items]="data.expenseOptions.expenseTypes" [control]="expenseTypeControl" [isRequired]="true"></app-catalog-item-select>
+            <app-catalog-item-select header="Vendor" [items]="data.expenseOptions.vendors" [control]="vendorControl" [isRequired]="true"></app-catalog-item-select>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Date</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="expenseDate" title="Expense date" required />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" placeholder="Enter description" required></textarea>
+              <mat-error *ngIf="expenseForm.get('description')?.invalid">Description is required</mat-error>
+            </mat-form-field>
+          </div>
+        </form>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+
+  <!-- Action button for "Link Existing" tab is shown when there are search results or existing links -->
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    [disabled]="!hasChanges"
+    (click)="confirmExisting()">
+    Apply Changes
+  </button>
+
+  <button
+    mat-raised-button
+    color="accent"
+    type="button"
+    [disabled]="expenseForm.invalid || !walletControl.value || !expenseTypeControl.value || !vendorControl.value"
+    (click)="submitNewExpense()">
+    Create & Link
+  </button>
+</mat-dialog-actions>

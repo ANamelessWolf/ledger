@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Payment History — {{ data.subscriptionName }}</h2>
+
+<mat-dialog-content class="history-content">
+  <div *ngIf="isLoading" class="spinner-wrapper">
+    <mat-spinner diameter="36"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && history.length === 0" class="empty-state">
+    <mat-icon>receipt_long</mat-icon>
+    <p>No payments recorded yet.</p>
+  </div>
+
+  <mat-list *ngIf="!isLoading && history.length > 0">
+    <mat-list-item *ngFor="let item of history" class="history-item">
+      <mat-icon matListItemIcon>receipt</mat-icon>
+      <div matListItemTitle class="item-title">{{ item.description }}</div>
+      <div matListItemLine class="item-meta">
+        {{ item.wallet }} · {{ item.expenseType }} · {{ item.buyDate | date:'mediumDate' }}
+      </div>
+      <div matListItemMeta class="item-actions">
+        <span class="item-total">${{ item.total | number:'1.2-2' }}</span>
+        <button mat-icon-button color="warn" matTooltip="Remove from history" (click)="removePayment(item)">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Close</button>
+</mat-dialog-actions>

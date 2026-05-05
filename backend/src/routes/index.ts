@@ -10,6 +10,7 @@ import expenseRoutes from './expenseRoutes';
 import walletRoutes from './walletRoutes';
 import monthlyRoute from './monthlyRoute';
 import budgetRoutes from './budgetRoutes';
+import subscriptionRoutes from './subscriptionRoutes';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.use('/expenses', expenseRoutes);
 router.use('/wallet', walletRoutes);
 router.use('/monthly', monthlyRoute);
 router.use('/budget', budgetRoutes);
+router.use('/subscription', subscriptionRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

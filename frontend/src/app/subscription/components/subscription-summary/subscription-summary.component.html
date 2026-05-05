@@ -1,0 +1,43 @@
+<div class="summary-container">
+  <div class="summary-cards">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="card-inner">
+          <mat-icon class="card-icon monthly">calendar_month</mat-icon>
+          <div class="card-data">
+            <span class="card-label">Monthly Total</span>
+            <span class="card-value">${{ (summary?.monthlyTotal ?? 0) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="card-inner">
+          <mat-icon class="card-icon annual">event_note</mat-icon>
+          <div class="card-data">
+            <span class="card-label">Annual Total</span>
+            <span class="card-value">${{ (summary?.annualTotal ?? 0) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="period-selector">
+    <mat-form-field appearance="outline" class="period-field">
+      <mat-label>Month</mat-label>
+      <mat-select [(ngModel)]="selectedMonth" (ngModelChange)="onPeriodChange()">
+        <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="period-field">
+      <mat-label>Year</mat-label>
+      <mat-select [(ngModel)]="selectedYear" (ngModelChange)="onPeriodChange()">
+        <mat-option *ngFor="let y of years" [value]="y">{{ y }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>

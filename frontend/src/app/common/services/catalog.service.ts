@@ -50,4 +50,8 @@ export class CatalogService {
   getExpenseYearRange(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/expense-year-range`);
   }
+
+  getPaymentFrequencies(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/payment-frequencies`);
+  }
 }

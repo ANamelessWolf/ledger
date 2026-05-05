@@ -1,0 +1,24 @@
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .row-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .toggle-row {
+    padding: 4px 0 8px;
+  }
+}

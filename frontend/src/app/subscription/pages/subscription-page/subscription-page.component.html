@@ -1,14 +1,26 @@
 <app-page-layout
   [title]="'Subscriptions'"
-  [hasFilter]="true"
+  [hasFilter]="false"
+  [hasWidget]="true"
   (onSearch)="onSearch($event)"
-  (add)="addSubscription()"
-  (openFilter)="openFilter()">
+  (add)="addSubscription()">
+
   <div widget>
-    <p>Widget Content</p>
+    <app-subscription-summary
+      [summary]="summary"
+      (periodChange)="onSummaryPeriodChange($event)">
+    </app-subscription-summary>
   </div>
 
   <div main>
-    <app-subscription-dashboard></app-subscription-dashboard>
+    <app-subscription-dashboard
+      [dataSource]="subscriptions"
+      [totalItems]="subscriptions.length"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+      (addPayment)="onAddPayment($event)"
+      (viewHistory)="onViewHistory($event)">
+    </app-subscription-dashboard>
   </div>
+
 </app-page-layout>

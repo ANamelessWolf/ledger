@@ -4,7 +4,7 @@ import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
 import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
 import { Expense } from "../models/expenses";
-import { Currency } from "../models/settings";
+import { Currency, PaymentFrequency } from "../models/settings";
 import {
   getCardListFilter,
   getCreditCardStatus,
@@ -289,6 +289,20 @@ export const getExpenseYearRange = asyncErrorHandler(
     } catch (error) {
       console.error(error);
       return next(new Exception("An error occurred getting the expense year range", HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    }
+  }
+);
+
+export const getPaymentFrequencyList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const frequencies: PaymentFrequency[] = await AppDataSource.manager.find(PaymentFrequency, {
+        order: { name: "ASC" },
+      });
+      const result: CatalogItem[] = frequencies.map((f) => ({ id: f.id, name: f.name }));
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      return next(new Exception("An error occurred getting the payment frequency list", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }
 );

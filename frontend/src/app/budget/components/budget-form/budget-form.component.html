@@ -17,7 +17,7 @@
 
     <mat-form-field appearance="outline" class="half-width">
       <mat-label>Budget Total</mat-label>
-      <input matInput type="number" formControlName="total" min="0.01" step="0.01" />
+      <input matInput type="number" formControlName="total" min="0.01" step="0.01" placeholder="0.00" />
       <mat-error *ngIf="form.get('total')?.hasError('required')">Total is required</mat-error>
       <mat-error *ngIf="form.get('total')?.hasError('min')">Must be greater than 0</mat-error>
     </mat-form-field>
