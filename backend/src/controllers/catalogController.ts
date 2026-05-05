@@ -262,9 +262,11 @@ export const getCurrencyList = asyncErrorHandler(
       const currencies: Currency[] = await AppDataSource.manager.find(Currency, {
         order: { name: "ASC" },
       });
-      const result: CatalogItem[] = currencies.map((c) => ({
+      const result = currencies.map((c) => ({
         id: c.id,
         name: `${c.name} (${c.symbol})`,
+        symbol: c.symbol,
+        conversion: c.conversion,
       }));
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {

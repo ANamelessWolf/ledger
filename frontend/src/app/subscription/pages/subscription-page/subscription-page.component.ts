@@ -45,6 +45,23 @@ export class SubscriptionPageComponent implements OnInit {
   paymentFrequencies: CatalogItem[] = [];
   expenseOptions: ExpenseOptions = { wallets: [], expenseTypes: [], vendors: [] };
 
+  currencyConversionMap: Map<number, number> = new Map();
+  defaultCurrencySymbol: string = '';
+
+  get activeTotal(): number {
+    return this.computeTotal(1);
+  }
+
+  get inactiveTotal(): number {
+    return this.computeTotal(0);
+  }
+
+  private computeTotal(activeStatus: number): number {
+    return this.subscriptions
+      .filter(s => s.active === activeStatus)
+      .reduce((sum, s) => sum + s.price / (this.currencyConversionMap.get(s.currencyId) ?? 1), 0);
+  }
+
   constructor(
     private subscriptionService: SubscriptionService,
     private catalogService: CatalogService,
@@ -219,7 +236,13 @@ export class SubscriptionPageComponent implements OnInit {
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getCurrencies().subscribe({
-      next: (res) => (this.currencies = res.data ?? []),
+      next: (res) => {
+        const list = res.data ?? [];
+        this.currencies = list;
+        this.currencyConversionMap = new Map(list.map((c: any) => [c.id, c.conversion ?? 1]));
+        const def = list.find((c: any) => c.conversion === 1);
+        this.defaultCurrencySymbol = def?.symbol ?? '';
+      },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getPaymentFrequencies().subscribe({

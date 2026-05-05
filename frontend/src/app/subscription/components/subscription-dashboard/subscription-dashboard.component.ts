@@ -5,10 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { PaginationEvent } from '@config/commonTypes';
+import { MoneyPipe } from '@common/pipes/money.pipe';
 import { Subscription } from '@subscription/types/subscriptionTypes';
 
 @Component({
@@ -23,7 +25,9 @@ import { Subscription } from '@subscription/types/subscriptionTypes';
     MatButtonModule,
     MatMenuModule,
     MatSlideToggleModule,
+    MatCardModule,
     MatDividerModule,
+    MoneyPipe,
   ],
   templateUrl: './subscription-dashboard.component.html',
   styleUrl: './subscription-dashboard.component.scss',
@@ -33,6 +37,9 @@ export class SubscriptionDashboardComponent {
   @Input() totalItems: number = 0;
   @Input() pageSizeOptions: number[] = [5, 10, 25, 100];
   @Input() pageSize: number = 25;
+  @Input() activeTotal: number = 0;
+  @Input() inactiveTotal: number = 0;
+  @Input() defaultCurrencySymbol: string = '';
 
   @Output() pageChange = new EventEmitter<PaginationEvent>();
   @Output() sortChange = new EventEmitter<Sort>();
@@ -44,7 +51,6 @@ export class SubscriptionDashboardComponent {
   displayedColumns: string[] = [
     'name',
     'price',
-    'currency',
     'wallet',
     'frequency',
     'chargeDay',

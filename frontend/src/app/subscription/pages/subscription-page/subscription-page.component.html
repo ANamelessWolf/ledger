@@ -16,6 +16,9 @@
     <app-subscription-dashboard
       [dataSource]="subscriptions"
       [totalItems]="subscriptions.length"
+      [activeTotal]="activeTotal"
+      [inactiveTotal]="inactiveTotal"
+      [defaultCurrencySymbol]="defaultCurrencySymbol"
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
       (addPayment)="onAddPayment($event)"

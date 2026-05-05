@@ -1,10 +1,37 @@
 <div class="subscription-dashboard">
+
+  <div class="totals-cards">
+    <mat-card class="totals-card">
+      <mat-card-content>
+        <div class="card-inner">
+          <mat-icon class="card-icon active-icon">check_circle</mat-icon>
+          <div class="card-data">
+            <span class="card-label">Active Total</span>
+            <span class="card-value">{{ activeTotal | money:defaultCurrencySymbol }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="totals-card">
+      <mat-card-content>
+        <div class="card-inner">
+          <mat-icon class="card-icon inactive-icon">cancel</mat-icon>
+          <div class="card-data">
+            <span class="card-label">Inactive Total</span>
+            <span class="card-value">{{ inactiveTotal | money:defaultCurrencySymbol }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="table-container mat-elevation-z2">
   <table
     mat-table
     [dataSource]="dataSource"
     matSort
-    (matSortChange)="sortChanged($event)"
-    class="mat-elevation-z2">
+    (matSortChange)="sortChanged($event)">
 
     <!-- Name Column -->
     <ng-container matColumnDef="name">
@@ -15,13 +42,7 @@
     <!-- Price Column -->
     <ng-container matColumnDef="price">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-      <td mat-cell *matCellDef="let row">{{ row.price | number:'1.2-2' }}</td>
-    </ng-container>
-
-    <!-- Currency Column -->
-    <ng-container matColumnDef="currency">
-      <th mat-header-cell *matHeaderCellDef>Currency</th>
-      <td mat-cell *matCellDef="let row">{{ row.currencySymbol || row.currency }}</td>
+      <td mat-cell *matCellDef="let row">{{ row.price | money:row.currencySymbol }}</td>
     </ng-container>
 
     <!-- Wallet Column -->
@@ -87,9 +108,10 @@
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  </div>
 
   <div *ngIf="dataSource.length === 0" class="empty-table">
     <mat-icon>subscriptions</mat-icon>
