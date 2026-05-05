@@ -12,7 +12,7 @@
     <div class="row-two">
       <mat-form-field appearance="outline">
         <mat-label>Price</mat-label>
-        <input matInput type="number" formControlName="price" min="0.01" step="0.01" />
+        <input matInput type="number" formControlName="price" min="0.01" step="0.01" placeholder="0.00" />
         <mat-error *ngIf="form.get('price')?.hasError('required')">Price is required</mat-error>
         <mat-error *ngIf="form.get('price')?.hasError('min')">Must be greater than 0</mat-error>
       </mat-form-field>
@@ -29,10 +29,10 @@
     <div class="row-two">
       <mat-form-field appearance="outline">
         <mat-label>Wallet</mat-label>
-        <mat-select formControlName="walletId">
-          <mat-option *ngFor="let w of data.wallets" [value]="w.id">{{ w.name }}</mat-option>
+        <mat-select formControlName="walletGroupId">
+          <mat-option *ngFor="let w of data.walletGroups" [value]="w.id">{{ w.name }}</mat-option>
         </mat-select>
-        <mat-error *ngIf="form.get('walletId')?.hasError('required')">Wallet is required</mat-error>
+        <mat-error *ngIf="form.get('walletGroupId')?.hasError('required')">Wallet is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

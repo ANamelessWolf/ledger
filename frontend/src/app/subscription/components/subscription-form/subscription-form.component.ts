@@ -53,7 +53,7 @@ export class SubscriptionFormComponent implements OnInit {
     this.form = this.fb.group({
       name: [sub?.name ?? '', [Validators.required, Validators.maxLength(40)]],
       price: [sub?.price ?? 0, [Validators.required, Validators.min(0.01)]],
-      walletId: [sub?.walletId ?? null, Validators.required],
+      walletGroupId: [sub?.walletGroupId ?? null, Validators.required],
       currencyId: [sub?.currencyId ?? null, Validators.required],
       paymentFrequencyId: [sub?.paymentFrequencyId ?? null, Validators.required],
       chargeDay: [sub?.chargeDay ?? 1, [Validators.required, Validators.min(1), Validators.max(28)]],
@@ -68,7 +68,7 @@ export class SubscriptionFormComponent implements OnInit {
     const payload: AddSubscription = {
       name: v.name,
       price: +v.price,
-      walletId: +v.walletId,
+      walletGroupId: +v.walletGroupId,
       currencyId: +v.currencyId,
       paymentFrequencyId: +v.paymentFrequencyId,
       chargeDay: +v.chargeDay,

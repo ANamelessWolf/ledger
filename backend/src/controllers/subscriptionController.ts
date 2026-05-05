@@ -5,19 +5,34 @@ import { AppDataSource } from "..";
 import { Subscription } from "../models/subscriptions/subscription";
 import { SubscriptionPaymentHistory } from "../models/subscriptions/subcriptionPaymentHistory";
 
+const SUBSCRIPTION_SELECT = `
+  SELECT s.id, s.name, s.price, s.active, s.charge_day AS chargeDay, s.last_payment_date AS lastPaymentDate,
+    s.wallet_id AS walletId, s.currency_id AS currencyId, s.payment_frequency_id AS paymentFrequencyId,
+    w.name AS wallet, c.name AS currency, c.symbol AS currencySymbol, pf.name AS paymentFrequency,
+    wm.wallet_group_id AS walletGroupId, wg.name AS walletGroup
+  FROM subscription s
+  JOIN wallet w ON w.id = s.wallet_id
+  JOIN currency c ON c.id = s.currency_id
+  JOIN payment_frequency pf ON pf.id = s.payment_frequency_id
+  LEFT JOIN wallet_member wm ON wm.wallet_id = s.wallet_id
+  LEFT JOIN wallet_group wg ON wg.id = wm.wallet_group_id
+`;
+
+const resolveWalletId = async (walletGroupId: number, currencyId: number): Promise<number | null> => {
+  const rows = await AppDataSource.query(`
+    SELECT wm.wallet_id AS walletId
+    FROM wallet_member wm
+    JOIN wallet w ON w.id = wm.wallet_id
+    WHERE wm.wallet_group_id = ? AND w.currency_id = ?
+    LIMIT 1
+  `, [walletGroupId, currencyId]);
+  return rows.length > 0 ? rows[0].walletId : null;
+};
+
 export const getSubscriptions = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const rows = await AppDataSource.query(`
-        SELECT s.id, s.name, s.price, s.active, s.charge_day AS chargeDay, s.last_payment_date AS lastPaymentDate,
-          s.wallet_id AS walletId, s.currency_id AS currencyId, s.payment_frequency_id AS paymentFrequencyId,
-          w.name AS wallet, c.name AS currency, c.symbol AS currencySymbol, pf.name AS paymentFrequency
-        FROM subscription s
-        JOIN wallet w ON w.id = s.wallet_id
-        JOIN currency c ON c.id = s.currency_id
-        JOIN payment_frequency pf ON pf.id = s.payment_frequency_id
-        ORDER BY s.name ASC
-      `);
+      const rows = await AppDataSource.query(`${SUBSCRIPTION_SELECT} ORDER BY s.name ASC`);
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: rows }));
     } catch (error) {
       console.error(error);
@@ -30,16 +45,7 @@ export const getSubscriptionById = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = +req.params.id;
-      const rows = await AppDataSource.query(`
-        SELECT s.id, s.name, s.price, s.active, s.charge_day AS chargeDay, s.last_payment_date AS lastPaymentDate,
-          s.wallet_id AS walletId, s.currency_id AS currencyId, s.payment_frequency_id AS paymentFrequencyId,
-          w.name AS wallet, c.name AS currency, c.symbol AS currencySymbol, pf.name AS paymentFrequency
-        FROM subscription s
-        JOIN wallet w ON w.id = s.wallet_id
-        JOIN currency c ON c.id = s.currency_id
-        JOIN payment_frequency pf ON pf.id = s.payment_frequency_id
-        WHERE s.id = ?
-      `, [id]);
+      const rows = await AppDataSource.query(`${SUBSCRIPTION_SELECT} WHERE s.id = ?`, [id]);
       if (!rows || rows.length === 0) {
         return next(new Exception("Subscription not found", HTTP_STATUS.NOT_FOUND));
       }
@@ -54,9 +60,13 @@ export const getSubscriptionById = asyncErrorHandler(
 export const createSubscription = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { walletId, currencyId, paymentFrequencyId, name, price, active, chargeDay, lastPaymentDate } = req.body;
+      const { walletGroupId, currencyId, paymentFrequencyId, name, price, active, chargeDay, lastPaymentDate } = req.body;
+      const walletId = await resolveWalletId(+walletGroupId, +currencyId);
+      if (!walletId) {
+        return next(new Exception("No wallet found for the selected group and currency", HTTP_STATUS.BAD_REQUEST));
+      }
       const sub = new Subscription();
-      sub.walletId = +walletId;
+      sub.walletId = walletId;
       sub.currencyId = +currencyId;
       sub.paymentFrequencyId = +paymentFrequencyId;
       sub.name = name;
@@ -81,8 +91,12 @@ export const updateSubscription = asyncErrorHandler(
       if (!sub) {
         return next(new Exception("Subscription not found", HTTP_STATUS.NOT_FOUND));
       }
-      const { walletId, currencyId, paymentFrequencyId, name, price, active, chargeDay, lastPaymentDate } = req.body;
-      sub.walletId = +walletId;
+      const { walletGroupId, currencyId, paymentFrequencyId, name, price, active, chargeDay, lastPaymentDate } = req.body;
+      const walletId = await resolveWalletId(+walletGroupId, +currencyId);
+      if (!walletId) {
+        return next(new Exception("No wallet found for the selected group and currency", HTTP_STATUS.BAD_REQUEST));
+      }
+      sub.walletId = walletId;
       sub.currencyId = +currencyId;
       sub.paymentFrequencyId = +paymentFrequencyId;
       sub.name = name;

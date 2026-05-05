@@ -40,7 +40,7 @@ export class SubscriptionPageComponent implements OnInit {
   subscriptions: Subscription[] = [];
   summary: SubscriptionSummary | null = null;
 
-  wallets: CatalogItem[] = [];
+  walletGroups: CatalogItem[] = [];
   currencies: CatalogItem[] = [];
   paymentFrequencies: CatalogItem[] = [];
   expenseOptions: ExpenseOptions = { wallets: [], expenseTypes: [], vendors: [] };
@@ -67,7 +67,7 @@ export class SubscriptionPageComponent implements OnInit {
 
   addSubscription(): void {
     this.subscriptionService.showSubscriptionFormDialog({
-      wallets: this.wallets,
+      walletGroups: this.walletGroups,
       currencies: this.currencies,
       paymentFrequencies: this.paymentFrequencies,
       onSaved: (data: AddSubscription) => {
@@ -87,7 +87,7 @@ export class SubscriptionPageComponent implements OnInit {
       id: subscription.id,
       name: subscription.name,
       price: subscription.price,
-      walletId: subscription.walletId,
+      walletGroupId: subscription.walletGroupId,
       currencyId: subscription.currencyId,
       paymentFrequencyId: subscription.paymentFrequencyId,
       chargeDay: subscription.chargeDay,
@@ -96,7 +96,7 @@ export class SubscriptionPageComponent implements OnInit {
     };
     this.subscriptionService.showSubscriptionFormDialog({
       subscription: updateData,
-      wallets: this.wallets,
+      walletGroups: this.walletGroups,
       currencies: this.currencies,
       paymentFrequencies: this.paymentFrequencies,
       onSaved: (data: AddSubscription) => {
@@ -208,10 +208,13 @@ export class SubscriptionPageComponent implements OnInit {
   }
 
   private loadCatalogs(): void {
+    this.catalogService.getWalletGroups().subscribe({
+      next: (res) => (this.walletGroups = res.data ?? []),
+      error: (err: HttpErrorResponse) => this.notifService.showError(err),
+    });
     this.catalogService.getWallets().subscribe({
       next: (res) => {
-        this.wallets = res.data ?? [];
-        this.expenseOptions = { ...this.expenseOptions, wallets: this.wallets };
+        this.expenseOptions = { ...this.expenseOptions, wallets: res.data ?? [] };
       },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });

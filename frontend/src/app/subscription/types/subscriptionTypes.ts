@@ -10,6 +10,8 @@ export type Subscription = {
   lastPaymentDate: string;
   walletId: number;
   wallet: string;
+  walletGroupId: number;
+  walletGroup: string;
   currencyId: number;
   currency: string;
   currencySymbol: string;
@@ -18,7 +20,7 @@ export type Subscription = {
 };
 
 export type AddSubscription = {
-  walletId: number;
+  walletGroupId: number;
   currencyId: number;
   paymentFrequencyId: number;
   name: string;
@@ -60,7 +62,7 @@ export type SubscriptionSummary = {
 
 export type SubscriptionFormData = {
   subscription?: UpdateSubscription;
-  wallets: CatalogItem[];
+  walletGroups: CatalogItem[];
   currencies: CatalogItem[];
   paymentFrequencies: CatalogItem[];
   onSaved: (data: AddSubscription) => void;
@@ -90,7 +92,7 @@ export type PaymentHistoryDialogData = {
 };
 
 export const EMPTY_ADD_SUBSCRIPTION: AddSubscription = {
-  walletId: 0,
+  walletGroupId: 0,
   currencyId: 0,
   paymentFrequencyId: 0,
   name: '',

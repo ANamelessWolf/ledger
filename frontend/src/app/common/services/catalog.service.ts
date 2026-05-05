@@ -54,4 +54,8 @@ export class CatalogService {
   getPaymentFrequencies(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/payment-frequencies`);
   }
+
+  getWalletGroups(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/wallet-groups`);
+  }
 }

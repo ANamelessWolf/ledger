@@ -5,6 +5,7 @@ import { AppDataSource } from "..";
 import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
 import { Expense } from "../models/expenses";
 import { Currency, PaymentFrequency } from "../models/settings";
+import { WalletGroup } from "../models/ledger";
 import {
   getCardListFilter,
   getCreditCardStatus,
@@ -289,6 +290,20 @@ export const getExpenseYearRange = asyncErrorHandler(
     } catch (error) {
       console.error(error);
       return next(new Exception("An error occurred getting the expense year range", HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    }
+  }
+);
+
+export const getWalletGroupList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const groups: WalletGroup[] = await AppDataSource.manager.find(WalletGroup, {
+        order: { name: "ASC" },
+      });
+      const result: CatalogItem[] = groups.map((g) => ({ id: g.id, name: g.name }));
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      return next(new Exception("An error occurred getting the wallet group list", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }
 );
