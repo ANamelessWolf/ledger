@@ -99,6 +99,10 @@
             <mat-icon>history</mat-icon>
             <span>Payment History</span>
           </button>
+          <button type="button" mat-menu-item (click)="viewPriceHistory.emit(row)">
+            <mat-icon>show_chart</mat-icon>
+            <span>Price History</span>
+          </button>
           <mat-divider></mat-divider>
           <button type="button" mat-menu-item class="delete-item" (click)="delete.emit(row)">
             <mat-icon color="warn">delete</mat-icon>
@@ -109,7 +113,9 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"
+        [class.selected-row]="selectedRow?.id === row.id"
+        (click)="toggleSelection(row)"></tr>
   </table>
   </div>
 

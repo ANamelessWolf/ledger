@@ -68,6 +68,36 @@ export type SubscriptionFormData = {
   onSaved: (data: AddSubscription) => void;
 };
 
+export type SubscriptionFilter = {
+  status: 'active' | 'inactive' | 'all';
+  paymentFrequencyId: number | null;
+  walletGroupId: number | null;
+};
+
+export const DEFAULT_SUBSCRIPTION_FILTER: SubscriptionFilter = {
+  status: 'all',
+  paymentFrequencyId: null,
+  walletGroupId: null,
+};
+
+export type SubscriptionFilterDialogData = {
+  current: SubscriptionFilter;
+  paymentFrequencies: CatalogItem[];
+  walletGroups: CatalogItem[];
+};
+
+export type PriceHistoryItem = {
+  total: number;
+  buyDate: string;
+};
+
+export type PriceHistoryDialogData = {
+  subscriptionId: number;
+  subscriptionName: string;
+  currencyConversion: number;
+  onLoadPriceHistory: (callback: (items: PriceHistoryItem[]) => void) => void;
+};
+
 export type ExistingPaymentRef = {
   id: number;
   expenseId: number;

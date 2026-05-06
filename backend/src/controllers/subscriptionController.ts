@@ -234,6 +234,25 @@ export const searchExpenses = asyncErrorHandler(
   }
 );
 
+export const getPriceHistory = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const subscriptionId = +req.params.id;
+      const rows = await AppDataSource.query(`
+        SELECT e.total, e.buy_date AS buyDate
+        FROM subscription_payment_history sph
+        JOIN expense e ON e.id = sph.expense_id
+        WHERE sph.subscription_id = ?
+        ORDER BY e.buy_date ASC
+      `, [subscriptionId]);
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: rows }));
+    } catch (error) {
+      console.error(error);
+      return next(new Exception("Error getting price history", HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    }
+  }
+);
+
 export const getSubscriptionSummary = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {

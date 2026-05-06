@@ -41,12 +41,19 @@ export class SubscriptionDashboardComponent {
   @Input() inactiveTotal: number = 0;
   @Input() defaultCurrencySymbol: string = '';
 
+  selectedRow: Subscription | null = null;
+
+  toggleSelection(row: Subscription): void {
+    this.selectedRow = this.selectedRow?.id === row.id ? null : row;
+  }
+
   @Output() pageChange = new EventEmitter<PaginationEvent>();
   @Output() sortChange = new EventEmitter<Sort>();
   @Output() edit = new EventEmitter<Subscription>();
   @Output() delete = new EventEmitter<Subscription>();
   @Output() addPayment = new EventEmitter<Subscription>();
   @Output() viewHistory = new EventEmitter<Subscription>();
+  @Output() viewPriceHistory = new EventEmitter<Subscription>();
 
   displayedColumns: string[] = [
     'name',

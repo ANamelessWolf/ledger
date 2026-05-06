@@ -14,10 +14,14 @@ import { SubscriptionSummaryComponent } from '@subscription/components/subscript
 import { SubscriptionService } from '@subscription/services/subscription.service';
 import {
   AddSubscription,
+  DEFAULT_SUBSCRIPTION_FILTER,
   Subscription,
+  SubscriptionFilter,
+  SubscriptionFilterDialogData,
   SubscriptionSummary,
   UpdateSubscription,
 } from '@subscription/types/subscriptionTypes';
+import { SubscriptionFilterDialogComponent } from '@subscription/components/subscription-filter-dialog/subscription-filter-dialog.component';
 import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.component';
 
@@ -39,12 +43,26 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
 export class SubscriptionPageComponent implements OnInit {
   subscriptions: Subscription[] = [];
   searchTerm: string = '';
+  activeFilter: SubscriptionFilter = { ...DEFAULT_SUBSCRIPTION_FILTER };
   summary: SubscriptionSummary | null = null;
 
+  get hasActiveFilters(): boolean {
+    return this.activeFilter.status !== 'all'
+      || this.activeFilter.paymentFrequencyId !== null
+      || this.activeFilter.walletGroupId !== null;
+  }
+
   get filteredSubscriptions(): Subscription[] {
+    let result = this.subscriptions;
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.subscriptions;
-    return this.subscriptions.filter(s => s.name.toLowerCase().includes(term));
+    if (term) result = result.filter(s => s.name.toLowerCase().includes(term));
+    if (this.activeFilter.status === 'active') result = result.filter(s => s.active === 1);
+    if (this.activeFilter.status === 'inactive') result = result.filter(s => s.active !== 1);
+    if (this.activeFilter.paymentFrequencyId !== null)
+      result = result.filter(s => s.paymentFrequencyId === this.activeFilter.paymentFrequencyId);
+    if (this.activeFilter.walletGroupId !== null)
+      result = result.filter(s => s.walletGroupId === this.activeFilter.walletGroupId);
+    return result;
   }
 
   walletGroups: CatalogItem[] = [];
@@ -222,8 +240,31 @@ export class SubscriptionPageComponent implements OnInit {
     }).subscribe();
   }
 
+  onViewPriceHistory(subscription: Subscription): void {
+    this.subscriptionService.showPriceHistoryDialog({
+      subscriptionId: subscription.id,
+      subscriptionName: subscription.name,
+      currencyConversion: this.currencyConversionMap.get(subscription.currencyId) ?? 1,
+    }).subscribe();
+  }
+
   onSearch(term: string): void {
     this.searchTerm = term;
+  }
+
+  openFilter(): void {
+    const data: SubscriptionFilterDialogData = {
+      current: { ...this.activeFilter },
+      paymentFrequencies: this.paymentFrequencies,
+      walletGroups: this.walletGroups,
+    };
+    this.dialog.open(SubscriptionFilterDialogComponent, { width: '420px', data })
+      .afterClosed()
+      .subscribe((result: SubscriptionFilter | null) => {
+        if (result !== null && result !== undefined) {
+          this.activeFilter = result;
+        }
+      });
   }
 
   private loadSubscriptions(): void {

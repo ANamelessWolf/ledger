@@ -1,8 +1,9 @@
 <app-page-layout
   [title]="'Subscriptions'"
-  [hasFilter]="false"
+  [hasFilter]="hasActiveFilters"
   [hasWidget]="true"
   (onSearch)="onSearch($event)"
+  (openFilter)="openFilter()"
   (add)="addSubscription()">
 
 
@@ -13,7 +14,7 @@
     </app-subscription-summary>
   </div>
 
-  <div main>
+  <div main class="main-content-fill">
     <app-subscription-dashboard
       [dataSource]="filteredSubscriptions"
       [totalItems]="filteredSubscriptions.length"
@@ -23,7 +24,8 @@
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
       (addPayment)="onAddPayment($event)"
-      (viewHistory)="onViewHistory($event)">
+      (viewHistory)="onViewHistory($event)"
+      (viewPriceHistory)="onViewPriceHistory($event)">
     </app-subscription-dashboard>
   </div>
 

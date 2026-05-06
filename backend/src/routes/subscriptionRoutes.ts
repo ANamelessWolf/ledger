@@ -6,6 +6,7 @@ import {
   updateSubscription,
   deleteSubscription,
   getPaymentHistory,
+  getPriceHistory,
   addPayments,
   removePayment,
   searchExpenses,
@@ -25,5 +26,8 @@ router.route("/:id").get(getSubscriptionById).put(updateSubscription).delete(del
 // Payment history
 router.route("/:id/payments").get(getPaymentHistory).post(addPayments);
 router.route("/:id/payments/:paymentId").delete(removePayment);
+
+// Price history
+router.route("/:id/price-history").get(getPriceHistory);
 
 export default router;

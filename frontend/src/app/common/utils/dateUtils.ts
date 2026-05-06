@@ -106,6 +106,12 @@ export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
   return { periods, currentKey };
 };
 
+export const formatShortMonthYear = (dateStr: string): string => {
+  const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+  const month = date.toLocaleString('en', { month: 'short' });
+  return `${month} ${date.getFullYear()}`;
+};
+
 export const sliceMonthLabels = (
   sliceMonthLabels: string[]
 ): { startIndex: number; endIndex: number } => {

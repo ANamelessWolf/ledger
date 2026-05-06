@@ -8,12 +8,14 @@ import {
   AddPaymentDialogData,
   ExpenseSearchResult,
   PaymentHistoryDialogData,
+  PriceHistoryDialogData,
   SubscriptionFormData,
   UpdateSubscription,
 } from '@subscription/types/subscriptionTypes';
 import { SubscriptionFormComponent } from '@subscription/components/subscription-form/subscription-form.component';
 import { SubscriptionAddPaymentComponent } from '@subscription/components/subscription-add-payment/subscription-add-payment.component';
 import { SubscriptionPaymentHistoryComponent } from '@subscription/components/subscription-payment-history/subscription-payment-history.component';
+import { SubscriptionPriceHistoryComponent } from '@subscription/components/subscription-price-history/subscription-price-history.component';
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +63,10 @@ export class SubscriptionService {
     return this.http.get(`${LEDGER_API.SUBSCRIPTION}/summary?month=${month}&year=${year}`);
   }
 
+  getPriceHistory(subscriptionId: number): Observable<any> {
+    return this.http.get(`${LEDGER_API.SUBSCRIPTION}/${subscriptionId}/price-history`);
+  }
+
   showSubscriptionFormDialog(data: SubscriptionFormData) {
     const dialogRef = this.dialog.open(SubscriptionFormComponent, {
       width: '560px',
@@ -83,6 +89,22 @@ export class SubscriptionService {
           });
         },
       } satisfies AddPaymentDialogData,
+    });
+    return dialogRef.afterClosed();
+  }
+
+  showPriceHistoryDialog(data: Omit<PriceHistoryDialogData, 'onLoadPriceHistory'>) {
+    const dialogRef = this.dialog.open(SubscriptionPriceHistoryComponent, {
+      width: '620px',
+      data: {
+        ...data,
+        onLoadPriceHistory: (callback: (items: any[]) => void) => {
+          this.getPriceHistory(data.subscriptionId).subscribe({
+            next: (res) => callback(res.data ?? []),
+            error:() => callback([]),
+          });
+        },
+      } satisfies PriceHistoryDialogData,
     });
     return dialogRef.afterClosed();
   }

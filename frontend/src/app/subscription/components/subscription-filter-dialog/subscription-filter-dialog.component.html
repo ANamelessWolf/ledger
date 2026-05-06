@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Filter Subscriptions</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="filter-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let s of statusOptions" [value]="s.value">{{ s.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Payment Frequency</mat-label>
+      <mat-select formControlName="paymentFrequencyId">
+        <mat-option [value]="null">Any</mat-option>
+        <mat-option *ngFor="let f of data.paymentFrequencies" [value]="f.id">{{ f.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Wallet Group</mat-label>
+      <mat-select formControlName="walletGroupId">
+        <mat-option [value]="null">Any</mat-option>
+        <mat-option *ngFor="let w of data.walletGroups" [value]="w.id">{{ w.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="cancel()">Cancel</button>
+  <button type="button" mat-stroked-button color="warn" (click)="clear()">
+    <mat-icon>filter_list_off</mat-icon>
+    Clear Filters
+  </button>
+  <button type="button" mat-raised-button color="primary" (click)="apply()">Apply</button>
+</mat-dialog-actions>
