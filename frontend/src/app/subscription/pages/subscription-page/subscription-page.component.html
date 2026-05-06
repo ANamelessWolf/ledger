@@ -5,6 +5,7 @@
   (onSearch)="onSearch($event)"
   (add)="addSubscription()">
 
+
   <div widget>
     <app-subscription-summary
       [summary]="summary"
@@ -14,8 +15,8 @@
 
   <div main>
     <app-subscription-dashboard
-      [dataSource]="subscriptions"
-      [totalItems]="subscriptions.length"
+      [dataSource]="filteredSubscriptions"
+      [totalItems]="filteredSubscriptions.length"
       [activeTotal]="activeTotal"
       [inactiveTotal]="inactiveTotal"
       [defaultCurrencySymbol]="defaultCurrencySymbol"

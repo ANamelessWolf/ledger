@@ -38,7 +38,14 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
 })
 export class SubscriptionPageComponent implements OnInit {
   subscriptions: Subscription[] = [];
+  searchTerm: string = '';
   summary: SubscriptionSummary | null = null;
+
+  get filteredSubscriptions(): Subscription[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.subscriptions;
+    return this.subscriptions.filter(s => s.name.toLowerCase().includes(term));
+  }
 
   walletGroups: CatalogItem[] = [];
   currencies: CatalogItem[] = [];
@@ -215,7 +222,9 @@ export class SubscriptionPageComponent implements OnInit {
     }).subscribe();
   }
 
-  onSearch(term: string): void {}
+  onSearch(term: string): void {
+    this.searchTerm = term;
+  }
 
   private loadSubscriptions(): void {
     this.subscriptionService.getSubscriptions().subscribe({
