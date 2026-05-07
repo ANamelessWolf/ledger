@@ -3,303 +3,68 @@
 <mat-dialog-content class="wizard-content">
   <mat-stepper [linear]="true" #stepper orientation="horizontal">
 
-    <!-- ── Paso 1: Tarjeta y meses ──────────────────────────────────────── -->
     <mat-step label="Tarjeta y meses" [completed]="isStep1Valid">
-      <form [formGroup]="step1Form" class="step-form">
-        <div class="form-group">
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Tarjeta de crédito</mat-label>
-            <mat-select formControlName="creditCard">
-              <mat-option *ngFor="let card of data.creditCards" [value]="card">
-                {{ card.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error>Selecciona una tarjeta</mat-error>
-          </mat-form-field>
-        </div>
-        <div class="form-group">
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Número de meses</mat-label>
-            <mat-select formControlName="months">
-              <mat-option *ngFor="let m of monthsOptions" [value]="m">{{ m }}</mat-option>
-            </mat-select>
-            <mat-error>Selecciona el número de meses</mat-error>
-          </mat-form-field>
-        </div>
-        <div class="step-actions">
-          <button mat-button type="button" (click)="cancel()">Cancelar</button>
-          <button mat-raised-button color="primary" matStepperNext [disabled]="!isStep1Valid">
-            Siguiente
-          </button>
-        </div>
-      </form>
+      <app-wizard-step1
+        [creditCards]="data.creditCards"
+        [creditCardControl]="creditCardControl"
+        [monthsForm]="step1Form"
+        [monthsOptions]="monthsOptions"
+        [isValid]="isStep1Valid"
+        (cancel)="cancel()"
+        (next)="stepper.next()">
+      </app-wizard-step1>
     </mat-step>
 
-    <!-- ── Paso 2: Gasto ────────────────────────────────────────────────── -->
     <mat-step label="Gasto" [completed]="isStep2Valid">
-      <div class="step-form">
-        <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onTabChange($event)">
-
-          <!-- Tab: Nuevo gasto -->
-          <mat-tab label="Nuevo gasto">
-            <div class="tab-body">
-              <form [formGroup]="newExpenseForm">
-                <div class="form-group">
-                  <mat-form-field appearance="fill">
-                    <mat-label>Total</mat-label>
-                    <input matInput formControlName="total" type="number" placeholder="0.00" required />
-                    <mat-error *ngIf="newExpenseForm.get('total')?.invalid">Monto requerido</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill">
-                    <mat-label>Wallet</mat-label>
-                    <mat-select [formControl]="walletControl">
-                      <mat-option *ngFor="let w of cardWallets" [value]="w">
-                        {{ w.name }} ({{ w.currency }})
-                      </mat-option>
-                    </mat-select>
-                    <mat-error>Selecciona un wallet</mat-error>
-                  </mat-form-field>
-                </div>
-                <div class="form-group">
-                  <app-catalog-item-select
-                    header="Tipo de gasto"
-                    [items]="data.expenseTypes"
-                    [control]="expenseTypeControl"
-                    [isRequired]="true">
-                  </app-catalog-item-select>
-                  <app-catalog-item-select
-                    header="Proveedor"
-                    [items]="data.vendors"
-                    [control]="vendorControl"
-                    [isRequired]="true">
-                  </app-catalog-item-select>
-                </div>
-                <div class="form-group">
-                  <mat-form-field appearance="fill">
-                    <mat-label>Fecha de compra</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="buyDate" required />
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                    <mat-error>Fecha requerida</mat-error>
-                  </mat-form-field>
-                </div>
-                <div class="form-group">
-                  <mat-form-field appearance="fill" class="full-width">
-                    <mat-label>Descripción</mat-label>
-                    <textarea matInput formControlName="description" placeholder="Descripción del gasto" required rows="2"></textarea>
-                    <mat-error>Descripción requerida</mat-error>
-                  </mat-form-field>
-                </div>
-                <div class="description-hint" *ngIf="selectedMonths > 0">
-                  <mat-icon>info</mat-icon>
-                  <span>{{ descriptionHint }}</span>
-                </div>
-              </form>
-            </div>
-          </mat-tab>
-
-          <!-- Tab: Seleccionar gasto existente -->
-          <mat-tab label="Gasto existente">
-            <div class="tab-body">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Buscar por descripción</mat-label>
-                <input matInput [formControl]="searchControl" placeholder="Escribe para buscar..." />
-                <mat-icon matSuffix>search</mat-icon>
-              </mat-form-field>
-
-              <div *ngIf="isSearching" class="spinner-wrapper">
-                <mat-spinner diameter="32"></mat-spinner>
-              </div>
-
-              <div class="search-results" *ngIf="!isSearching">
-                <div *ngIf="searchResults.length === 0 && searchControl.value && searchControl.value.length >= 2"
-                  class="empty-state">
-                  Sin resultados.
-                </div>
-                <div
-                  *ngFor="let exp of searchResults"
-                  class="expense-row"
-                  [class.selected]="selectedExisting?.id === exp.id"
-                  (click)="selectExisting(exp)">
-                  <div class="expense-info">
-                    <span class="expense-desc">{{ exp.description }}</span>
-                    <span class="expense-meta">{{ exp.wallet }} · {{ exp.currency }} · {{ exp.buyDate }}</span>
-                  </div>
-                  <span class="expense-total">{{ exp.total | currencyFormat }}</span>
-                  <mat-icon *ngIf="selectedExisting?.id === exp.id" class="check-icon">check_circle</mat-icon>
-                </div>
-              </div>
-
-              <div *ngIf="selectedExisting" class="selected-info">
-                <mat-icon>receipt</mat-icon>
-                <div>
-                  <strong>{{ selectedExisting.description }}</strong>
-                  <span class="expense-meta">{{ selectedExisting.buyDate }} — {{ selectedExisting.total | currencyFormat }}</span>
-                </div>
-              </div>
-
-              <div class="form-group" *ngIf="selectedExisting" style="margin-top:16px;">
-                <app-catalog-item-select
-                  header="Tipo de gasto (mensualidades)"
-                  [items]="data.expenseTypes"
-                  [control]="expenseTypeControl"
-                  [isRequired]="true">
-                </app-catalog-item-select>
-                <app-catalog-item-select
-                  header="Proveedor (mensualidades)"
-                  [items]="data.vendors"
-                  [control]="vendorControl"
-                  [isRequired]="true">
-                </app-catalog-item-select>
-              </div>
-            </div>
-          </mat-tab>
-
-        </mat-tab-group>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Atrás</button>
-          <button mat-button type="button" (click)="cancel()">Cancelar</button>
-          <button
-            mat-raised-button
-            color="primary"
-            matStepperNext
-            type="button"
-            [disabled]="!isStep2Valid"
-            (click)="buildPaymentRows()">
-            Siguiente
-          </button>
-        </div>
-      </div>
+      <app-wizard-step2
+        [expenseTypes]="data.expenseTypes"
+        [vendors]="data.vendors"
+        [cardWalletItems]="cardWalletItems"
+        [newExpenseForm]="newExpenseForm"
+        [walletControl]="walletControl"
+        [expenseTypeControl]="expenseTypeControl"
+        [vendorControl]="vendorControl"
+        [searchControl]="searchControl"
+        [searchResults]="searchResults"
+        [selectedExisting]="selectedExisting"
+        [isSearching]="isSearching"
+        [isValid]="isStep2Valid"
+        [selectedMonths]="selectedMonths"
+        [descriptionHint]="descriptionHint"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (next)="onStep2Next()"
+        (tabChange)="onTabChange($event)"
+        (selectExisting)="onSelectExisting($event)">
+      </app-wizard-step2>
     </mat-step>
 
-    <!-- ── Paso 3: Mensualidades ─────────────────────────────────────────── -->
     <mat-step label="Mensualidades" [completed]="isStep3Valid">
-      <div class="step-form">
-
-        <div class="step3-header">
-          <div class="step3-info">
-            <div class="form-group">
-              <app-catalog-item-select
-                header="Tipo de gasto"
-                [items]="data.expenseTypes"
-                [control]="paymentTypeControl"
-                [isRequired]="true">
-              </app-catalog-item-select>
-              <app-catalog-item-select
-                header="Proveedor"
-                [items]="data.vendors"
-                [control]="paymentVendorControl"
-                [isRequired]="true">
-              </app-catalog-item-select>
-            </div>
-          </div>
-          <div class="step3-total">
-            <span class="total-label">Total por mensualidad</span>
-            <span class="total-value">{{ paymentTotal | currencyFormat }}</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="payments-table-wrapper">
-          <table mat-table [dataSource]="paymentRows" class="payments-table">
-
-            <ng-container matColumnDef="index">
-              <th mat-header-cell *matHeaderCellDef>#</th>
-              <td mat-cell *matCellDef="let row">{{ row.index }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef>Descripción</th>
-              <td mat-cell *matCellDef="let row">
-                <mat-form-field appearance="outline" class="cell-field">
-                  <textarea matInput [(ngModel)]="row.description" rows="2"></textarea>
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef>Fecha</th>
-              <td mat-cell *matCellDef="let row">
-                <mat-form-field appearance="outline" class="cell-field-date">
-                  <input matInput [matDatepicker]="rowPicker" [(ngModel)]="row.buyDate" />
-                  <mat-datepicker-toggle matSuffix [for]="rowPicker"></mat-datepicker-toggle>
-                  <mat-datepicker #rowPicker></mat-datepicker>
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="total">
-              <th mat-header-cell *matHeaderCellDef>Total</th>
-              <td mat-cell *matCellDef="let row">{{ row.total | currencyFormat }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: paymentColumns;"></tr>
-          </table>
-        </div>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Atrás</button>
-          <button mat-button type="button" (click)="cancel()">Cancelar</button>
-          <button mat-raised-button color="primary" matStepperNext [disabled]="!isStep3Valid">
-            Siguiente
-          </button>
-        </div>
-      </div>
+      <app-wizard-step3
+        [expenseTypes]="data.expenseTypes"
+        [vendors]="data.vendors"
+        [paymentRows]="paymentRows"
+        [paymentTypeControl]="paymentTypeControl"
+        [paymentVendorControl]="paymentVendorControl"
+        [paymentTotal]="paymentTotal"
+        [isValid]="isStep3Valid"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (next)="stepper.next()">
+      </app-wizard-step3>
     </mat-step>
 
-    <!-- ── Paso 4: Resumen y confirmación ────────────────────────────────── -->
     <mat-step label="Resumen">
-      <div class="step-form">
-        <div class="summary-section">
-          <h3>Resumen de la mensualidad</h3>
-
-          <div class="summary-row">
-            <span class="summary-label">Tarjeta</span>
-            <span class="summary-value">{{ step1Form.get('creditCard')?.value?.name }}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Meses</span>
-            <span class="summary-value">{{ selectedMonths }}</span>
-          </div>
-
-          <div *ngIf="activeTab === 0 && newExpenseForm.get('description')?.value" class="summary-row">
-            <span class="summary-label">Gasto</span>
-            <span class="summary-value">{{ newExpenseForm.get('description')?.value }}</span>
-          </div>
-          <div *ngIf="activeTab === 1 && selectedExisting" class="summary-row">
-            <span class="summary-label">Gasto</span>
-            <span class="summary-value">{{ selectedExisting?.description }}</span>
-          </div>
-
-          <div class="summary-row">
-            <span class="summary-label">Total por mensualidad</span>
-            <span class="summary-value">{{ paymentTotal | currencyFormat }}</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="payments-preview">
-          <h4>Mensualidades ({{ paymentRows.length }})</h4>
-          <div *ngFor="let row of paymentRows" class="payment-preview-row">
-            <span class="payment-num">{{ row.index }}</span>
-            <span class="payment-desc" [innerHTML]="row.description.replace('\n', '<br>')"></span>
-            <span class="payment-date">{{ row.buyDate | date:'mediumDate' }}</span>
-            <span class="payment-total">{{ row.total | currencyFormat }}</span>
-          </div>
-        </div>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious type="button">Atrás</button>
-          <button mat-button type="button" (click)="cancel()">Cancelar</button>
-          <button mat-raised-button color="primary" type="button" (click)="confirm()">
-            Confirmar
-          </button>
-        </div>
-      </div>
+      <app-wizard-step4
+        [creditCardName]="selectedCard?.name ?? ''"
+        [selectedMonths]="selectedMonths"
+        [expenseDescription]="expenseDescription"
+        [paymentTotal]="paymentTotal"
+        [paymentRows]="paymentRows"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (confirm)="confirm()">
+      </app-wizard-step4>
     </mat-step>
 
   </mat-stepper>

@@ -1,0 +1,127 @@
+<div class="step-form">
+  <mat-tab-group animationDuration="200ms" (selectedIndexChange)="tabChange.emit($event)">
+
+    <!-- Tab: Nuevo gasto -->
+    <mat-tab label="Nuevo gasto">
+      <div class="tab-body">
+        <form [formGroup]="newExpenseForm">
+          <div class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Total</mat-label>
+              <input matInput formControlName="total" type="number" placeholder="0.00" required />
+              <mat-error *ngIf="newExpenseForm.get('total')?.invalid">Monto requerido</mat-error>
+            </mat-form-field>
+            <app-catalog-item-select
+              header="Wallet"
+              [items]="cardWalletItems"
+              [control]="walletControl"
+              [isRequired]="true"
+              errMessage="Selecciona un wallet">
+            </app-catalog-item-select>
+          </div>
+          <div class="form-group">
+            <app-catalog-item-select
+              header="Tipo de gasto"
+              [items]="expenseTypes"
+              [control]="expenseTypeControl"
+              [isRequired]="true">
+            </app-catalog-item-select>
+            <app-catalog-item-select
+              header="Proveedor"
+              [items]="vendors"
+              [control]="vendorControl"
+              [isRequired]="true">
+            </app-catalog-item-select>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Fecha de compra</mat-label>
+              <input placeholder="Fecha de compra" matInput [matDatepicker]="picker" formControlName="buyDate" required />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error>Fecha requerida</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput formControlName="description" placeholder="Descripción del gasto" required rows="2"></textarea>
+              <mat-error>Descripción requerida</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="description-hint" *ngIf="selectedMonths > 0">
+            <mat-icon>info</mat-icon>
+            <span>{{ descriptionHint }}</span>
+          </div>
+        </form>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Seleccionar gasto existente -->
+    <mat-tab label="Gasto existente">
+      <div class="tab-body">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Buscar por descripción</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Escribe para buscar..." />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div *ngIf="isSearching" class="spinner-wrapper">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+
+        <div class="search-results" *ngIf="!isSearching">
+          <div
+            *ngIf="searchResults.length === 0 && searchControl.value && searchControl.value.length >= 2"
+            class="empty-state">
+            Sin resultados.
+          </div>
+          <div
+            *ngFor="let exp of searchResults"
+            class="expense-row"
+            [class.selected]="selectedExisting?.id === exp.id"
+            (click)="selectExisting.emit(exp)">
+            <div class="expense-info">
+              <span class="expense-desc">{{ exp.description }}</span>
+              <span class="expense-meta">{{ exp.wallet }} · {{ exp.currency }} · {{ exp.buyDate }}</span>
+            </div>
+            <span class="expense-total">{{ exp.total | currencyFormat }}</span>
+            <mat-icon *ngIf="selectedExisting?.id === exp.id" class="check-icon">check_circle</mat-icon>
+          </div>
+        </div>
+
+        <div *ngIf="selectedExisting" class="selected-info">
+          <mat-icon>receipt</mat-icon>
+          <div>
+            <strong>{{ selectedExisting.description }}</strong>
+            <span class="expense-meta">{{ selectedExisting.buyDate }} — {{ selectedExisting.total | currencyFormat }}</span>
+          </div>
+        </div>
+
+        <div class="form-group category-group" *ngIf="selectedExisting">
+          <app-catalog-item-select
+            header="Tipo de gasto (mensualidades)"
+            [items]="expenseTypes"
+            [control]="expenseTypeControl"
+            [isRequired]="true">
+          </app-catalog-item-select>
+          <app-catalog-item-select
+            header="Proveedor (mensualidades)"
+            [items]="vendors"
+            [control]="vendorControl"
+            [isRequired]="true">
+          </app-catalog-item-select>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+  <div class="step-actions">
+    <button mat-button type="button" (click)="previous.emit()">Atrás</button>
+    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" [disabled]="!isValid" (click)="next.emit()">
+      Siguiente
+    </button>
+  </div>
+</div>

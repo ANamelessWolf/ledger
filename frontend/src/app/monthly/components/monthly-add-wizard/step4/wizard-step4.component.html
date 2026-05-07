@@ -1,0 +1,42 @@
+<div class="step-form">
+  <div class="summary-section">
+    <h3>Resumen de la mensualidad</h3>
+
+    <div class="summary-row">
+      <span class="summary-label">Tarjeta</span>
+      <span class="summary-value">{{ creditCardName }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Meses</span>
+      <span class="summary-value">{{ selectedMonths }}</span>
+    </div>
+    <div class="summary-row" *ngIf="expenseDescription">
+      <span class="summary-label">Gasto</span>
+      <span class="summary-value">{{ expenseDescription }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Total por mensualidad</span>
+      <span class="summary-value">{{ paymentTotal | currencyFormat }}</span>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="payments-preview">
+    <h4>Mensualidades ({{ paymentRows.length }})</h4>
+    <div *ngFor="let row of paymentRows" class="payment-preview-row">
+      <span class="payment-num">{{ row.index }}</span>
+      <span class="payment-desc" [innerHTML]="row.description.replace('\n', '<br>')"></span>
+      <span class="payment-date">{{ row.buyDate | date:'mediumDate' }}</span>
+      <span class="payment-total">{{ row.total | currencyFormat }}</span>
+    </div>
+  </div>
+
+  <div class="step-actions">
+    <button mat-button type="button" (click)="previous.emit()">Atrás</button>
+    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" (click)="confirm.emit()">
+      Confirmar
+    </button>
+  </div>
+</div>

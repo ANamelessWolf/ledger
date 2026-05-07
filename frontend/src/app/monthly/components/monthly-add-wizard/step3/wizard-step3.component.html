@@ -1,0 +1,72 @@
+<div class="step-form">
+  <div class="step3-header">
+    <div class="step3-info">
+      <div class="form-group">
+        <app-catalog-item-select
+          header="Tipo de gasto"
+          [items]="expenseTypes"
+          [control]="paymentTypeControl"
+          [isRequired]="true">
+        </app-catalog-item-select>
+        <app-catalog-item-select
+          header="Proveedor"
+          [items]="vendors"
+          [control]="paymentVendorControl"
+          [isRequired]="true">
+        </app-catalog-item-select>
+      </div>
+    </div>
+    <div class="step3-total">
+      <span class="total-label">Total por mensualidad</span>
+      <span class="total-value">{{ paymentTotal | currencyFormat }}</span>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="payments-table-wrapper">
+    <table mat-table [dataSource]="paymentRows" class="payments-table">
+
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let row">{{ row.index }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let row">
+          <mat-form-field appearance="outline" class="cell-field">
+            <textarea placeholder="Descripción" matInput [(ngModel)]="row.description" rows="2"></textarea>
+          </mat-form-field>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+        <td mat-cell *matCellDef="let row">
+          <mat-form-field appearance="outline" class="cell-field-date">
+            <input placeholder="Fecha" matInput [matDatepicker]="rowPicker" [(ngModel)]="row.buyDate" />
+            <mat-datepicker-toggle matSuffix [for]="rowPicker"></mat-datepicker-toggle>
+            <mat-datepicker #rowPicker></mat-datepicker>
+          </mat-form-field>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Total</th>
+        <td mat-cell *matCellDef="let row">{{ row.total | currencyFormat }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+  </div>
+
+  <div class="step-actions">
+    <button mat-button type="button" (click)="previous.emit()">Atrás</button>
+    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" [disabled]="!isValid" (click)="next.emit()">
+      Siguiente
+    </button>
+  </div>
+</div>
