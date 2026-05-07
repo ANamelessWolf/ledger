@@ -21,8 +21,6 @@ import {
   getCurrentMonthlyCreditTotals,
   getMonthlyFilter,
   getMonthlyInstallmentItemResponse,
-  // getMonthlyInstallmentTotals,
-  // getMonthlyInstallmentTotals2,
   payMonthlyInstallment,
   updatePaidMonths,
 } from "../utils/monthlyInstallmentUtils";
@@ -38,9 +36,9 @@ import {
 import { Creditcard } from "../models/ledger";
 import { CreditCardCutDays } from "../types/newMonthlyInstallment";
 import { MonthlyInterestPaymentsSummary } from "../models/banking/summary";
-// import { NewMonthlyInstallment } from "../types/newMonthlyInstallment";
-// import { Expense } from "../models/expenses";
-// import { getExpenseById } from "../utils/expenseUtils";
+import { Expense } from "../models/expenses";
+import { MonthlyWizardPayload } from "../types/monthlyWizardPayload";
+import { createMonthlyInstallment } from "../services/MonthlyService";
 /**
  * Retrieves a list of all monthly free installments with his asigned payments
  * @summary Retrieves list of montly buys with payments
@@ -292,15 +290,138 @@ export const payInstallment = asyncErrorHandler(
 export const createMonthlyExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const { total, buyDate, description, walletId, expenseTypeId, vendorId, months } =
-      //   req.body;
-      // TO DO: Implement createMonthlyExpense
-
+      const payload: MonthlyWizardPayload = req.body;
+      const result = await createMonthlyInstallment(payload);
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
       console.log(error);
       return next(
         new Exception(
           `An error occurred adding a new Expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get credit cards with wallet group info for the wizard
+ * @route GET /monthly/credit-cards
+ */
+export const getCreditCardsForWizard = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+        where: { active: 1 },
+      });
+      const result = await Promise.all(
+        cards.map(async (card) => {
+          const wg = await card.walletGroup;
+          return {
+            id: card.id,
+            name: wg ? wg.name : `Card ${card.id}`,
+            walletGroupId: card.walletGroupId,
+            color: card.color,
+          };
+        })
+      );
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting credit cards`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get wallets belonging to a wallet group with their currency info
+ * @route GET /monthly/wallets/:walletGroupId
+ */
+export const getWalletsByGroup = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const walletGroupId = +req.params.walletGroupId;
+      const rows: any[] = await AppDataSource.query(
+        `SELECT walletId AS id, wallet AS name, currencyId, currency
+         FROM vw_wallet_list
+         WHERE walletGroupId = ?`,
+        [walletGroupId]
+      );
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: rows }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting wallets`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Search expenses within the wallets of a wallet group
+ * @route GET /monthly/search-expenses?walletGroupId=&description=
+ */
+export const searchExpensesForInstallment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { walletGroupId, description } = req.query;
+      if (!walletGroupId) {
+        return next(new Exception("walletGroupId is required", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      const wallets: any[] = await AppDataSource.query(
+        `SELECT walletId AS id, wallet AS name, currencyId, currency
+         FROM vw_wallet_list
+         WHERE walletGroupId = ?`,
+        [+walletGroupId]
+      );
+
+      if (wallets.length === 0) {
+        return res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: [] }));
+      }
+
+      const walletIds = wallets.map((w: any) => w.id);
+      const desc = description ? `%${description}%` : "%";
+
+      const expenses: Expense[] = await AppDataSource.getRepository(Expense)
+        .createQueryBuilder("e")
+        .where("e.walletId IN (:...walletIds)", { walletIds })
+        .andWhere("e.description LIKE :desc", { desc })
+        .orderBy("e.buyDate", "DESC")
+        .take(20)
+        .getMany();
+
+      const walletMap = new Map<number, any>(wallets.map((w: any) => [w.id, w]));
+
+      const result = expenses.map((e) => {
+        const w = walletMap.get(e.walletId);
+        return {
+          id: e.id,
+          description: e.description,
+          total: e.total,
+          buyDate: formatDate(e.buyDate),
+          wallet: w?.name ?? "",
+          walletId: e.walletId,
+          currencyId: w?.currencyId ?? 0,
+          currency: w?.currency ?? "",
+        };
+      });
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred searching expenses`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );

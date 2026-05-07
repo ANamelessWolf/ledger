@@ -117,7 +117,12 @@ export class MoNoIntIndexPageComponent implements OnInit {
 
   openFilter() {}
 
-  addWallet() {}
+  addWallet() {
+    this.moNoIntService.showAddWizardDialog(() => {
+      this.notifService.showNotification('Mensualidad creada correctamente', 'success');
+      this.getNoIntMonthlyInstallments();
+    });
+  }
 
   private errorResponse(err: HttpErrorResponse) {
     this.error = true;

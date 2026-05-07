@@ -1,5 +1,14 @@
 import { Router } from "express";
-import { createMonthlyExpense, getMonthlyInstallmentPayment, getMonthlyInstallments, payInstallment, getMonthlyInterestPaymentsSummary } from "../controllers/monthlyController";
+import {
+  createMonthlyExpense,
+  getCreditCardsForWizard,
+  getMonthlyInstallmentPayment,
+  getMonthlyInstallments,
+  getWalletsByGroup,
+  payInstallment,
+  getMonthlyInterestPaymentsSummary,
+  searchExpensesForInstallment,
+} from "../controllers/monthlyController";
 
 /**
  * @swagger
@@ -295,6 +304,9 @@ const router = Router();
  *         description: Error processing the request
  */
 router.route("/").get(getMonthlyInstallments).post(createMonthlyExpense);
+router.route("/credit-cards").get(getCreditCardsForWizard);
+router.route("/wallets/:walletGroupId").get(getWalletsByGroup);
+router.route("/search-expenses").get(searchExpensesForInstallment);
 router.route("/payments/:id").get(getMonthlyInstallmentPayment);
 router.route("/pay").put(payInstallment);
 router.route("/payments/summary").get(getMonthlyInterestPaymentsSummary);
