@@ -60,8 +60,7 @@ export const getMonthlyInstallments = asyncErrorHandler(
         cutDaysByCreditCard[card.id] = card.cutDay;
       });
       // 2: Get filter from query
-      // TODO : Implement getMonthlyFilter
-      const filter = buildFilter(req.query);
+      const filter = await buildFilter(req.query);
       const where = getMonthlyFilter(filter);
       const options: FindManyOptions<MonthlyNonInterest> = { where };
 
@@ -82,9 +81,10 @@ export const getMonthlyInstallments = asyncErrorHandler(
 
       // 3: Select all monthly non interest with the filter
       const items: MonthlyNonInterest[] = await AppDataSource.manager.find(
-        MonthlyNonInterest
+        MonthlyNonInterest,
+        options
       );
-      const count = await AppDataSource.manager.count(MonthlyNonInterest);
+      const count = await AppDataSource.manager.count(MonthlyNonInterest, { where: options.where });
       const payments: MonthlyInstallmentPayment[] =
         await AppDataSource.manager.find(MonthlyInstallmentPayment);
 
@@ -469,14 +469,8 @@ export const getMonthlyInterestPaymentsSummary = asyncErrorHandler(
   }
 );
 
-const buildFilter = (query: QueryString.ParsedQs): MontlyInstallmentFilter => {
-  const { creditCard, archived } = query;
-  let isArchived: number | undefined = undefined;
-  if (archived !== undefined) {
-    isArchived = ["1", "0"].includes(archived.toString())
-      ? +archived.toString()
-      : undefined;
-  }
+const buildFilter = async (query: QueryString.ParsedQs): Promise<MontlyInstallmentFilter> => {
+  const { creditCard, status, fromMonth, fromYear, toMonth, toYear, walletGroupId } = query;
 
   const filter: MontlyInstallmentFilter = {
     creditcardId:
@@ -484,8 +478,31 @@ const buildFilter = (query: QueryString.ParsedQs): MontlyInstallmentFilter => {
         ?.toString()
         .split(",")
         .map((id) => +id) || undefined,
-    archived: isArchived,
+    status: ['active', 'inactive', 'all'].includes(status?.toString() ?? '')
+      ? (status?.toString() as 'active' | 'inactive' | 'all')
+      : 'active',
+    fromMonth: fromMonth ? +fromMonth.toString() : undefined,
+    fromYear: fromYear ? +fromYear.toString() : undefined,
+    toMonth: toMonth ? +toMonth.toString() : undefined,
+    toYear: toYear ? +toYear.toString() : undefined,
   };
+
+  // Resolve walletGroupId → creditcard IDs
+  if (walletGroupId) {
+    const groupId = +walletGroupId.toString();
+    const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+      where: { walletGroupId: groupId },
+    });
+    const cardIds = cards.map((c) => c.id);
+    if (cardIds.length > 0) {
+      filter.creditcardId = filter.creditcardId
+        ? filter.creditcardId.filter((id) => cardIds.includes(id))
+        : cardIds;
+    } else {
+      filter.creditcardId = [-1]; // no match
+    }
+  }
+
   return filter;
 };
 

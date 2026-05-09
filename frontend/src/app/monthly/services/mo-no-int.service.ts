@@ -3,10 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, Observable } from 'rxjs';
 import {
+  DEFAULT_MO_NO_INT_FILTER,
   InstallmentPayment,
   MoNoIntFilter,
+  MoNoIntFilterDialogData,
   MoNoIntSearchOptions,
 } from '@moNoInt/types/monthlyNoInterest';
+import { MoNoIntFilterDialogComponent } from '@moNoInt/components/mo-no-int-filter-dialog/mo-no-int-filter-dialog.component';
 import { LEDGER_API } from '@config/constants';
 import { Pagination, SortType } from '@config/commonTypes';
 import { QueryBuilder } from '@common/utils/filterUtils';
@@ -36,6 +39,10 @@ export class MoNoIntService {
   payInstallment(installmentId: Number, paymentId: Number): Observable<any> {
     const body = { id: installmentId, paymentId: paymentId };
     return this.http.put(`${LEDGER_API.MO_NO_INT}/pay`, body);
+  }
+
+  getWalletGroups(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/wallet-groups`);
   }
 
   getCreditCardsForWizard(): Observable<any> {
@@ -119,6 +126,25 @@ export class MoNoIntService {
     });
   }
 
+  showFilterDialog(current: MoNoIntFilter, onApply: (filter: MoNoIntFilter) => void): void {
+    forkJoin({
+      walletGroups: this.http.get<any>(`${LEDGER_API.CATALOG}/wallet-groups`),
+    }).subscribe(({ walletGroups }) => {
+      const data: MoNoIntFilterDialogData = {
+        current: { ...current },
+        walletGroups: walletGroups.data ?? [],
+      };
+      this.dialog
+        .open(MoNoIntFilterDialogComponent, { width: '420px', data })
+        .afterClosed()
+        .subscribe((result: MoNoIntFilter | null) => {
+          if (result !== null && result !== undefined) {
+            onApply(result);
+          }
+        });
+    });
+  }
+
   private getQueryString = (
     pagination: Pagination,
     filter: MoNoIntFilter,
@@ -131,7 +157,12 @@ export class MoNoIntService {
 
     // Filter
     query.appendArrFilterProp('creditcardId', filter.creditCard);
-    query.appendFilterProperty('archived', filter.archived);
+    query.appendFilterProperty('status', filter.status);
+    query.appendFilterProperty('fromMonth', filter.fromMonth);
+    query.appendFilterProperty('fromYear', filter.fromYear);
+    query.appendFilterProperty('toMonth', filter.toMonth);
+    query.appendFilterProperty('toYear', filter.toYear);
+    query.appendFilterProperty('walletGroupId', filter.walletGroupId);
 
     // Sorting
     query.addSorting(sorting);

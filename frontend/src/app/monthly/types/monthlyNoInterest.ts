@@ -1,3 +1,4 @@
+import { CatalogItem } from '@common/types/catalogTypes';
 import { Pagination, SortType } from '@config/commonTypes';
 
 export interface IFreeMontlyInt {
@@ -18,11 +19,17 @@ export interface ICardValue {
   value: number;
 }
 
-export const EMPTY_MONTHLY_INT_FILTER: MoNoIntFilter = {
-  creditCard: [],
-  archived: 1,
-  description: '',
+const _now = new Date();
+export const DEFAULT_MO_NO_INT_FILTER: MoNoIntFilter = {
+  status: 'active',
+  fromMonth: 1,
+  fromYear: _now.getFullYear(),
+  toMonth: 12,
+  toYear: _now.getFullYear(),
+  walletGroupId: null,
 };
+
+export const EMPTY_MONTHLY_INT_FILTER: MoNoIntFilter = { ...DEFAULT_MO_NO_INT_FILTER };
 
 export const EMPTY_CREDIT_CARD_INST_TOT: CreditCardInstallmentTotal = {
   currentPeriod: {
@@ -44,8 +51,17 @@ export const EMPTY_CREDIT_CARD_INST_TOT: CreditCardInstallmentTotal = {
 
 export type MoNoIntFilter = {
   creditCard?: number[];
-  archived?: number;
-  description?: string;
+  status: 'active' | 'inactive' | 'all';
+  fromMonth: number;
+  fromYear: number;
+  toMonth: number;
+  toYear: number;
+  walletGroupId: number | null;
+};
+
+export type MoNoIntFilterDialogData = {
+  current: MoNoIntFilter;
+  walletGroups: CatalogItem[];
 };
 
 export type MoNoIntSearchOptions = {
