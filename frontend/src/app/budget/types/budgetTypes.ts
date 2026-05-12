@@ -44,6 +44,7 @@ export type BudgetSummary = {
   budgetTotal: number;
   spentTotal: number;
   remaining: number;
+  annualBudget: number; // 1 = annual, 0 = monthly
 };
 
 export type BudgetFormData = {
