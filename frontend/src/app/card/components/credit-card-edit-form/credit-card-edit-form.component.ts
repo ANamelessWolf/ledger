@@ -56,7 +56,7 @@ export interface CreditCardEditData {
   templateUrl: './credit-card-edit-form.component.html',
   styleUrl: './credit-card-edit-form.component.scss',
 })
-export class CreditCardEditFormComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CreditCardEditFormComponent implements OnInit {
   @ViewChild('cardPreview') cardPreviewRef!: ElementRef<HTMLElement>;
 
   // Set by dialog-wrapper
@@ -64,7 +64,7 @@ export class CreditCardEditFormComponent implements OnInit, AfterViewInit, OnDes
 
   editForm!: FormGroup;
 
-  cardScale = 0.8;
+  cardScale = 1;
   private resizeObserver!: ResizeObserver;
 
   constructor(private fb: FormBuilder, private zone: NgZone) {}
@@ -94,22 +94,6 @@ export class CreditCardEditFormComponent implements OnInit, AfterViewInit, OnDes
 
     this.data.isValid   = () => this.editForm.valid;
     this.data.getResult = () => this.buildResult();
-  }
-
-  ngAfterViewInit(): void {
-    this.resizeObserver = new ResizeObserver(entries => {
-      const w = entries[0].contentRect.width;
-      if (w > 0) {
-        this.zone.run(() => {
-          this.cardScale = w / CARD_NATURAL_W;
-        });
-      }
-    });
-    this.resizeObserver.observe(this.cardPreviewRef.nativeElement);
-  }
-
-  ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
   }
 
   get credit()     { return this.editForm.get('credit'); }
