@@ -1,6 +1,7 @@
 .expense-section {
   display: flex;
   flex-direction: column;
+  height: 1200px;
 
   .header {
     display: flex;
@@ -25,6 +26,8 @@
 
   .table {
     flex: 1;
+    min-height: 0;
     padding: 16px;
+    overflow: hidden;
   }
 }
