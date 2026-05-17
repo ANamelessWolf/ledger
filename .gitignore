@@ -132,3 +132,4 @@ database/design/*.mwb.bak
 database/backup/*.sql
 backend/sql/*
 Instructions/*
+.claude/settings.local.json

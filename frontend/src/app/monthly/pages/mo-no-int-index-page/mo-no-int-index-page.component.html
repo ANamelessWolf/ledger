@@ -24,6 +24,6 @@
       class="overview-chart" />
     </div>
     <app-interest-free-summary [data]="summaryChartData"></app-interest-free-summary>
-    <app-interest-free-details [installments]="installments" />
+    <app-interest-free-details [installments]="installments" [statusFilter]="activeFilter.status" [showPaid]="activeFilter.showPaid" (refreshRequest)="loadInstallments()" />
   </div>
 </div>

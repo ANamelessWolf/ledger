@@ -3,6 +3,6 @@
     <mat-card-title>Installments</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <app-purchase-table [installments]="activeInstallments"/>
+    <app-purchase-table [installments]="displayInstallments" (refreshRequest)="refreshRequest.emit()"/>
   </mat-card-content>
 </mat-card >

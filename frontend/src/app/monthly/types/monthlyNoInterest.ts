@@ -27,6 +27,7 @@ export const DEFAULT_MO_NO_INT_FILTER: MoNoIntFilter = {
   toMonth: 12,
   toYear: _now.getFullYear(),
   walletGroupId: null,
+  showPaid: false,
 };
 
 export const EMPTY_MONTHLY_INT_FILTER: MoNoIntFilter = { ...DEFAULT_MO_NO_INT_FILTER };
@@ -57,6 +58,7 @@ export type MoNoIntFilter = {
   toMonth: number;
   toYear: number;
   walletGroupId: number | null;
+  showPaid: boolean;
 };
 
 export type MoNoIntFilterDialogData = {

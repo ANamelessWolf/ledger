@@ -7,7 +7,7 @@ import {
 } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import QueryString from "qs";
-import { FindManyOptions } from "typeorm";
+import { FindManyOptions, In } from "typeorm";
 import { AppDataSource } from "..";
 import {
   MonthlyNonInterest,
@@ -79,27 +79,47 @@ export const getMonthlyInstallments = asyncErrorHandler(
       options.skip = skip;
       options.take = take;
 
-      // 3: Select all monthly non interest with the filter
+      // 3: Select filtered installments (paginated for result, all for totals)
       const items: MonthlyNonInterest[] = await AppDataSource.manager.find(
         MonthlyNonInterest,
         options
       );
       const count = await AppDataSource.manager.count(MonthlyNonInterest, { where: options.where });
-      const payments: MonthlyInstallmentPayment[] =
-        await AppDataSource.manager.find(MonthlyInstallmentPayment);
 
-      // 4: Calculate the totals
+      // Fetch all matching installment IDs (without pagination) for accurate totals
+      const allMatchingItems: MonthlyNonInterest[] = await AppDataSource.manager.find(
+        MonthlyNonInterest,
+        { where: options.where }
+      );
+      const allItemIds = allMatchingItems.map((i) => i.id);
+
+      const payments: MonthlyInstallmentPayment[] = allItemIds.length > 0
+        ? await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+            where: { id: In(allItemIds) },
+          })
+        : [];
+
+      // 4: Calculate the totals scoped to the filter's date range
+      const fromMonth = filter.fromMonth ?? 1;
+      const fromYear = filter.fromYear ?? new Date().getFullYear();
+      const toMonth = filter.toMonth ?? 12;
+      const toYear = filter.toYear ?? new Date().getFullYear();
+
       const installments = classifyInstallments(payments, cutDaysByCreditCard);
       const installmentTotals = calculateInstallmentTotals(
-        11,
-        2023,
-        installments
+        fromMonth,
+        fromYear,
+        installments,
+        toMonth,
+        toYear
       );
       const creditCardTotals = await calculateCreditCardTotals(
-        11,
-        2023,
+        fromMonth,
+        fromYear,
         installments,
-        creditCards
+        creditCards,
+        toMonth,
+        toYear
       );
       const currentCreditCardTotals =
         getCurrentMonthlyCreditTotals(creditCardTotals);

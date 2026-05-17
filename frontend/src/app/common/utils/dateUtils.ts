@@ -112,6 +112,30 @@ export const formatShortMonthYear = (dateStr: string): string => {
   return `${month} ${date.getFullYear()}`;
 };
 
+const FULL_MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+];
+
+export const sliceByMonthRange = (
+  labels: string[],
+  fromMonth: number,
+  fromYear: number,
+  toMonth: number,
+  toYear: number
+): { startIndex: number; endIndex: number } => {
+  const fromLabel = `${FULL_MONTH_NAMES[fromMonth - 1]} ${fromYear}`;
+  const toLabel = `${FULL_MONTH_NAMES[toMonth - 1]} ${toYear}`;
+
+  let startIndex = labels.findIndex((l) => l === fromLabel);
+  let endIndex = labels.findIndex((l) => l === toLabel);
+
+  if (startIndex === -1) startIndex = 0;
+  if (endIndex === -1) endIndex = labels.length - 1;
+
+  return { startIndex, endIndex: endIndex + 1 };
+};
+
 export const sliceMonthLabels = (
   sliceMonthLabels: string[]
 ): { startIndex: number; endIndex: number } => {

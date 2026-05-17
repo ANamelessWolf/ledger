@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import {
   DEFAULT_MO_NO_INT_FILTER,
@@ -22,6 +23,7 @@ import {
     MatDialogModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatCheckboxModule,
     MatButtonModule,
     MatDividerModule,
     MatIconModule,
@@ -75,6 +77,7 @@ export class MoNoIntFilterDialogComponent implements OnInit {
       toMonth: [c.toMonth],
       toYear: [c.toYear],
       walletGroupId: [c.walletGroupId],
+      showPaid: [c.showPaid],
     });
   }
 

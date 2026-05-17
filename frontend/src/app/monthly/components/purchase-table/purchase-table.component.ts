@@ -8,7 +8,6 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
 import { PaginationEvent } from '@config/commonTypes';
 import { MatButtonModule } from '@angular/material/button';
-import { ExpensesService } from '@expense/services/expenses.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   InstallmentPayment,
@@ -47,6 +46,7 @@ export class PurchaseTableComponent {
   @Input() totalItems: number = 0;
   @Output() pageChange = new EventEmitter<PaginationEvent>();
   @Output() sortChange = new EventEmitter<Sort>();
+  @Output() refreshRequest = new EventEmitter<void>();
 
   displayedColumns: string[] = [
     'id',
@@ -131,37 +131,19 @@ export class PurchaseTableComponent {
   editPurchase(id: number, installment: NoIntMonthlyInstallment) {}
 
   showPayments(id: number, installment: NoIntMonthlyInstallment) {
-    this.moNoIntService.getPayments(id).subscribe(
-      (response) => {
+    this.moNoIntService.getPayments(id).subscribe({
+      next: (response) => {
         const payments = response.data as InstallmentPayment[];
-        console.log(payments);
         this.moNoIntService
           .showPaymentsDialog(
             'Lista de Pagos',
             payments.filter((x) => x.paymentId !== null),
             id,
-            this.refresh.bind(this)
+            () => this.refreshRequest.emit()
           )
           .subscribe();
       },
-      this.errorResponse,
-      this.completed
-    );
-  }
-
-  private getPayments() {}
-
-  private errorResponse(err: HttpErrorResponse) {
-    this.error = true;
-    this.notifService.showError(err);
-  }
-
-  private completed() {
-    this.error = true;
-    this.isLoading = false;
-  }
-
-  refresh() {
-    console.log('refreshing');
+      error: (err: HttpErrorResponse) => this.notifService.showError(err),
+    });
   }
 }

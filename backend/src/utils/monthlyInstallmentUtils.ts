@@ -426,18 +426,21 @@ export function classifyInstallments(
 export function calculateInstallmentTotals(
   month: number,
   year: number,
-  classifiedInstallments: ClassifiedInstallment
+  classifiedInstallments: ClassifiedInstallment,
+  toMonth: number = 12,
+  toYear: number = 9999
 ): MonthlyInstallmentTotal[] {
   const totalsMap: Record<string, MonthlyInstallmentTotal> = {};
 
-  // Format filter key as YYYYMM
-  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterFromKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterToKey = `${toYear}${toMonth.toString().padStart(2, "0")}`;
 
   for (const installmentId in classifiedInstallments) {
     const installment = classifiedInstallments[parseInt(installmentId)];
 
     for (const monthKey in installment.payments) {
-      if (monthKey < filterMonthKey) continue; // Skip months earlier than filter
+      if (monthKey < filterFromKey) continue;
+      if (monthKey > filterToKey) continue;
 
       if (!totalsMap[monthKey]) {
         totalsMap[monthKey] = {
@@ -462,12 +465,14 @@ export async function calculateCreditCardTotals(
   month: number,
   year: number,
   classifiedInstallments: ClassifiedInstallment,
-  creditCards: Creditcard[]
+  creditCards: Creditcard[],
+  toMonth: number = 12,
+  toYear: number = 9999
 ): Promise<CreditCardInstallmentTotals> {
   const totals: CreditCardInstallmentTotals = {};
-  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterFromKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterToKey = `${toYear}${toMonth.toString().padStart(2, "0")}`;
   const creditCardName: Record<number, string> = {};
-  // Map Credit Cards by ID for quick lookup
   const creditCardMap: Record<number, Creditcard> = {};
   for (const card of creditCards) {
     creditCardMap[card.id] = card;
@@ -478,7 +483,8 @@ export async function calculateCreditCardTotals(
     const installment = classifiedInstallments[parseInt(installmentId)];
 
     for (const monthKey in installment.payments) {
-      if (monthKey < filterMonthKey) continue; // Skip previous months
+      if (monthKey < filterFromKey) continue;
+      if (monthKey > filterToKey) continue;
 
       if (!totals[monthKey]) {
         totals[monthKey] = [];

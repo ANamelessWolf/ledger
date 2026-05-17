@@ -8,7 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { NotificationService } from '@common/services/notification.service';
 import { CatalogItem } from '@common/types/catalogTypes';
-import { sliceMonthLabels } from '@common/utils/dateUtils';
+import { sliceByMonthRange } from '@common/utils/dateUtils';
 import { EMPTY_PAGINATION } from '@config/commonTypes';
 import { ChartData, EMPTY_CHART_DATA } from '@expense/types/chartComponent';
 import { MoNoIntFilterDialogComponent } from '@moNoInt/components/mo-no-int-filter-dialog/mo-no-int-filter-dialog.component';
@@ -73,7 +73,8 @@ export class MoNoIntIndexPageComponent implements OnInit {
       f.fromYear !== d.fromYear ||
       f.toMonth !== d.toMonth ||
       f.toYear !== d.toYear ||
-      f.walletGroupId !== d.walletGroupId
+      f.walletGroupId !== d.walletGroupId ||
+      f.showPaid !== d.showPaid
     );
   }
 
@@ -99,7 +100,7 @@ export class MoNoIntIndexPageComponent implements OnInit {
     this.loadInstallments();
   }
 
-  private loadInstallments(): void {
+  loadInstallments(): void {
     this.isLoading = true;
     this.moNoIntService.getNonIntMonthlyInstallments(this.options).subscribe({
       next: (response) => {
@@ -117,7 +118,13 @@ export class MoNoIntIndexPageComponent implements OnInit {
           color: c.color,
           value: c.percent,
         }));
-        const { startIndex, endIndex } = sliceMonthLabels(this.totals.summary.labels);
+        const { startIndex, endIndex } = sliceByMonthRange(
+          this.totals.summary.labels,
+          this.activeFilter.fromMonth,
+          this.activeFilter.fromYear,
+          this.activeFilter.toMonth,
+          this.activeFilter.toYear
+        );
         this.summaryChartData = {
           labels: this.totals.summary.labels.slice(startIndex, endIndex),
           datasets: [
@@ -143,7 +150,7 @@ export class MoNoIntIndexPageComponent implements OnInit {
     });
   }
 
-  onSearch(event: any) {}
+  onSearch(_event: any) {}
 
   openFilter(): void {
     const data: MoNoIntFilterDialogData = {
