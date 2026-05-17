@@ -41,6 +41,7 @@ export type CardItem = {
   entity: string;
   status: string;
   ending: string;
+  color?: string;
   active: CARD_STATUS;
   isSelected: boolean;
 };
@@ -53,6 +54,7 @@ export const EMPTY_CARD_ITEM: CardItem = {
   status: '',
   name: '',
   ending: '',
+  color: 'blue',
   active: CARD_STATUS.OTHER,
   isSelected: false,
 };

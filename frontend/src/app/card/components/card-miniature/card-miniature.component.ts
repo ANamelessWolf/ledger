@@ -8,11 +8,12 @@ import {
   faCcDiscover,
 } from '@fortawesome/free-brands-svg-icons';
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-card-miniature',
   standalone: true,
-  imports: [FaIconComponent],
+  imports: [FaIconComponent, NgClass, NgIf],
   templateUrl: './card-miniature.component.html',
   styleUrl: './card-miniature.component.scss',
 })
@@ -22,6 +23,7 @@ export class CardMiniatureComponent {
   @Input() expiration: String = '';
   @Input() ending: String = '';
   @Input() cardType: CardType = CardType.OTHER;
+  @Input() miniMode: boolean = false;
 
   get iconCard(): IconDefinition {
     let icon: IconDefinition = faCreditCard;

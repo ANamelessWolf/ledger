@@ -9,11 +9,12 @@ import {
   PAYMENT_STATUS,
 } from '@common/types/cardItem';
 import { HEADERS } from '@config/messages';
+import { CardMiniatureComponent } from '@card/components/card-miniature/card-miniature.component';
 
 @Component({
   selector: 'app-card-list-item',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatChipsModule],
+  imports: [CommonModule, MatIconModule, MatChipsModule, CardMiniatureComponent],
   templateUrl: './card-list-item.component.html',
   styleUrl: './card-list-item.component.scss',
 })
@@ -47,6 +48,12 @@ export class CardListItemComponent {
 
   get cardEnding() {
     return `**** ${this.data.ending}`;
+  }
+
+  get statusDotClass(): string {
+    if (this.data.active === CARD_STATUS.ACTIVE) return 'active';
+    if (this.data.active === CARD_STATUS.CANCELLED) return 'cancelled';
+    return 'inactive';
   }
 
   get statusStyle() {

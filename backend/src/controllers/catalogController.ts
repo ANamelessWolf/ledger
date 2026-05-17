@@ -13,7 +13,7 @@ import {
 } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { CatalogItem } from "../types/response/catalogItemResponse";
-import { Creditcard, Wallet } from "../models/ledger";
+import { Creditcard, Debitcard, Wallet } from "../models/ledger";
 import { PAYMENT_STATUS } from "../common/enums";
 import { CardItemResponse } from "../types/response/cardItemResponse";
 
@@ -51,6 +51,9 @@ export const getCardList = asyncErrorHandler(
       const cc_cards: Creditcard[] = await AppDataSource.manager.find(
         Creditcard
       );
+      const dc_cards: Debitcard[] = await AppDataSource.manager.find(
+        Debitcard
+      );
       const cards: CardItem[] = await AppDataSource.manager.find(CardItem, {
         where,
       });
@@ -59,6 +62,8 @@ export const getCardList = asyncErrorHandler(
       for (let index = 0; index < cards.length; index++) {
         const card = cards[index];
         const cc = getCreditCard(card, cc_cards);
+        const dc = getDebitCard(card, dc_cards);
+        const color = cc?.color ?? dc?.color ?? '';
         let status: string = PAYMENT_STATUS.UNDEFINED;
         if (cc !== null) {
           const payments = await getPayments(card.id);
@@ -72,11 +77,13 @@ export const getCardList = asyncErrorHandler(
           cancelled.push({
             ...card,
             status: status,
+            color: color,
           });
         } else {
           response.push({
             ...card,
             status: status,
+            color: color,
           });
         }
       }
@@ -328,8 +335,21 @@ const getCreditCard = (
   card: CardItem,
   cc_cards: Creditcard[]
 ): Creditcard | null => {
-  if (card.isCreditCard) {
+  if (Number(card.isCreditCard) === 1) {
     const result: Creditcard[] = cc_cards.filter((x) => x.id === card.id);
+    if (result.length > 0) {
+      return result[0];
+    }
+  }
+  return null;
+};
+
+const getDebitCard = (
+  card: CardItem,
+  dc_cards: Debitcard[]
+): Debitcard | null => {
+  if (Number(card.isCreditCard) !== 1) {
+    const result: Debitcard[] = dc_cards.filter((x) => x.id === card.id);
     if (result.length > 0) {
       return result[0];
     }

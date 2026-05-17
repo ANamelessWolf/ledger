@@ -1,11 +1,11 @@
 <div class="card-container {{ color }}">
   <p class="header">{{ banking }}</p>
   <div class="rect"></div>
-  <div class="exp">
+  <div class="exp" *ngIf="!miniMode">
     <p class="label">Exp</p>
     <p>{{ expiration }}</p>
   </div>
   <p class="card-number">{{ endingCard }}</p>
-  <fa-icon [icon]="iconCard"></fa-icon>
+  <fa-icon [icon]="iconCard" *ngIf="!miniMode"></fa-icon>
 </div>
 

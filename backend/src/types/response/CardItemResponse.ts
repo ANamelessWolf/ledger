@@ -6,5 +6,6 @@ export type CardItemResponse = {
   entity: string;
   status: string;
   ending: string;
+  color: string;
   active: number;
 };

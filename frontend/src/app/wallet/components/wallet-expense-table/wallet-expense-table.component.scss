@@ -1,7 +1,6 @@
 .expense-section {
   display: flex;
   flex-direction: column;
-  height: 1200px;
 
   .header {
     display: flex;
@@ -25,9 +24,55 @@
   }
 
   .table {
-    flex: 1;
-    min-height: 0;
     padding: 16px;
-    overflow: hidden;
+
+    ::ng-deep {
+      app-expense-table {
+        height: auto !important;
+        flex: none !important;
+      }
+
+      .table-wrapper {
+        height: auto !important;
+        padding-bottom: 0 !important;
+      }
+
+      .table-card {
+        min-height: unset !important;
+        flex: none !important;
+      }
+
+      .table-scroll-area {
+        flex: none !important;
+        max-height: 620px;
+        overflow-y: auto;
+
+        table {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #94a3b8;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
+
+    p {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin: 0;
+    }
   }
 }
