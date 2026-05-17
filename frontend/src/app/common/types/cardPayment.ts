@@ -25,7 +25,7 @@ export type CreditCardBody = {
 
 export type CreditCardRequest = {
   id: number;
-  body: CreditCardPaymentBody;
+  body: CreditCardBody;
 };
 
 export type DebitCardBody = {

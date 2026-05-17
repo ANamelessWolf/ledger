@@ -1,52 +1,65 @@
-form {
-  padding: 20px 10px;
-}
-
-h2 {
-  margin: 0px 0px 10px 40px;
-}
-
-.form-actions {
+.edit-form {
+  padding: 8px 0 4px;
   display: flex;
-  justify-content: end;
-
-  div {
-    width: 180px;
-    margin-top: 20px;
-    display: flex;
-    flex: 0 0 auto;
-    text-align: right;
-    justify-content: space-between;
-  }
+  flex-direction: column;
+  gap: 4px;
 }
 
-.container-miniature {
+// ── Card preview ──────────────────────────────────────────
+.card-preview {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 16px;
+}
+
+.mini-card-wrapper {
+  width: 216px;
+  height: 131px;
+  overflow: hidden;
   position: relative;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
   app-card-miniature {
-    right: 370px;
     position: absolute;
-    top: 0px;
+    top: 0;
+    left: 0;
+    transform: scale(0.6);
+    transform-origin: top left;
   }
 }
 
-.form-group {
+// ── Sections scroll ───────────────────────────────────────
+.sections-scroll {
+  overflow-y: auto;
+  max-height: 380px;
   display: flex;
-  width: 50%;
-  justify-content: space-between;
-  margin: 0px 40px;
+  flex-direction: column;
 }
 
-hr {
-  width: auto;
-  margin-top: 0px;
+// ── Sections ──────────────────────────────────────────────
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--color-border);
 }
 
-.header {
-  padding: 16px;
-  font-size: x-large;
+.section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.color-min{
-  width: 16px;
-  height: 16px;
+// ── Form rows ─────────────────────────────────────────────
+.form-row {
+  display: flex;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1;
+  }
 }
