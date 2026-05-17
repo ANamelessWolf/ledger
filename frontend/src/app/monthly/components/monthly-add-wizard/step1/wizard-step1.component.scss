@@ -1,0 +1,31 @@
+.step-form {
+  padding: 16px 0 8px;
+}
+
+.form-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+
+  mat-form-field,
+  app-catalog-item-select {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  app-catalog-item-select ::ng-deep mat-form-field {
+    width: 100%;
+  }
+}
+
+.months-field {
+  flex: 1;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

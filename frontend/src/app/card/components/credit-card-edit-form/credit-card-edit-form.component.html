@@ -1,199 +1,113 @@
-<div class="header">
-  {{ dialogData.header }}
-</div>
-<hr />
-<form class="dialog-form" [formGroup]="editForm" (ngSubmit)="onSubmit()">
-  <div class="container-miniature">
-    <app-card-miniature
-      color="{{ color?.value + '' }}"
-      banking="{{ card.banking }}"
-      expiration="{{ expiration }}"
-      ending="{{ ending?.value + '' }}"
-      [cardType]="card.type"
-    />
-  </div>
+<div class="edit-form" *ngIf="editForm" [formGroup]="editForm">
 
-  <h2>Financing information</h2>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Financing Entity</mat-label>
-      <input
-        matInput
-        type="text"
-        placeholder="banking"
-        value="{{ card.banking }}"
-        disabled
+  <!-- Card preview — fills dialog width, scale driven by ResizeObserver -->
+  <div class="card-preview" #cardPreview>
+    <div class="mini-card-wrapper"
+         [style.width.px]="cardW"
+         [style.height.px]="cardH">
+      <app-card-miniature
+        [color]="color?.value"
+        [banking]="data.card.banking"
+        [expiration]="expiration"
+        [ending]="ending?.value + ''"
+        [cardType]="data.card.type"
+        [style.transform]="'scale(' + cardScale + ')'"
       />
-    </mat-form-field>
-  </div>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Cut day</mat-label>
-      <mat-select formControlName="cutDay" required>
-        <mat-option *ngFor="let day of options.days" [value]="day">
-          {{ day }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="cutDay?.invalid && (cutDay?.dirty || cutDay?.touched)">
-        <span *ngIf="cutDay?.errors?.['required']">Cut day is required.</span>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Due day</mat-label>
-      <mat-select formControlName="dueDay" required>
-        <mat-option *ngFor="let day of options.days" [value]="day">
-          {{ day }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="dueDay?.invalid && (dueDay?.dirty || dueDay?.touched)">
-        <span *ngIf="dueDay?.errors?.['required']">Due day is required.</span>
-      </mat-error>
-    </mat-form-field>
-  </div>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Ending</mat-label>
-      <input
-        matInput
-        formControlName="ending"
-        maxlength="5"
-        type="number"
-        placeholder="Enter used credit"
-        required
-      />
-      <mat-error *ngIf="ending?.invalid && (ending?.dirty || ending?.touched)">
-        <span *ngIf="ending?.errors?.['required']"
-          >Card ending is obligatory</span
-        >
-        <span *ngIf="ending?.errors?.['pattern']">Invalid number format.</span>
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <h2>Balance</h2>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Credit Limit</mat-label>
-      <input
-        matInput
-        formControlName="credit"
-        type="number"
-        placeholder="Enter credit limit"
-        required
-      />
-      <mat-error *ngIf="credit?.invalid && (credit?.dirty || credit?.touched)">
-        <span *ngIf="credit?.errors?.['required']"
-          >Credit limit is required.</span
-        >
-        <span *ngIf="credit?.errors?.['pattern']">Invalid number format.</span>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Used credit</mat-label>
-      <input
-        matInput
-        formControlName="usedCredit"
-        type="number"
-        placeholder="Enter used credit"
-        required
-      />
-      <mat-error
-        *ngIf="
-          usedCredit?.invalid && (usedCredit?.dirty || usedCredit?.touched)
-        "
-      >
-        <span *ngIf="usedCredit?.errors?.['required']"
-          >Used credit is required.</span
-        >
-        <span *ngIf="usedCredit?.errors?.['pattern']"
-          >Invalid number format.</span
-        >
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <h2>Expiration</h2>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Month</mat-label>
-      <mat-select formControlName="expMonth" required>
-        <mat-option *ngFor="let month of options.months" [value]="month">
-          {{ month }}
-        </mat-option>
-      </mat-select>
-      <mat-error
-        *ngIf="expMonth?.invalid && (expMonth?.dirty || expMonth?.touched)"
-      >
-        <span *ngIf="expMonth?.errors?.['required']"
-          >Month is required for expiration date</span
-        >
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Year</mat-label>
-      <mat-select formControlName="expYear" required>
-        <mat-option *ngFor="let year of options.years" [value]="year">
-          {{ year }}
-        </mat-option>
-      </mat-select>
-      <mat-error
-        *ngIf="expYear?.invalid && (expYear?.dirty || expYear?.touched)"
-      >
-        <span *ngIf="expYear?.errors?.['required']"
-          >Year is required for expiration date</span
-        >
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <h2>Status</h2>
-  <div class="form-group">
-    <mat-form-field appearance="fill">
-      <mat-label>Card color</mat-label>
-      <mat-select formControlName="color" required>
-        <div class="color-min">
-
-        </div><mat-option
-          *ngFor="let cardColor of options.colors"
-          [value]="cardColor"
-        >
-          {{ cardColor }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="color?.invalid && (color?.dirty || color?.touched)">
-        <span *ngIf="color?.errors?.['required']">Color is required.</span>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Card status</mat-label>
-      <mat-select formControlName="active" required>
-        <mat-option *ngFor="let status of options.status" [value]="status.value">
-          {{ status.description }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="active?.invalid && (active?.dirty || active?.touched)">
-        <span *ngIf="active?.errors?.['required']"
-          >Card status is required.</span
-        >
-      </mat-error>
-    </mat-form-field>
-  </div>
-  <div class="form-actions">
-    <div>
-      <button mat-raised-button type="submit" [disabled]="editForm.invalid">
-        Submit
-      </button>
-      <button
-        mat-raised-button
-        class="secondary-btn"
-        type="button"
-        (click)="close()"
-      >
-        Cancel
-      </button>
     </div>
   </div>
-</form>
+
+  <!-- Scrollable form sections -->
+  <div class="sections-scroll">
+
+    <div class="form-section">
+      <span class="section-label">Financing</span>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Financing Entity</mat-label>
+          <input matInput [value]="data.card.banking" aria-label="Financing Entity" disabled />
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Cut day</mat-label>
+          <mat-select formControlName="cutDay" required>
+            <mat-option *ngFor="let day of data.options.days" [value]="day">{{ day }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="cutDay?.invalid">Cut day is required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Due day</mat-label>
+          <mat-select formControlName="dueDay" required>
+            <mat-option *ngFor="let day of data.options.days" [value]="day">{{ day }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="dueDay?.invalid">Due day is required.</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Card ending</mat-label>
+          <input matInput formControlName="ending" maxlength="5" type="number" aria-label="Card ending" required />
+          <mat-error *ngIf="ending?.errors?.['required']">Required.</mat-error>
+          <mat-error *ngIf="ending?.errors?.['pattern']">Invalid number.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <span class="section-label">Balance</span>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Credit Limit</mat-label>
+          <input matInput appCurrencyInput formControlName="credit" inputmode="decimal" aria-label="Credit Limit" required />
+          <mat-error *ngIf="credit?.errors?.['required']">Required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Used Credit</mat-label>
+          <input matInput appCurrencyInput formControlName="usedCredit" inputmode="decimal" aria-label="Used Credit" required />
+          <mat-error *ngIf="usedCredit?.errors?.['required']">Required.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <span class="section-label">Expiration</span>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Month</mat-label>
+          <mat-select formControlName="expMonth" required>
+            <mat-option *ngFor="let month of data.options.months" [value]="month">{{ month }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="expMonth?.invalid">Required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="expYear" required>
+            <mat-option *ngFor="let year of data.options.years" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="expYear?.invalid">Required.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <span class="section-label">Status & Appearance</span>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Card color</mat-label>
+          <mat-select formControlName="color" required>
+            <mat-option *ngFor="let c of data.options.colors" [value]="c">{{ c }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="color?.invalid">Required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Card status</mat-label>
+          <mat-select formControlName="active" required>
+            <mat-option *ngFor="let s of data.options.status" [value]="s.value">{{ s.description }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="active?.invalid">Required.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+  </div>
+</div>

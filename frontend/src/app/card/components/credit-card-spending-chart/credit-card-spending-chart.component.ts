@@ -14,6 +14,7 @@ import {
   EMPTY_CREDIT_CARD_SPENDING,
 } from '@common/types/creditCardSummary';
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
+import { MaskCurrencyPipe } from '@common/pipes/mask-currency.pipe';
 
 const ticksFormat = (value: string | number) => {
   return typeof value === 'number' ? toCurrency(value) : value;
@@ -22,12 +23,13 @@ const ticksFormat = (value: string | number) => {
 @Component({
   selector: 'app-credit-card-spending-chart',
   standalone: true,
-  imports: [CommonModule, CurrencyFormatPipe],
+  imports: [CommonModule, CurrencyFormatPipe, MaskCurrencyPipe],
   templateUrl: './credit-card-spending-chart.component.html',
   styleUrl: './credit-card-spending-chart.component.scss',
 })
 export class CreditCardSpendingChartComponent {
   @Input() cardSpending: CreditCardSpending = EMPTY_CREDIT_CARD_SPENDING;
+  @Input() masked = false;
   @Input() sizeWidth: string = '70%';
   @Input() sizeHeight: string = '400px';
   private chart!: any;
@@ -37,7 +39,7 @@ export class CreditCardSpendingChartComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['cardSpending']) {
+    if (changes['cardSpending'] || changes['masked']) {
       this.updateChart();
     }
   }
@@ -45,6 +47,10 @@ export class CreditCardSpendingChartComponent {
   private updateChart(): void {
     if (this.chart) {
       this.chart.data = this.getChartData();
+      this.chart.options.plugins.tooltip.enabled = !this.masked;
+      this.chart.options.scales.y.ticks.callback = this.masked
+        ? () => '••••'
+        : ticksFormat;
       this.chart.update();
     }
   }
@@ -66,12 +72,30 @@ export class CreditCardSpendingChartComponent {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleColor: '#94a3b8',
+              bodyColor: '#f1f5f9',
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: (item: any) => ` ${toCurrency(item.raw as number)}`,
+              },
+            },
+          },
           scales: {
             y: {
               beginAtZero: true,
-              ticks: {
-                callback: ticksFormat,
-              },
+              grid: { color: 'rgba(0,0,0,0.04)' },
+              border: { display: false },
+              ticks: { color: '#94a3b8', callback: ticksFormat },
+            },
+            x: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: { color: '#64748b' },
             },
           },
         },
@@ -79,23 +103,20 @@ export class CreditCardSpendingChartComponent {
     }
   }
 
-  public getColor(value: number, average: number) {
-    if (value <= average * 1.1) {
-      return 'greenyellow';
-    } else if (value > average * 1.1 && value < average * 1.4) {
-      return 'gold';
-    } else {
-      return '#ff3c3c';
-    }
+  private cssVar(name: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
+
+  public getColor(value: number, average: number) {
+    if (value <= average * 1.1) return this.cssVar('--color-green-fill');
+    if (value < average * 1.4)  return this.cssVar('--color-yellow-fill');
+    return this.cssVar('--color-red-fill');
+  }
+
   public getBorderColor(value: number, average: number) {
-    if (value <= average * 1.1) {
-      return '#beb9ef';
-    } else if (value > average * 1.1 && value < average * 1.4) {
-      return '#beb9ef';
-    } else {
-      return '#beb9ef';
-    }
+    if (value <= average * 1.1) return this.cssVar('--color-green');
+    if (value < average * 1.4)  return this.cssVar('--color-yellow');
+    return this.cssVar('--color-red');
   }
 
   private getChartData() {
@@ -113,6 +134,8 @@ export class CreditCardSpendingChartComponent {
             this.getBorderColor(x.spending, average)
           ),
           borderWidth: 1,
+          borderRadius: 6,
+          borderSkipped: false,
         },
       ],
     };

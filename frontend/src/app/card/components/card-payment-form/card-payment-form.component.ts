@@ -1,9 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  Inject,
-  OnInit,
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,23 +9,18 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatButtonModule } from '@angular/material/button';
-import {
-  MatNativeDateModule,
-  provideNativeDateAdapter,
-} from '@angular/material/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogModule } from '@angular/cdk/dialog';
-import {
-  CreditCardSummary,
-  EMPTY_CREDIT_CARD_SUMMARY,
-} from '@common/types/creditCardSummary';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { CreditCardSummary } from '@common/types/creditCardSummary';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import { PAYMENT_STATUS } from '@common/types/cardItem';
-import {
-  CreditCardPaymentBody,
-  CreditCardPaymentRequest,
-} from '@common/types/cardPayment';
+import { CreditCardPaymentBody, CreditCardPaymentRequest } from '@common/types/cardPayment';
+import { CurrencyInputDirective } from '@common/directives/currency-input.directive';
+
+export interface CardPaymentData {
+  card: CreditCardSummary;
+  isValid: () => boolean;
+  getResult: () => CreditCardPaymentRequest;
+}
 
 @Component({
   selector: 'app-card-payment-form',
@@ -42,58 +33,41 @@ import {
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    DialogModule,
-    MatButtonModule,
+    CurrencyInputDirective,
   ],
   templateUrl: './card-payment-form.component.html',
   styleUrl: './card-payment-form.component.scss',
 })
 export class CardPaymentFormComponent implements OnInit {
-  paymentForm: FormGroup;
-  card: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
-  header: string = '';
+  // Set by dialog-wrapper
+  data!: CardPaymentData;
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    public dialogRef: MatDialogRef<CardPaymentFormComponent>,
-    private fb: FormBuilder
-  ) {
-    this.paymentForm = this.fb.group({
-      totalToPay: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
-      payDate: [new Date(), Validators.required],
-    });
-  }
+  paymentForm!: FormGroup;
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.card = this.dialogData.card;
-    this.header = this.dialogData.header;
+    this.paymentForm = this.fb.group({
+      totalToPay: [null, [Validators.required]],
+      payDate:    [new Date(), Validators.required],
+    });
+
+    this.data.isValid   = () => this.paymentForm.valid;
+    this.data.getResult = () => this.buildResult();
   }
 
-  get totalToPay() {
-    return this.paymentForm.get('totalToPay');
-  }
+  get totalToPay() { return this.paymentForm.get('totalToPay'); }
+  get payDate()    { return this.paymentForm.get('payDate'); }
 
-  get payDate() {
-    return this.paymentForm.get('payDate');
-  }
-
-  onSubmit() {
-    if (this.paymentForm.valid) {
-      const payDate = new Date(this.paymentForm.value.payDate);
-      const id = this.card.id;
-      const body: CreditCardPaymentBody = {
-        total: +this.paymentForm.value.totalToPay,
-        payDate: toRequestFormat(payDate),
-        cutDate: toRequestFormat(new Date(this.card.status.payment.startDate)),
-        dueDate: toRequestFormat(new Date(this.card.status.payment.dueDate)),
-      };
-      this.dialogData.card.status.status = PAYMENT_STATUS.PAID;
-      this.dialogData.formSubmitted({ id, body });
-      this.dialogRef.close();
-    }
-  }
-
-  close() {
-    this.dialogRef.close();
+  private buildResult(): CreditCardPaymentRequest {
+    const payDate = new Date(this.paymentForm.value.payDate);
+    const body: CreditCardPaymentBody = {
+      total:   this.paymentForm.value.totalToPay,
+      payDate: toRequestFormat(payDate),
+      cutDate: toRequestFormat(new Date(this.data.card.status.payment.startDate)),
+      dueDate: toRequestFormat(new Date(this.data.card.status.payment.dueDate)),
+    };
+    this.data.card.status.status = PAYMENT_STATUS.PAID;
+    return { id: this.data.card.id, body };
   }
 }

@@ -1,0 +1,68 @@
+.step-form {
+  padding: 16px 0 8px;
+}
+
+.summary-section {
+  margin-bottom: 16px;
+
+  h3 { margin-bottom: 12px; }
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  .summary-label {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .summary-value { font-weight: 500; }
+}
+
+.payments-preview {
+  margin-top: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+
+  h4 { margin-bottom: 8px; }
+}
+
+.payment-preview-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+
+  .payment-num {
+    width: 20px;
+    color: #888;
+    flex-shrink: 0;
+  }
+
+  .payment-desc {
+    flex: 1;
+    white-space: pre-line;
+  }
+
+  .payment-date {
+    color: #555;
+    white-space: nowrap;
+  }
+
+  .payment-total {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

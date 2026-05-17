@@ -1,29 +1,43 @@
-import { DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
 import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+  AfterViewInit,
+  Component,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { CreditCardBody } from '@common/types/cardPayment';
-import {
-  CreditCardSummary,
-  EMPTY_CREDIT_CARD_SUMMARY,
-} from '@common/types/creditCardSummary';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { CreditCardSummary } from '@common/types/creditCardSummary';
+import { CardItem } from '@common/types/cardItem';
+import { CreditCardBody, CreditCardRequest } from '@common/types/cardPayment';
 import { toNumber } from '@common/utils/formatUtils';
 import { CardMiniatureComponent } from '../card-miniature/card-miniature.component';
-import { CardItem, CardType } from '@common/types/cardItem';
+import { CurrencyInputDirective } from '@common/directives/currency-input.directive';
 
 const NUM_REG = /^\d+(\.\d{1,2})?$/;
+const CARD_NATURAL_W = 360;
+const CARD_NATURAL_H = 218;
+
+export interface CreditCardEditData {
+  card: CreditCardSummary;
+  item: CardItem;
+  options: {
+    days: number[];
+    months: number[];
+    years: number[];
+    colors: string[];
+    status: { value: number; description: string }[];
+  };
+  isValid: () => boolean;
+  getResult: () => CreditCardRequest;
+}
 
 @Component({
   selector: 'app-credit-card-edit-form',
@@ -36,111 +50,72 @@ const NUM_REG = /^\d+(\.\d{1,2})?$/;
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    DialogModule,
-    MatButtonModule,
-    ReactiveFormsModule,
     CardMiniatureComponent,
+    CurrencyInputDirective,
   ],
   templateUrl: './credit-card-edit-form.component.html',
   styleUrl: './credit-card-edit-form.component.scss',
 })
-export class CreditCardEditFormComponent {
-  editForm: FormGroup;
-  card: CreditCardSummary;
-  item: CardItem;
-  header: string = '';
-  options: any;
-  cardType: CardType = CardType.OTHER;
+export class CreditCardEditFormComponent implements OnInit {
+  @ViewChild('cardPreview') cardPreviewRef!: ElementRef<HTMLElement>;
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    public dialogRef: MatDialogRef<CreditCardEditFormComponent>,
-    private fb: FormBuilder
-  ) {
-    this.card = this.dialogData.card;
-    this.item = this.dialogData.item;
-    this.header = this.dialogData.header;
-    this.options = this.dialogData.options;
-    // this.cardType
+  // Set by dialog-wrapper
+  data!: CreditCardEditData;
 
-    const cutDay = this.card.status.cutDate.split(' ')[1].replace(',', '');
-    const dueDay = this.card.status.dueDate.split(' ')[1].replace(',', '');
-    const expMonth = this.card.expiration.split('/')[0];
-    const expYear = +this.card.expiration.split('/')[1] + 2000;
-    const status = this.item.active;
+  editForm!: FormGroup;
+
+  cardScale = 1;
+  private resizeObserver!: ResizeObserver;
+
+  constructor(private fb: FormBuilder, private zone: NgZone) {}
+
+  get cardW(): number { return CARD_NATURAL_W * this.cardScale; }
+  get cardH(): number { return CARD_NATURAL_H * this.cardScale; }
+
+  ngOnInit(): void {
+    const { card, item } = this.data;
+
+    const cutDay   = card.status.cutDate.split(' ')[1].replace(',', '');
+    const dueDay   = card.status.dueDate.split(' ')[1].replace(',', '');
+    const expMonth = card.expiration.split('/')[0];
+    const expYear  = +card.expiration.split('/')[1] + 2000;
 
     this.editForm = this.fb.group({
-      credit: [
-        toNumber(this.card.credit),
-        [Validators.required, Validators.pattern(NUM_REG)],
-      ],
-      usedCredit: [
-        toNumber(this.card.usedCredit),
-        [Validators.required, Validators.pattern(NUM_REG)],
-      ],
-      cutDay: [+cutDay, [Validators.required, Validators.pattern(NUM_REG)]],
-      dueDay: [+dueDay, [Validators.required, Validators.pattern(NUM_REG)]],
-      expMonth: [+expMonth, [Validators.required, Validators.pattern(NUM_REG)]],
-      expYear: [+expYear, [Validators.required, Validators.pattern(NUM_REG)]],
-      ending: [
-        this.card.ending,
-        [Validators.required, Validators.pattern(NUM_REG)],
-      ],
-      color: [this.card.color, [Validators.required]],
-      active: [status, [Validators.required]],
+      credit:     [toNumber(card.credit),     [Validators.required]],
+      usedCredit: [toNumber(card.usedCredit), [Validators.required]],
+      cutDay:     [+cutDay,   [Validators.required]],
+      dueDay:     [+dueDay,   [Validators.required]],
+      expMonth:   [+expMonth, [Validators.required]],
+      expYear:    [+expYear,  [Validators.required]],
+      ending:     [card.ending, [Validators.required, Validators.pattern(NUM_REG)]],
+      color:      [card.color,  [Validators.required]],
+      active:     [item.active, [Validators.required]],
     });
+
+    this.data.isValid   = () => this.editForm.valid;
+    this.data.getResult = () => this.buildResult();
   }
 
-  get credit() {
-    return this.editForm.get('credit');
-  }
-  get usedCredit() {
-    return this.editForm.get('usedCredit');
-  }
-  get cutDay() {
-    return this.editForm.get('cutDay');
-  }
-  get dueDay() {
-    return this.editForm.get('dueDay');
-  }
-  get expMonth() {
-    return this.editForm.get('expMonth');
-  }
-  get expYear() {
-    return this.editForm.get('expYear');
-  }
+  get credit()     { return this.editForm.get('credit'); }
+  get usedCredit() { return this.editForm.get('usedCredit'); }
+  get cutDay()     { return this.editForm.get('cutDay'); }
+  get dueDay()     { return this.editForm.get('dueDay'); }
+  get expMonth()   { return this.editForm.get('expMonth'); }
+  get expYear()    { return this.editForm.get('expYear'); }
+  get ending()     { return this.editForm.get('ending'); }
+  get color()      { return this.editForm.get('color'); }
+  get active()     { return this.editForm.get('active'); }
 
-  get expiration() {
-    const endYear = (this.expYear?.value + '').substring(2);
-    const endMonth = String(this.expMonth?.value + '').padStart(2, '0');
+  get expiration(): string {
+    const endYear  = (this.expYear?.value + '').substring(2);
+    const endMonth = String(this.expMonth?.value ?? '').padStart(2, '0');
     return `${endMonth}/${endYear}`;
   }
 
-  get ending() {
-    return this.editForm.get('ending');
-  }
-  get color() {
-    return this.editForm.get('color');
-  }
-  get active() {
-    return this.editForm.get('active');
-  }
-
-  onSubmit() {
-    if (this.editForm.valid) {
-      const id = this.card.id;
-      const body: any = {
-        ...this.editForm.value,
-        expiration: this.expiration,
-      };
-      delete body.expMonth;
-      delete body.expYear;
-      this.dialogData.formSubmitted({ id, body });
-      this.dialogRef.close();
-    }
-  }
-
-  close() {
-    this.dialogRef.close();
+  private buildResult(): CreditCardRequest {
+    const body: CreditCardBody = { ...this.editForm.value, expiration: this.expiration };
+    delete (body as any).expMonth;
+    delete (body as any).expYear;
+    return { id: this.data.card.id, body };
   }
 }

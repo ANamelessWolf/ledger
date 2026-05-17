@@ -1,0 +1,38 @@
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  min-width: 360px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.section-label {
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0 4px;
+}
+
+.date-row {
+  display: flex;
+  gap: 12px;
+
+  .flex-field {
+    flex: 1;
+  }
+
+  .year-field {
+    width: 110px;
+  }
+}
+
+mat-divider {
+  margin: 8px 0;
+}
+
+.show-paid-check {
+  margin: 8px 0;
+}

@@ -1,4 +1,4 @@
-import { FindManyOptions, In, MoreThanOrEqual } from "typeorm";
+import { FindManyOptions, In, MoreThanOrEqual, Raw } from "typeorm";
 import {
   MontlyInstallmentFilter as MonthlyInstallmentFilter,
   MontlyInstallmentFilter,
@@ -48,10 +48,36 @@ export const getMonthlyFilter = (
     where.creditcardId = In(filter.creditcardId);
   }
 
-  if (filter.archived) {
-    where.archived = In([0, 1]);
-  } else {
+  // Status filter
+  const status = filter.status ?? 'active';
+  if (status === 'active') {
     where.archived = In([0]);
+  } else if (status === 'inactive') {
+    where.archived = In([1]);
+  }
+  // 'all' → no archived filter
+
+  // Date range filter
+  // Active installments that started before the range but extend into it are included.
+  // Inactive/archived installments are filtered only by startDate within the range.
+  const hasFrom = filter.fromYear !== undefined && filter.fromMonth !== undefined;
+  const hasTo = filter.toYear !== undefined && filter.toMonth !== undefined;
+
+  if (hasFrom || hasTo) {
+    const fromDate = hasFrom
+      ? `${filter.fromYear}-${String(filter.fromMonth).padStart(2, '0')}-01`
+      : '2000-01-01';
+    const toDate = hasTo
+      ? `${filter.toYear}-${String(filter.toMonth).padStart(2, '0')}-31`
+      : '2099-12-31';
+
+    where.startDate = Raw(
+      (alias) =>
+        `(${alias} <= :toDate AND ` +
+        `(${alias} >= :fromDate OR ` +
+        `(archived = 0 AND DATE_ADD(${alias}, INTERVAL months MONTH) > :fromDate)))`,
+      { fromDate, toDate }
+    );
   }
 
   return where;
@@ -400,18 +426,21 @@ export function classifyInstallments(
 export function calculateInstallmentTotals(
   month: number,
   year: number,
-  classifiedInstallments: ClassifiedInstallment
+  classifiedInstallments: ClassifiedInstallment,
+  toMonth: number = 12,
+  toYear: number = 9999
 ): MonthlyInstallmentTotal[] {
   const totalsMap: Record<string, MonthlyInstallmentTotal> = {};
 
-  // Format filter key as YYYYMM
-  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterFromKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterToKey = `${toYear}${toMonth.toString().padStart(2, "0")}`;
 
   for (const installmentId in classifiedInstallments) {
     const installment = classifiedInstallments[parseInt(installmentId)];
 
     for (const monthKey in installment.payments) {
-      if (monthKey < filterMonthKey) continue; // Skip months earlier than filter
+      if (monthKey < filterFromKey) continue;
+      if (monthKey > filterToKey) continue;
 
       if (!totalsMap[monthKey]) {
         totalsMap[monthKey] = {
@@ -436,12 +465,14 @@ export async function calculateCreditCardTotals(
   month: number,
   year: number,
   classifiedInstallments: ClassifiedInstallment,
-  creditCards: Creditcard[]
+  creditCards: Creditcard[],
+  toMonth: number = 12,
+  toYear: number = 9999
 ): Promise<CreditCardInstallmentTotals> {
   const totals: CreditCardInstallmentTotals = {};
-  const filterMonthKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterFromKey = `${year}${month.toString().padStart(2, "0")}`;
+  const filterToKey = `${toYear}${toMonth.toString().padStart(2, "0")}`;
   const creditCardName: Record<number, string> = {};
-  // Map Credit Cards by ID for quick lookup
   const creditCardMap: Record<number, Creditcard> = {};
   for (const card of creditCards) {
     creditCardMap[card.id] = card;
@@ -452,7 +483,8 @@ export async function calculateCreditCardTotals(
     const installment = classifiedInstallments[parseInt(installmentId)];
 
     for (const monthKey in installment.payments) {
-      if (monthKey < filterMonthKey) continue; // Skip previous months
+      if (monthKey < filterFromKey) continue;
+      if (monthKey > filterToKey) continue;
 
       if (!totals[monthKey]) {
         totals[monthKey] = [];

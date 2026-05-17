@@ -43,18 +43,26 @@ const HEADERS_ES = {
 
 const BTN_EN = {
   OK: 'OK',
-  CANCEL: 'CANCEL',
-  SUBMIT: 'SUBMIT',
-  YES: 'YES',
-  NO: 'NO',
+  CANCEL: 'Cancel',
+  SUBMIT: 'Submit',
+  YES: 'Yes',
+  NO: 'No',
+  APPLY: 'Apply',
+  SAVE: 'Save',
+  CLOSE: 'Close',
+  CLEAR: 'Clear',
 };
 
 const BTN_ES = {
   OK: 'OK',
-  CANCEL: 'CANCELAR',
-  SUBMIT: 'ENVIAR',
-  YES: 'SI',
-  NO: 'NO',
+  CANCEL: 'Cancelar',
+  SUBMIT: 'Enviar',
+  YES: 'Sí',
+  NO: 'No',
+  APPLY: 'Aplicar',
+  SAVE: 'Guardar',
+  CLOSE: 'Cerrar',
+  CLEAR: 'Limpiar',
 };
 
 const TOOL_TIP_EN = {

@@ -1,81 +1,86 @@
-import { Component, Input } from '@angular/core';
-import { MatGridListModule } from '@angular/material/grid-list';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
+import { MaskCurrencyPipe } from '@common/pipes/mask-currency.pipe';
 import {
   CreditCardSummary,
   EMPTY_CREDIT_CARD_SUMMARY,
 } from '@common/types/creditCardSummary';
 import { CardMiniatureComponent } from '@card/components/card-miniature/card-miniature.component';
-('../card-miniature/card-miniature.component');
 import { CommonModule } from '@angular/common';
 import { CreditCardChartComponent } from '../credit-card-chart/credit-card-chart.component';
+
+const CARD_NATURAL_W = 360;
+const CARD_NATURAL_H = 218;
+const CARD_HEIGHT_RATIO = 0.9;
 
 @Component({
   selector: 'app-credit-card-overview',
   standalone: true,
-  imports: [
-    CommonModule,
-    CardMiniatureComponent,
-    MatGridListModule,
-    CreditCardChartComponent,
-  ],
+  imports: [CommonModule, CardMiniatureComponent, CreditCardChartComponent, MaskCurrencyPipe],
   templateUrl: './credit-card-overview.component.html',
   styleUrl: './credit-card-overview.component.scss',
 })
-export class CreditCardOverviewComponent {
+export class CreditCardOverviewComponent implements AfterViewInit, OnDestroy {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
+  @Input() masked = false;
+  @ViewChild('infoCol') infoColRef!: ElementRef<HTMLElement>;
+
   chartSize = '300px';
+  cardScale = 1;
+
+  private resizeObserver!: ResizeObserver;
+
+  constructor(private zone: NgZone) {}
+
+  get cardW(): number { return CARD_NATURAL_W * this.cardScale; }
+  get cardH(): number { return CARD_NATURAL_H * this.cardScale; }
+
+  ngAfterViewInit(): void {
+    this.resizeObserver = new ResizeObserver(entries => {
+      const h = entries[0].contentRect.height;
+      if (h > 0) {
+        this.zone.run(() => {
+          this.cardScale = (h * CARD_HEIGHT_RATIO) / CARD_NATURAL_H;
+        });
+      }
+    });
+    this.resizeObserver.observe(this.infoColRef.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
 
   get isPending() {
-    if (this.summary && this.summary.status && this.summary.status.status) {
-      this.summary.status.status === 'Pending';
-    }
-    return false;
+    return !!(this.summary?.status?.status === 'Pending');
   }
 
   get daysToPay() {
     try {
       if (this.summary.status) {
-        let date1 = new Date(this.summary.status.payment.dueDate);
-        let date2 = new Date();
-
-        // Calculating the time difference
-        // of two dates
-        let Difference_In_Time = date1.getTime() - date2.getTime();
-
-        // Calculating the no. of days between
-        // two dates
-        let Difference_In_Days = Math.round(
-          Difference_In_Time / (1000 * 3600 * 24)
-        );
-        return Difference_In_Days;
+        const diff = new Date(this.summary.status.payment.dueDate).getTime() - Date.now();
+        return Math.round(diff / (1000 * 3600 * 24));
       }
       return 0;
-    } catch (error) {
+    } catch {
       return 0;
     }
   }
 
   get cutDate() {
-    try {
-      if (this.summary.status) {
-        return this.summary.status.cutDate;
-      }
-      return '';
-    } catch (error) {
-      console.log(error);
-    }
-    return '';
+    try { return this.summary.status?.cutDate ?? ''; }
+    catch { return ''; }
   }
 
   get dueDate() {
-    try {
-      if (this.summary.status) {
-        return this.summary.status.dueDate;
-      }
-      return '';
-    } catch (error) {
-      console.log(error);
-    }
-    return '';
+    try { return this.summary.status?.dueDate ?? ''; }
+    catch { return ''; }
   }
 }

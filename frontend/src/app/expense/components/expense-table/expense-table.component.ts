@@ -54,7 +54,7 @@ export class ExpenseTableComponent {
     'actions',
   ];
   pageSizeOptions: number[] = [5, 10, 25, 100];
-  pageSize: number = 10;
+  pageSize: number = 25;
 
   public constructor(
     private expenseService: ExpensesService,

@@ -167,6 +167,18 @@ export class BudgetSummaryCardComponent implements OnInit {
     return this.allBudgetItems.some((i) => i.budgetId === budgetId);
   }
 
+  get isYearPeriod(): boolean {
+    return this.activePeriod === 'year';
+  }
+
+  get annualSummaries(): BudgetSummary[] {
+    return this.summaries.filter((s) => s.annualBudget === 1);
+  }
+
+  get monthlySummariesInYear(): BudgetSummary[] {
+    return this.summaries.filter((s) => s.annualBudget === 0);
+  }
+
   onDetailsClick(budgetId: number): void {
     let start: string;
     let end: string;

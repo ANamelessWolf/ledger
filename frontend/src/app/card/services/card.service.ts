@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { CardListFilterComponent } from '@card/components/card-list-filter/card-list-filter.component';
-import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
-import { CreditCardEditFormComponent } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
+import { CardListFilterComponent, CardFilterDialogData } from '@card/components/card-list-filter/card-list-filter.component';
+import { CreditCardEditFormComponent, CreditCardEditData } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
+import { CardPaymentFormComponent, CardPaymentData } from '@card/components/card-payment-form/card-payment-form.component';
 import { DebitCardEditFormComponent } from '@card/components/debit-card-edit-form/debit-card-edit-form.component';
+import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogButton } from '@config/enums';
 
 import {
   CARD_STATUS,
@@ -81,15 +83,31 @@ export class CardService {
     options: CardFilterOptions,
     filterSelected: (filter: CardFilter) => void
   ) {
-    const header: string = 'Card Filters';
-    const dialogRef = this.dialog.open(CardListFilterComponent, {
-      width: '600px',
+    const innerData: CardFilterDialogData = {
+      options,
+      getFilter: null,
+      _clearFn: null,
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '460px',
       data: {
-        header: header,
-        options: options,
-        filterSelected: filterSelected,
+        header: 'Card Filters',
+        component: CardListFilterComponent,
+        data: innerData,
+        buttons: [DialogButton.CLEAR, DialogButton.CLOSE, DialogButton.APPLY],
+        validationData: null,
+        validate: () => true,
+        onClear: () => innerData._clearFn?.(),
       },
     });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.button === DialogButton.APPLY && innerData.getFilter) {
+        filterSelected(innerData.getFilter());
+      }
+    });
+
     return dialogRef.afterClosed();
   }
 
@@ -97,15 +115,30 @@ export class CardService {
     summary: CreditCardSummary,
     formSubmitted: (request: CreditCardPaymentRequest) => void
   ) {
-    const header: string = `Add payment to ${summary.card} - ${summary.status.billing.period}`;
-    const dialogRef = this.dialog.open(CardPaymentFormComponent, {
-      width: '600px',
+    const innerData: CardPaymentData = {
+      card: summary,
+      isValid: () => false,
+      getResult: () => ({ id: 0, body: {} as any }),
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '480px',
       data: {
-        header: header,
-        card: summary,
-        formSubmitted: formSubmitted,
+        header: `Add payment to ${summary.card} - ${summary.status.billing.period}`,
+        component: CardPaymentFormComponent,
+        data: innerData,
+        buttons: [DialogButton.CLOSE, DialogButton.SUBMIT],
+        validationData: null,
+        validate: () => innerData.isValid(),
       },
     });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.button === DialogButton.SUBMIT) {
+        formSubmitted(innerData.getResult());
+      }
+    });
+
     return dialogRef.afterClosed();
   }
 
@@ -114,32 +147,40 @@ export class CardService {
     card: CardItem,
     formSubmitted: (request: CreditCardRequest) => void
   ) {
-    const header: string = `Edit ${summary.card} - ${summary.status.billing.period}`;
     const year = new Date().getFullYear() - 1;
-    const years = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => year + x);
-    const cardStatus = [
-      CARD_STATUS.ACTIVE,
-      CARD_STATUS.INACTIVE,
-      CARD_STATUS.CANCELLED,
-    ].map((st: CARD_STATUS) => {
-      return { value: st, description: CARD_STATUS_KEYS[st] };
-    });
-    const dialogRef = this.dialog.open(CreditCardEditFormComponent, {
-      width: '980px',
+    const innerData: CreditCardEditData = {
+      card: summary,
+      item: card,
+      options: {
+        days: APP_CATALOGS.CARD_DAYS,
+        months: APP_CATALOGS.CARD_MONTHS,
+        years: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => year + x),
+        colors: APP_CATALOGS.CARD_COLORS,
+        status: [CARD_STATUS.ACTIVE, CARD_STATUS.INACTIVE, CARD_STATUS.CANCELLED]
+          .map((st) => ({ value: st, description: CARD_STATUS_KEYS[st] })),
+      },
+      isValid: () => false,
+      getResult: () => ({ id: 0, body: {} as any }),
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '680px',
       data: {
-        header: header,
-        card: summary,
-        item: card,
-        options: {
-          days: APP_CATALOGS.CARD_DAYS,
-          months: APP_CATALOGS.CARD_MONTHS,
-          years: years,
-          colors: APP_CATALOGS.CARD_COLORS,
-          status: cardStatus,
-        },
-        formSubmitted: formSubmitted,
+        header: `Edit ${summary.card} - ${summary.status.billing.period}`,
+        component: CreditCardEditFormComponent,
+        data: innerData,
+        buttons: [DialogButton.CLOSE, DialogButton.SAVE],
+        validationData: null,
+        validate: () => innerData.isValid(),
       },
     });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.button === DialogButton.SAVE) {
+        formSubmitted(innerData.getResult());
+      }
+    });
+
     return dialogRef.afterClosed();
   }
 

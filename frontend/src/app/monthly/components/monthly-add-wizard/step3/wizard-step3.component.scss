@@ -1,0 +1,75 @@
+.step-form {
+  padding: 16px 0 8px;
+}
+
+.form-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+
+  app-catalog-item-select {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  app-catalog-item-select ::ng-deep mat-form-field {
+    width: 100%;
+  }
+}
+
+.step3-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.step3-info {
+  flex: 1;
+}
+
+.step3-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 8px;
+
+  .total-label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .total-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1976d2;
+  }
+}
+
+.payments-table-wrapper {
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 12px 0;
+}
+
+.payments-table {
+  width: 100%;
+}
+
+.cell-field {
+  width: 100%;
+  min-width: 180px;
+}
+
+.cell-field-date {
+  width: 160px;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

@@ -1,0 +1,24 @@
+<form [formGroup]="monthsForm" class="step-form">
+  <div class="form-group">
+    <app-catalog-item-select
+      header="Tarjeta de crédito"
+      [items]="creditCards"
+      [control]="creditCardControl"
+      [isRequired]="true"
+      errMessage="Selecciona una tarjeta">
+    </app-catalog-item-select>
+    <mat-form-field appearance="fill" class="months-field">
+      <mat-label>Número de meses</mat-label>
+      <mat-select formControlName="months">
+        <mat-option *ngFor="let m of monthsOptions" [value]="m">{{ m }}</mat-option>
+      </mat-select>
+      <mat-error>Selecciona el número de meses</mat-error>
+    </mat-form-field>
+  </div>
+  <div class="step-actions">
+    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
+    <button type="button" mat-raised-button color="primary" [disabled]="!isValid" (click)="next.emit()">
+      Siguiente
+    </button>
+  </div>
+</form>

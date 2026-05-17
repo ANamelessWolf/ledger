@@ -14,7 +14,7 @@
       </button>
     </div>
   </div>
-  <div class="table">
+  <div class="table" *ngIf="totalItems > 0; else emptyState">
     <app-expense-table
       [header]="tableHeader"
       [expenses]="expenses"
@@ -25,4 +25,10 @@
       (expenseEdited)="onExpenseEdited($event)"
     ></app-expense-table>
   </div>
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>Sin gastos en este periodo</p>
+    </div>
+  </ng-template>
 </div>

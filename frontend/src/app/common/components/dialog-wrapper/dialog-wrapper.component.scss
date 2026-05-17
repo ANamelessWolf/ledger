@@ -1,28 +1,65 @@
-.dialog-container {
+$teal: #087e8b;
+
+.dialog-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-width: 360px;
 }
 
-.header {
-  flex: 0 0 auto;
-  padding: 16px;
-  font-size: 20px;
-  font-weight: bold;
+// ── Header ────────────────────────────────────────────────
+.dialog-header {
+  padding: 20px 24px 16px;
+  border-left: 3px solid $teal;
+  margin-bottom: 4px;
 }
 
-.content {
-  flex: 1 1 auto;
-  padding: 16px;
+.dialog-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.2px;
 }
 
-.footer {
-  flex: 0 0 auto;
-  padding: 16px;
+// ── Content ───────────────────────────────────────────────
+.dialog-content {
+  padding: 0 24px !important;
+  margin: 0 !important;
+}
+
+// ── Footer ────────────────────────────────────────────────
+.dialog-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px 20px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 8px;
+  gap: 8px;
+}
 
-  button {
-    margin-left: 8px;
-  }
+.footer-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+// ── Buttons ───────────────────────────────────────────────
+.btn-clear {
+  color: var(--color-text-muted);
+  border-color: var(--color-border) !important;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: $teal !important;
+  color: white !important;
+}
+
+.btn-secondary {
+  background: transparent !important;
+  color: var(--color-text-muted) !important;
+  border-color: var(--color-border) !important;
 }

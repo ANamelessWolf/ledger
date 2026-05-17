@@ -1,20 +1,36 @@
-<div [ngClass]="isSelected ? 'container selected' : 'container not-selected'">
-  <div [ngClass]="isSelected ? 'selected-item' : 'not-selected-item'">
-    <h3>{{ data.name }}</h3>
-    <p>{{ cardType }}</p>
-    <div>
-      <mat-icon [ngClass]="isActive  ? 'active-icon' : (isCancelled?'cancelled-icon':'inactive-icon')">
-        circle
-      </mat-icon>
-      {{ cardStatus }}
+<div class="item" [class.selected]="isSelected" [class.not-selected]="!isSelected">
+
+  <!-- Selected layout -->
+  <div *ngIf="isSelected" class="selected-content">
+    <div class="info-col">
+      <div class="top-row">
+        <span class="card-name">{{ data.name }}</span>
+        <div *ngIf="data.isCreditCard" class="payment-badge" [ngClass]="statusStyle">{{ data.status }}</div>
+      </div>
+      <span class="card-type">{{ cardType }}</span>
+      <div class="status-row">
+        <span class="status-dot" [ngClass]="statusDotClass"></span>
+        <span class="status-label">{{ cardStatus }}</span>
+      </div>
+    </div>
+    <div class="mini-card-wrapper">
+      <app-card-miniature
+        [miniMode]="true"
+        [color]="data.color || 'blue'"
+        [banking]="data.entity"
+        [ending]="data.ending">
+      </app-card-miniature>
     </div>
   </div>
-  <div *ngIf="data.isCreditCard" class="chip {{ statusStyle }}">{{
-    data.status
-  }}</div>
-  <div [ngClass]="isSelected ? 'card-info' : 'card-info-gray'">
-    <h3 *ngIf="isSelected">{{ data.entity }}</h3>
-    <div></div>
-    <p>{{ cardEnding }}</p>
-  </div>
+
+  <!-- Not selected layout -->
+  <ng-container *ngIf="!isSelected">
+    <span class="status-dot" [ngClass]="statusDotClass"></span>
+    <div class="main-info">
+      <span class="card-name">{{ data.name }}</span>
+      <span class="sub-info">{{ cardType }} · {{ cardEnding }}</span>
+    </div>
+    <div *ngIf="data.isCreditCard" class="payment-badge" [ngClass]="statusStyle">{{ data.status }}</div>
+  </ng-container>
+
 </div>

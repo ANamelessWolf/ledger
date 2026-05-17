@@ -34,11 +34,41 @@
     </mat-form-field>
   </div>
 
-  <!-- Summary cards -->
-  <p *ngIf="summaries.length === 0" class="no-data">No budgets to display.</p>
+  <!-- Scrollable cards area -->
+  <div class="cards-scroll-area">
 
-  <div class="cards-grid">
-    <mat-card *ngFor="let s of summaries" class="summary-card">
+    <!-- Non-year periods -->
+    <ng-container *ngIf="!isYearPeriod">
+      <p *ngIf="summaries.length === 0" class="no-data">No budgets to display.</p>
+      <div class="cards-grid">
+        <ng-container *ngTemplateOutlet="cardTpl; context: { $implicit: summaries, readonly: false }"></ng-container>
+      </div>
+    </ng-container>
+
+    <!-- Year period: annual budgets first, then monthly read-only -->
+    <ng-container *ngIf="isYearPeriod">
+      <ng-container *ngIf="annualSummaries.length > 0">
+        <p class="section-label">Annual budgets</p>
+        <div class="cards-grid">
+          <ng-container *ngTemplateOutlet="cardTpl; context: { $implicit: annualSummaries, readonly: false }"></ng-container>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="monthlySummariesInYear.length > 0">
+        <p class="section-label">Monthly budgets (Annual view)</p>
+        <div class="cards-grid">
+          <ng-container *ngTemplateOutlet="cardTpl; context: { $implicit: monthlySummariesInYear, readonly: true }"></ng-container>
+        </div>
+      </ng-container>
+
+      <p *ngIf="summaries.length === 0" class="no-data">No budgets to display.</p>
+    </ng-container>
+
+  </div>
+
+  <!-- Card template -->
+  <ng-template #cardTpl let-list let-readonly="readonly">
+    <mat-card *ngFor="let s of list" class="summary-card">
       <mat-card-header>
         <mat-icon mat-card-avatar>{{ s.icon || 'account_balance_wallet' }}</mat-icon>
         <mat-card-title>{{ s.description }}</mat-card-title>
@@ -90,7 +120,7 @@
           (click)="toggleExpand(s.budgetId, $event)">
           <mat-icon>{{ isExpanded(s.budgetId) ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
-        <button type="button" mat-icon-button matTooltip="Manage items"
+        <button *ngIf="!readonly" type="button" mat-icon-button matTooltip="Manage items"
           (click)="onManageItemsClick(s.budgetId, $event)">
           <mat-icon>playlist_add</mat-icon>
         </button>
@@ -99,6 +129,6 @@
         </button>
       </mat-card-actions>
     </mat-card>
-  </div>
+  </ng-template>
 
 </div>

@@ -1,48 +1,54 @@
-<h2 class="header" mat-dialog-title>{{ data.header }}</h2>
-<hr />
-<div class="filer-form">
-  <mat-dialog-content class="form-group" [formGroup]="filterForm">
-    <div>
-      <app-catalog-item-select
-        header="Financing Entity"
-        [items]="data.options.entities"
-        [control]="entityControl"
-      ></app-catalog-item-select>
-    </div>
-    <div>
-      <mat-form-field appearance="fill">
-        <mat-label>Card Status</mat-label>
-        <mat-select formControlName="active">
-          <mat-option
-            *ngFor="let status of data.options.cardStatus"
-            [value]="status.value"
-          >
-            {{ status.description }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div>
-      <h3>Card Type</h3>
-      <mat-checkbox
-        *ngFor="let card of cardTypes"
-        formControlName="{{ card.name }}"
-        [value]="card.value"
-        >{{ card.description }}</mat-checkbox
-      >
-    </div>
-  </mat-dialog-content>
-  <div class="form-actions">
-    <div>
-      <button mat-raised-button type="button" (click)="onApply()">Apply</button>
-      <button
-        mat-raised-button
-        class="secondary-btn"
-        type="button"
-        (click)="onCancel()"
-      >
-        Cancel
-      </button>
+<div class="filter-body" *ngIf="filterForm" [formGroup]="filterForm">
+
+  <!-- Entity -->
+  <div class="filter-section">
+    <span class="section-label">Financing Entity</span>
+    <app-catalog-item-select
+      [items]="data.options.entities"
+      [control]="entityControl"
+    />
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Card type -->
+  <div class="filter-section">
+    <span class="section-label">Card Type</span>
+    <div class="checkbox-row">
+      <label class="check-chip" *ngFor="let card of cardTypes">
+        <mat-checkbox [formControlName]="card.name" color="primary"></mat-checkbox>
+        <span>{{ card.description }}</span>
+      </label>
     </div>
   </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Status -->
+  <div class="filter-section">
+    <span class="section-label">Status</span>
+    <div class="checkbox-row">
+      <label class="check-chip" [class.active]="anyStatus" (click)="toggleAny()">
+        <mat-checkbox [checked]="anyStatus" color="primary" (click)="$event.preventDefault()"></mat-checkbox>
+        <span>Any</span>
+      </label>
+      <label class="check-chip">
+        <mat-checkbox formControlName="showActive" color="primary"></mat-checkbox>
+        <span>Active</span>
+      </label>
+      <label class="check-chip">
+        <mat-checkbox formControlName="showInactive" color="primary"></mat-checkbox>
+        <span>Inactive</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Show cancelled -->
+  <div class="filter-section cancelled-row">
+    <label class="check-chip warning">
+      <mat-checkbox formControlName="showCancelled" color="warn"></mat-checkbox>
+      <span>Show cancelled cards</span>
+    </label>
+  </div>
+
 </div>

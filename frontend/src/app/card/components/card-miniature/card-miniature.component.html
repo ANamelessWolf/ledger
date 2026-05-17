@@ -1,11 +1,30 @@
 <div class="card-container {{ color }}">
-  <p class="header">{{ banking }}</p>
-  <div class="rect"></div>
-  <div class="exp">
-    <p class="label">Exp</p>
-    <p>{{ expiration }}</p>
-  </div>
-  <p class="card-number">{{ endingCard }}</p>
-  <fa-icon [icon]="iconCard"></fa-icon>
-</div>
+  <div class="card-shine"></div>
 
+  <div class="card-top">
+    <span class="card-bank">{{ banking }}</span>
+    <div class="card-chip">
+      <div class="chip-line chip-h"></div>
+      <div class="chip-line chip-v"></div>
+    </div>
+  </div>
+
+  <div class="card-middle" *ngIf="!miniMode">
+    <div class="contactless">
+      <span class="wave w1"></span>
+      <span class="wave w2"></span>
+      <span class="wave w3"></span>
+    </div>
+  </div>
+
+  <div class="card-bottom">
+    <div class="card-num">{{ endingCard }}</div>
+    <div class="card-footer" *ngIf="!miniMode">
+      <div class="card-exp">
+        <span class="exp-label">EXP</span>
+        <span class="exp-value">{{ expiration }}</span>
+      </div>
+      <img [src]="networkLogo" [class]="'card-network ' + networkClass" alt="" />
+    </div>
+  </div>
+</div>

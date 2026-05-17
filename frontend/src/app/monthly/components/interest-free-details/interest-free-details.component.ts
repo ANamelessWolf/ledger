@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { NoIntMonthlyInstallment } from '@moNoInt/types/monthlyNoInterest';
 import { PurchaseTableComponent } from '../purchase-table/purchase-table.component';
@@ -13,11 +13,15 @@ import { PurchaseTableComponent } from '../purchase-table/purchase-table.compone
 })
 export class InterestFreeDetailsComponent {
   @Input() installments: NoIntMonthlyInstallment[] = [];
+  @Input() statusFilter: 'active' | 'inactive' | 'all' = 'active';
+  @Input() showPaid = false;
+  @Output() refreshRequest = new EventEmitter<void>();
 
-  get activeInstallments() {
-    return this.installments?.filter(
-      (installment) =>
-        installment.payments.filter((payment) => !payment.isPaid).length > 0
-    ); //.filter(installment => installment.months !== installment.paidMonths);
+  get displayInstallments() {
+    let result = this.installments ?? [];
+    if (!this.showPaid) {
+      result = result.filter((i) => i.paidMonths < i.months);
+    }
+    return result;
   }
 }

@@ -40,6 +40,7 @@
   </div>
   <app-credit-card-overview
     [summary]="creditCardSummary"
+    [masked]="!visibility"
     *ngIf="card.isCreditCard"
   />
   <app-debit-card-overview
@@ -53,6 +54,7 @@
     <app-credit-card-spending-chart
       *ngIf="card.isCreditCard"
       [cardSpending]="creditCardSpending"
+      [masked]="!visibility"
     />
   </div>
   <div class="divider-pad">

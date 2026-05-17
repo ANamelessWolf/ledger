@@ -14,12 +14,12 @@ import {
   CardFilterOptions,
   CardItem,
   EMPTY_CARD_ITEM,
-  PAYMENT_STATUS,
 } from '@common/types/cardItem';
 import { SpinnerComponent } from '@common/components/spinner/spinner.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CardService } from '@card/services/card.service';
 import { HEADERS } from '@config/messages';
+import { CatalogItem } from '@common/types/catalogTypes';
 
 @Component({
   selector: 'app-card-list-view',
@@ -37,14 +37,16 @@ import { HEADERS } from '@config/messages';
   providers: [CatalogService, NotificationService],
 })
 export class CardListViewComponent implements OnInit {
-  // Component variables
   @Input() selectedCard: CardItem = EMPTY_CARD_ITEM;
   @Input() cardId!: number;
   @Output() cardSelected = new EventEmitter<CardItem>();
+
   isLoading = true;
   error = false;
   cards: CardItem[] = [];
   hasFilter: boolean = false;
+
+  private allEntities: CatalogItem[] = [];
 
   options: CardFilterOptions = {
     entities: [],
@@ -54,9 +56,7 @@ export class CardListViewComponent implements OnInit {
       CARD_STATUS.ACTIVE,
       CARD_STATUS.INACTIVE,
       CARD_STATUS.CANCELLED,
-    ].map((st: CARD_STATUS) => {
-      return { value: st, description: CARD_STATUS_KEYS[st] };
-    }),
+    ].map((st: CARD_STATUS) => ({ value: st, description: CARD_STATUS_KEYS[st] })),
   };
 
   constructor(
@@ -75,11 +75,7 @@ export class CardListViewComponent implements OnInit {
     const status = card.isSelected;
     this.cards.forEach((c) => (c.isSelected = false));
     card.isSelected = !status;
-    if (card.isSelected) {
-      this.cardSelected.emit(card);
-    } else {
-      this.cardSelected.emit(EMPTY_CARD_ITEM);
-    }
+    this.cardSelected.emit(card.isSelected ? card : EMPTY_CARD_ITEM);
   }
 
   openFilter() {
@@ -89,78 +85,77 @@ export class CardListViewComponent implements OnInit {
   }
 
   applyFilter(filter: CardFilter) {
-    if (
+    const isDefault =
       filter.entityId === 0 &&
       filter.crediCardType === 2 &&
-      filter.active === CARD_STATUS.ANY
-    ) {
-      this.options.filter = undefined;
-      this.hasFilter = false;
-    } else {
-      this.options.filter = filter;
-      this.hasFilter = true;
-    }
+      filter.active === CARD_STATUS.ANY &&
+      !filter.showCancelled;
+
+    this.options.filter = isDefault ? undefined : filter;
+    this.hasFilter = !isDefault;
     this.getCards();
   }
 
-  private pickCard() {
+  private pickCard(): CardItem {
     let card = this.cards[0];
     const cardType = this.router.url.split('/')[2];
     if (cardType === 'cc' && this.cardId) {
-      const filtered = this.cards.filter(
-        (c: CardItem) => c.isCreditCard && c.id === this.cardId
-      );
-      if (filtered.length > 0) {
-        card = filtered[0];
-      }
+      const filtered = this.cards.filter((c) => c.isCreditCard && c.id === this.cardId);
+      if (filtered.length > 0) card = filtered[0];
     } else if (cardType === 'dc' && this.cardId) {
-      const filtered = this.cards.filter(
-        (c: CardItem) => !c.isCreditCard && c.id === this.cardId
-      );
-      if (filtered.length > 0) {
-        card = filtered[0];
-      }
+      const filtered = this.cards.filter((c) => !c.isCreditCard && c.id === this.cardId);
+      if (filtered.length > 0) card = filtered[0];
     }
     return card;
   }
 
+  private updateEntityOptions(): void {
+    const entityIds = new Set(this.cards.map((c) => c.entityId));
+    this.options.entities = this.allEntities.filter(
+      (e) => e.id === 0 || entityIds.has(e.id)
+    );
+  }
+
   private getCards() {
-    this.catalogService.getCards(this.options.filter).subscribe(
-      (response) => {
-        this.cards = response.data.map((row: any) => {
-          return {
-            ...row,
-            active: row.active as CARD_STATUS,
-            isCreditCard: row.isCreditCard === '1',
-          };
-        });
+    this.catalogService.getCards(this.options.filter).subscribe({
+      next: (response) => {
+        let rows: CardItem[] = response.data.map((row: any) => ({
+          ...row,
+          active: row.active as CARD_STATUS,
+          isCreditCard: row.isCreditCard === '1',
+        }));
+
+        if (!this.options.filter?.showCancelled) {
+          rows = rows.filter((c) => c.active !== CARD_STATUS.CANCELLED);
+        }
+
+        this.cards = rows;
+        this.updateEntityOptions();
+
         if (this.cards.length > 0) {
           const card = this.pickCard();
           card.isSelected = true;
           this.cardSelected.emit(card);
         }
       },
-      (err: HttpErrorResponse) => {
+      error: (err: HttpErrorResponse) => {
         this.error = true;
         this.notifService.showError(err);
       },
-      //Complete
-      () => {
-        this.isLoading = false;
-      }
-    );
+      complete: () => { this.isLoading = false; },
+    });
   }
 
   private getFinancingEntities() {
-    this.catalogService.getFinancingEntities().subscribe(
-      (response) => {
-        this.options.entities = response.data;
-        this.options.entities.unshift({ id: 0, name: HEADERS.ANY });
+    this.catalogService.getFinancingEntities().subscribe({
+      next: (response) => {
+        this.allEntities = [{ id: 0, name: HEADERS.ANY }, ...response.data];
+        this.options.entities = this.allEntities;
       },
-      (err: HttpErrorResponse) => {
+      error: (err: HttpErrorResponse) => {
         this.error = true;
         this.notifService.showError(err);
-      }
-    );
+      },
+    });
   }
 }

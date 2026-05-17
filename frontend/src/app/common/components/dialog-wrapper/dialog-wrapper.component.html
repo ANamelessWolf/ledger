@@ -1,17 +1,35 @@
-<div class="dialog-container">
-  <div class="header">
-    {{ dialogData.header }}
+<div class="dialog-wrapper">
+
+  <div class="dialog-header">
+    <span class="dialog-title">{{ dialogData.header }}</span>
   </div>
-  <div class="content" #content>
-  </div>
-  <div class="footer">
+
+  <mat-dialog-content class="dialog-content">
+    <ng-container #content></ng-container>
+  </mat-dialog-content>
+
+  <div class="dialog-footer">
     <button
+      *ngIf="hasClearButton"
       mat-stroked-button
-      *ngFor="let button of dialogData.buttons"
-      class="{{ getButtonStyle(button) }}"
-      (click)="onButtonClick(button)"
+      class="btn-clear"
+      type="button"
+      (click)="onClear()"
     >
-      {{ getButtonHeader(button) }}
+      <mat-icon>clear_all</mat-icon> Clear
     </button>
+
+    <div class="footer-right">
+      <button
+        *ngFor="let button of actionButtons"
+        mat-flat-button
+        [class]="getButtonStyle(button)"
+        type="button"
+        (click)="onButtonClick(button)"
+      >
+        {{ getButtonHeader(button) }}
+      </button>
+    </div>
   </div>
+
 </div>

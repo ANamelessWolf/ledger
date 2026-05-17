@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatSortModule } from '@angular/material/sort';
 import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
 import { MatButtonModule } from '@angular/material/button';
 import { InstallmentPayment } from '@moNoInt/types/monthlyNoInterest';
@@ -53,22 +53,18 @@ export class PaymentListComponent {
   pay(row: InstallmentPayment) {
     this.isProcessing = true;
     this.error = false;
-    this.data.pay(row.id, row.paymentId).subscribe(
-      (response) => {
-        const result = response.data;
-        console.log(result);
-      },
-      this.errorResponse,
-      () => {
+    this.data.pay(row.id, row.paymentId).subscribe({
+      next: () => {
         row.isPaid = true;
+        this.payments = [...this.payments];
         this.isProcessing = false;
-      }
-    );
-  }
-
-  private errorResponse(err: HttpErrorResponse) {
-    console.log(err.message);
-    this.error = true;
+      },
+      error: (err: HttpErrorResponse) => {
+        console.log(err.message);
+        this.error = true;
+        this.isProcessing = false;
+      },
+    });
   }
 
   close() {

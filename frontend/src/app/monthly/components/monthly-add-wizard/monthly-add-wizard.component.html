@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>Nueva mensualidad sin intereses</h2>
+
+<mat-dialog-content class="wizard-content">
+  <mat-stepper [linear]="true" #stepper orientation="horizontal">
+
+    <mat-step label="Tarjeta y meses" [completed]="isStep1Valid">
+      <app-wizard-step1
+        [creditCards]="data.creditCards"
+        [creditCardControl]="creditCardControl"
+        [monthsForm]="step1Form"
+        [monthsOptions]="monthsOptions"
+        [isValid]="isStep1Valid"
+        (cancel)="cancel()"
+        (next)="stepper.next()">
+      </app-wizard-step1>
+    </mat-step>
+
+    <mat-step label="Gasto" [completed]="isStep2Valid">
+      <app-wizard-step2
+        [expenseTypes]="data.expenseTypes"
+        [vendors]="data.vendors"
+        [cardWalletItems]="cardWalletItems"
+        [newExpenseForm]="newExpenseForm"
+        [walletControl]="walletControl"
+        [expenseTypeControl]="expenseTypeControl"
+        [vendorControl]="vendorControl"
+        [searchControl]="searchControl"
+        [searchResults]="searchResults"
+        [selectedExisting]="selectedExisting"
+        [isSearching]="isSearching"
+        [isValid]="isStep2Valid"
+        [selectedMonths]="selectedMonths"
+        [descriptionHint]="descriptionHint"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (next)="onStep2Next()"
+        (tabChange)="onTabChange($event)"
+        (selectExisting)="onSelectExisting($event)">
+      </app-wizard-step2>
+    </mat-step>
+
+    <mat-step label="Mensualidades" [completed]="isStep3Valid">
+      <app-wizard-step3
+        [expenseTypes]="data.expenseTypes"
+        [vendors]="data.vendors"
+        [paymentRows]="paymentRows"
+        [paymentTypeControl]="paymentTypeControl"
+        [paymentVendorControl]="paymentVendorControl"
+        [paymentTotal]="paymentTotal"
+        [isValid]="isStep3Valid"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (next)="stepper.next()">
+      </app-wizard-step3>
+    </mat-step>
+
+    <mat-step label="Resumen">
+      <app-wizard-step4
+        [creditCardName]="selectedCard?.name ?? ''"
+        [selectedMonths]="selectedMonths"
+        [expenseDescription]="expenseDescription"
+        [paymentTotal]="paymentTotal"
+        [paymentRows]="paymentRows"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (confirm)="confirm()">
+      </app-wizard-step4>
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>

@@ -7,7 +7,7 @@ import {
 } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import QueryString from "qs";
-import { FindManyOptions } from "typeorm";
+import { FindManyOptions, In } from "typeorm";
 import { AppDataSource } from "..";
 import {
   MonthlyNonInterest,
@@ -21,8 +21,6 @@ import {
   getCurrentMonthlyCreditTotals,
   getMonthlyFilter,
   getMonthlyInstallmentItemResponse,
-  // getMonthlyInstallmentTotals,
-  // getMonthlyInstallmentTotals2,
   payMonthlyInstallment,
   updatePaidMonths,
 } from "../utils/monthlyInstallmentUtils";
@@ -38,9 +36,9 @@ import {
 import { Creditcard } from "../models/ledger";
 import { CreditCardCutDays } from "../types/newMonthlyInstallment";
 import { MonthlyInterestPaymentsSummary } from "../models/banking/summary";
-// import { NewMonthlyInstallment } from "../types/newMonthlyInstallment";
-// import { Expense } from "../models/expenses";
-// import { getExpenseById } from "../utils/expenseUtils";
+import { Expense } from "../models/expenses";
+import { MonthlyWizardPayload } from "../types/monthlyWizardPayload";
+import { createMonthlyInstallment } from "../services/MonthlyService";
 /**
  * Retrieves a list of all monthly free installments with his asigned payments
  * @summary Retrieves list of montly buys with payments
@@ -62,8 +60,7 @@ export const getMonthlyInstallments = asyncErrorHandler(
         cutDaysByCreditCard[card.id] = card.cutDay;
       });
       // 2: Get filter from query
-      // TODO : Implement getMonthlyFilter
-      const filter = buildFilter(req.query);
+      const filter = await buildFilter(req.query);
       const where = getMonthlyFilter(filter);
       const options: FindManyOptions<MonthlyNonInterest> = { where };
 
@@ -82,26 +79,47 @@ export const getMonthlyInstallments = asyncErrorHandler(
       options.skip = skip;
       options.take = take;
 
-      // 3: Select all monthly non interest with the filter
+      // 3: Select filtered installments (paginated for result, all for totals)
       const items: MonthlyNonInterest[] = await AppDataSource.manager.find(
-        MonthlyNonInterest
+        MonthlyNonInterest,
+        options
       );
-      const count = await AppDataSource.manager.count(MonthlyNonInterest);
-      const payments: MonthlyInstallmentPayment[] =
-        await AppDataSource.manager.find(MonthlyInstallmentPayment);
+      const count = await AppDataSource.manager.count(MonthlyNonInterest, { where: options.where });
 
-      // 4: Calculate the totals
+      // Fetch all matching installment IDs (without pagination) for accurate totals
+      const allMatchingItems: MonthlyNonInterest[] = await AppDataSource.manager.find(
+        MonthlyNonInterest,
+        { where: options.where }
+      );
+      const allItemIds = allMatchingItems.map((i) => i.id);
+
+      const payments: MonthlyInstallmentPayment[] = allItemIds.length > 0
+        ? await AppDataSource.manager.find(MonthlyInstallmentPayment, {
+            where: { id: In(allItemIds) },
+          })
+        : [];
+
+      // 4: Calculate the totals scoped to the filter's date range
+      const fromMonth = filter.fromMonth ?? 1;
+      const fromYear = filter.fromYear ?? new Date().getFullYear();
+      const toMonth = filter.toMonth ?? 12;
+      const toYear = filter.toYear ?? new Date().getFullYear();
+
       const installments = classifyInstallments(payments, cutDaysByCreditCard);
       const installmentTotals = calculateInstallmentTotals(
-        11,
-        2023,
-        installments
+        fromMonth,
+        fromYear,
+        installments,
+        toMonth,
+        toYear
       );
       const creditCardTotals = await calculateCreditCardTotals(
-        11,
-        2023,
+        fromMonth,
+        fromYear,
         installments,
-        creditCards
+        creditCards,
+        toMonth,
+        toYear
       );
       const currentCreditCardTotals =
         getCurrentMonthlyCreditTotals(creditCardTotals);
@@ -292,15 +310,138 @@ export const payInstallment = asyncErrorHandler(
 export const createMonthlyExpense = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const { total, buyDate, description, walletId, expenseTypeId, vendorId, months } =
-      //   req.body;
-      // TO DO: Implement createMonthlyExpense
-
+      const payload: MonthlyWizardPayload = req.body;
+      const result = await createMonthlyInstallment(payload);
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
       console.log(error);
       return next(
         new Exception(
           `An error occurred adding a new Expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get credit cards with wallet group info for the wizard
+ * @route GET /monthly/credit-cards
+ */
+export const getCreditCardsForWizard = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+        where: { active: 1 },
+      });
+      const result = await Promise.all(
+        cards.map(async (card) => {
+          const wg = await card.walletGroup;
+          return {
+            id: card.id,
+            name: wg ? wg.name : `Card ${card.id}`,
+            walletGroupId: card.walletGroupId,
+            color: card.color,
+          };
+        })
+      );
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting credit cards`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Get wallets belonging to a wallet group with their currency info
+ * @route GET /monthly/wallets/:walletGroupId
+ */
+export const getWalletsByGroup = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const walletGroupId = +req.params.walletGroupId;
+      const rows: any[] = await AppDataSource.query(
+        `SELECT walletId AS id, wallet AS name, currencyId, currency
+         FROM vw_wallet_list
+         WHERE walletGroupId = ?`,
+        [walletGroupId]
+      );
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: rows }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred getting wallets`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
+ * Search expenses within the wallets of a wallet group
+ * @route GET /monthly/search-expenses?walletGroupId=&description=
+ */
+export const searchExpensesForInstallment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { walletGroupId, description } = req.query;
+      if (!walletGroupId) {
+        return next(new Exception("walletGroupId is required", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      const wallets: any[] = await AppDataSource.query(
+        `SELECT walletId AS id, wallet AS name, currencyId, currency
+         FROM vw_wallet_list
+         WHERE walletGroupId = ?`,
+        [+walletGroupId]
+      );
+
+      if (wallets.length === 0) {
+        return res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: [] }));
+      }
+
+      const walletIds = wallets.map((w: any) => w.id);
+      const desc = description ? `%${description}%` : "%";
+
+      const expenses: Expense[] = await AppDataSource.getRepository(Expense)
+        .createQueryBuilder("e")
+        .where("e.walletId IN (:...walletIds)", { walletIds })
+        .andWhere("e.description LIKE :desc", { desc })
+        .orderBy("e.buyDate", "DESC")
+        .take(20)
+        .getMany();
+
+      const walletMap = new Map<number, any>(wallets.map((w: any) => [w.id, w]));
+
+      const result = expenses.map((e) => {
+        const w = walletMap.get(e.walletId);
+        return {
+          id: e.id,
+          description: e.description,
+          total: e.total,
+          buyDate: formatDate(e.buyDate),
+          wallet: w?.name ?? "",
+          walletId: e.walletId,
+          currencyId: w?.currencyId ?? 0,
+          currency: w?.currency ?? "",
+        };
+      });
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred searching expenses`,
           HTTP_STATUS.INTERNAL_SERVER_ERROR
         )
       );
@@ -348,14 +489,8 @@ export const getMonthlyInterestPaymentsSummary = asyncErrorHandler(
   }
 );
 
-const buildFilter = (query: QueryString.ParsedQs): MontlyInstallmentFilter => {
-  const { creditCard, archived } = query;
-  let isArchived: number | undefined = undefined;
-  if (archived !== undefined) {
-    isArchived = ["1", "0"].includes(archived.toString())
-      ? +archived.toString()
-      : undefined;
-  }
+const buildFilter = async (query: QueryString.ParsedQs): Promise<MontlyInstallmentFilter> => {
+  const { creditCard, status, fromMonth, fromYear, toMonth, toYear, walletGroupId } = query;
 
   const filter: MontlyInstallmentFilter = {
     creditcardId:
@@ -363,8 +498,31 @@ const buildFilter = (query: QueryString.ParsedQs): MontlyInstallmentFilter => {
         ?.toString()
         .split(",")
         .map((id) => +id) || undefined,
-    archived: isArchived,
+    status: ['active', 'inactive', 'all'].includes(status?.toString() ?? '')
+      ? (status?.toString() as 'active' | 'inactive' | 'all')
+      : 'active',
+    fromMonth: fromMonth ? +fromMonth.toString() : undefined,
+    fromYear: fromYear ? +fromYear.toString() : undefined,
+    toMonth: toMonth ? +toMonth.toString() : undefined,
+    toYear: toYear ? +toYear.toString() : undefined,
   };
+
+  // Resolve walletGroupId → creditcard IDs
+  if (walletGroupId) {
+    const groupId = +walletGroupId.toString();
+    const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, {
+      where: { walletGroupId: groupId },
+    });
+    const cardIds = cards.map((c) => c.id);
+    if (cardIds.length > 0) {
+      filter.creditcardId = filter.creditcardId
+        ? filter.creditcardId.filter((id) => cardIds.includes(id))
+        : cardIds;
+    } else {
+      filter.creditcardId = [-1]; // no match
+    }
+  }
+
   return filter;
 };
 

@@ -168,7 +168,7 @@ export const getWeekSummaryByOwnerId = asyncErrorHandler(
       const raw = await callGetBudgetSummary(ownerId, start, end, 0);
       const result = raw.map((row: any) => {
         const weeklyBudget = round2(calcWeeklyBudget(row.budgetTotal, monday, sunday));
-        return { ...row, budgetTotal: weeklyBudget, remaining: round2(weeklyBudget - row.spentTotal) };
+        return { ...row, annualBudget: 0, budgetTotal: weeklyBudget, remaining: round2(weeklyBudget - row.spentTotal) };
       });
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
@@ -185,7 +185,8 @@ export const getMonthSummaryByOwnerId = asyncErrorHandler(
       const { start, end } = req.query.start && req.query.end
         ? { start: req.query.start.toString(), end: req.query.end.toString() }
         : getMonthRange();
-      const result = await callGetBudgetSummary(ownerId, start, end, 0);
+      const rawMonth = await callGetBudgetSummary(ownerId, start, end, 0);
+      const result = rawMonth.map((row: any) => ({ ...row, annualBudget: 0 }));
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
     } catch (error) {
       console.error(error);
@@ -201,11 +202,29 @@ export const getYearSummaryByOwnerId = asyncErrorHandler(
       const { start, end } = req.query.start && req.query.end
         ? { start: req.query.start.toString(), end: req.query.end.toString() }
         : getYearRange();
-      const raw = await callGetBudgetSummary(ownerId, start, end, 1);
-      const result = raw.map((row: any) => {
-        return { ...row, remaining: round2(row.budgetTotal - row.spentTotal) };
+
+      const [annualRows, monthlyRows] = await Promise.all([
+        callGetBudgetSummary(ownerId, start, end, 1),
+        callGetBudgetSummary(ownerId, start, end, 0),
+      ]);
+
+      const annualResult = annualRows.map((row: any) => ({
+        ...row,
+        annualBudget: 1,
+        remaining: round2(row.budgetTotal - row.spentTotal),
+      }));
+
+      const monthlyResult = monthlyRows.map((row: any) => {
+        const yearlyBudget = round2(row.budgetTotal * 12);
+        return {
+          ...row,
+          annualBudget: 0,
+          budgetTotal: yearlyBudget,
+          remaining: round2(yearlyBudget - row.spentTotal),
+        };
       });
-      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: [...annualResult, ...monthlyResult] }));
     } catch (error) {
       console.error(error);
       return next(new Exception("Error getting year summary", HTTP_STATUS.INTERNAL_SERVER_ERROR));
