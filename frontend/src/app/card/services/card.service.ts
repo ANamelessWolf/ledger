@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { CardListFilterComponent } from '@card/components/card-list-filter/card-list-filter.component';
+import { CardListFilterComponent, CardFilterDialogData } from '@card/components/card-list-filter/card-list-filter.component';
+import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogButton } from '@config/enums';
 import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
 import { CreditCardEditFormComponent } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
 import { DebitCardEditFormComponent } from '@card/components/debit-card-edit-form/debit-card-edit-form.component';
@@ -81,15 +83,31 @@ export class CardService {
     options: CardFilterOptions,
     filterSelected: (filter: CardFilter) => void
   ) {
-    const header: string = 'Card Filters';
-    const dialogRef = this.dialog.open(CardListFilterComponent, {
-      width: '600px',
+    const innerData: CardFilterDialogData = {
+      options,
+      getFilter: null,
+      _clearFn: null,
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '460px',
       data: {
-        header: header,
-        options: options,
-        filterSelected: filterSelected,
+        header: 'Card Filters',
+        component: CardListFilterComponent,
+        data: innerData,
+        buttons: [DialogButton.CLEAR, DialogButton.CLOSE, DialogButton.APPLY],
+        validationData: null,
+        validate: () => true,
+        onClear: () => innerData._clearFn?.(),
       },
     });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.button === DialogButton.APPLY && innerData.getFilter) {
+        filterSelected(innerData.getFilter());
+      }
+    });
+
     return dialogRef.afterClosed();
   }
 

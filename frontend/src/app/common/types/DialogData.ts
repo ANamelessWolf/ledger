@@ -8,4 +8,5 @@ export interface DialogData {
   data: any;
   buttons: DialogButton[];
   validate: (data: any) => boolean;
+  onClear?: () => void;
 }

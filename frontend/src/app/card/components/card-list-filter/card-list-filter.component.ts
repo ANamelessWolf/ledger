@@ -1,23 +1,21 @@
-import { Component, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import {
-  CARD_STATUS,
-  CardFilter,
-  CardFilterOptions,
-} from '@common/types/cardItem';
+import { CARD_STATUS, CardFilter, CardFilterOptions } from '@common/types/cardItem';
 import { HEADERS } from '@config/messages';
 import { CatalogItem } from '@common/types/catalogTypes';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
+
+export interface CardFilterDialogData {
+  options: CardFilterOptions;
+  getFilter: (() => CardFilter) | null;
+  _clearFn: (() => void) | null;
+}
+
 @Component({
   selector: 'app-card-list-filter',
   standalone: true,
@@ -26,80 +24,94 @@ import { CatalogItemSelectComponent } from '@common/components/catalog-item-sele
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
-    MatCardModule,
-    MatSelectModule,
     MatAutocompleteModule,
-    MatButtonModule,
     ReactiveFormsModule,
-    DialogModule,
-    CatalogItemSelectComponent
+    CatalogItemSelectComponent,
   ],
   templateUrl: './card-list-filter.component.html',
   styleUrl: './card-list-filter.component.scss',
 })
-export class CardListFilterComponent {
-  filterForm: FormGroup;
+export class CardListFilterComponent implements OnInit {
+  // Set by dialog-wrapper
+  data!: CardFilterDialogData;
+
+  filterForm!: FormGroup;
   entityControl = new FormControl();
 
   cardTypes = [
-    { name: 'isCreditCard', value: '1', description: HEADERS.C_CARD },
-    { name: 'isDebitCard', value: '2', description: HEADERS.D_CARD },
+    { name: 'isCreditCard', description: HEADERS.C_CARD },
+    { name: 'isDebitCard',  description: HEADERS.D_CARD },
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<CardListFilterComponent>,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      header: string;
-      options: CardFilterOptions;
-      filterSelected: (filter: CardFilter) => void;
-    }
-  ) {
-    let filter = {
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    const filter: CardFilter = this.data.options.filter ?? {
       entityId: 0,
       crediCardType: 2,
       active: CARD_STATUS.ANY,
+      showCancelled: false,
     };
-    if (data.options.filter) {
-      filter = data.options.filter;
-    }
-    const selEntName = data.options.entities.filter(
-      (x: CatalogItem) => x.id === filter.entityId
-    );
-    const entName: string =
-      selEntName.length > 0 ? selEntName[0].name : HEADERS.ANY;
+
+    const selEnt = this.data.options.entities.find((x: CatalogItem) => x.id === filter.entityId);
+    const entName = selEnt?.name ?? HEADERS.ANY;
+
     this.filterForm = this.fb.group({
-      entityId: [filter.entityId],
-      entityName: [entName],
-      isCreditCard: [filter.crediCardType === 1 || filter.crediCardType === 2],
-      isDebitCard: [filter.crediCardType === 0 || filter.crediCardType === 2],
-      active: [filter.active],
+      isCreditCard:  [filter.crediCardType === 1 || filter.crediCardType === 2],
+      isDebitCard:   [filter.crediCardType === 0 || filter.crediCardType === 2],
+      showActive:    [filter.active === CARD_STATUS.ACTIVE   || filter.active === CARD_STATUS.ANY],
+      showInactive:  [filter.active === CARD_STATUS.INACTIVE || filter.active === CARD_STATUS.ANY],
+      showCancelled: [filter.showCancelled ?? false],
     });
 
     this.entityControl.setValue(entName);
+
+    // Register callbacks so dialog-wrapper can reach them
+    this.data.getFilter = () => this.computeFilter();
+    this.data._clearFn  = () => this.doClear();
   }
 
-  getCreditCardType(form: FormGroup<any>): number {
-    if (form.value.isCreditCard && form.value.isDebitCard) return 2;
-    else return form.value.isCreditCard ? 1 : 0;
+  get anyStatus(): boolean {
+    return this.filterForm.value.showActive && this.filterForm.value.showInactive;
   }
 
-  onApply() {
-    if (this.filterForm.valid) {
-      const selectedEntity = this.entityControl.value;
-      const filter: CardFilter = {
-        entityId: selectedEntity ? selectedEntity.id : 0,
-        crediCardType: this.getCreditCardType(this.filterForm),
-        active: this.filterForm.value.active,
-      };
-      this.data.filterSelected(filter);
-      this.dialogRef.close();
-    }
+  toggleAny(): void {
+    const next = !this.anyStatus;
+    this.filterForm.patchValue({ showActive: next, showInactive: next });
   }
 
-  onCancel() {
-    this.dialogRef.close();
+  private computeFilter(): CardFilter {
+    const { isCreditCard, isDebitCard, showActive, showInactive, showCancelled } = this.filterForm.value;
+    const selectedEntity = this.entityControl.value;
+
+    let crediCardType = 2;
+    if (isCreditCard && isDebitCard) crediCardType = 2;
+    else if (isCreditCard) crediCardType = 1;
+    else crediCardType = 0;
+
+    let active: number;
+    if (showActive && showInactive) active = CARD_STATUS.ANY;
+    else if (showActive)            active = CARD_STATUS.ACTIVE;
+    else if (showInactive)          active = CARD_STATUS.INACTIVE;
+    else                            active = CARD_STATUS.ANY;
+
+    return {
+      entityId: selectedEntity?.id ?? 0,
+      crediCardType,
+      active,
+      showCancelled,
+    };
   }
 
+  private doClear(): void {
+    this.filterForm.patchValue({
+      isCreditCard:  true,
+      isDebitCard:   true,
+      showActive:    true,
+      showInactive:  true,
+      showCancelled: false,
+    });
+    const anyEnt = this.data.options.entities.find((e) => e.id === 0);
+    this.entityControl.setValue(anyEnt ?? { id: 0, name: HEADERS.ANY });
+  }
 }

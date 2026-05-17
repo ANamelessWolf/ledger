@@ -71,6 +71,7 @@ export type CardFilter = {
   entityId: number;
   crediCardType: number;
   active: number;
+  showCancelled: boolean;
 };
 
 export type CardFilterOptions = {
