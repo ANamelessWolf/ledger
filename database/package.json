@@ -1,0 +1,29 @@
+{
+  "name": "ledger-database",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Database administration project for Ledger.",
+  "type": "module",
+  "scripts": {
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:backup": "tsx scripts/backup.ts",
+    "db:restore": "tsx scripts/restore.ts",
+    "db:rebuild": "tsx scripts/rebuild.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "dotenv": "^16.4.7",
+    "glob": "^11.0.1",
+    "mysql2": "^3.12.0",
+    "ora": "^8.1.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/node": "^22.10.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
