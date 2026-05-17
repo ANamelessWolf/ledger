@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
 .list-header {
   position: relative;
   width: 100%;
@@ -29,6 +34,7 @@
 }
 
 .scrollable-container {
+  height: 100%;
   overflow-y: auto;
   margin: 0;
   padding: 0;

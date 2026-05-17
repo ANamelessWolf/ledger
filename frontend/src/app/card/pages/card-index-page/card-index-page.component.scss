@@ -13,4 +13,6 @@
 .card-main-area {
   flex: 1;
   padding: 16px;
+  overflow: hidden;
+  min-height: 0;
 }
