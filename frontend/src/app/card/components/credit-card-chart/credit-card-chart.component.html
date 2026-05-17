@@ -1,1 +1,7 @@
-<canvas id="creditCardChart" [ngStyle]="{width: size, height: size}"></canvas>
+<div class="chart-wrap" [ngStyle]="{ width: size, height: size }">
+  <canvas id="creditCardChart"></canvas>
+  <div class="chart-center">
+    <span class="center-value">{{ usedPct }}%</span>
+    <span class="center-label">used</span>
+  </div>
+</div>

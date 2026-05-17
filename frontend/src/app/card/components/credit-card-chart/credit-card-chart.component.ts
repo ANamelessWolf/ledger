@@ -22,7 +22,7 @@ import { Chart, registerables } from 'chart.js';
 })
 export class CreditCardChartComponent implements OnInit, OnChanges {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
-  @Input() size: string = '250px';
+  @Input() size: string = '220px';
   private chart!: any;
 
   ngOnInit(): void {
@@ -42,6 +42,24 @@ export class CreditCardChartComponent implements OnInit, OnChanges {
     }
   }
 
+  get usedPct(): number {
+    const used = toNumber(this.summary?.usedCredit ?? 0);
+    const limit = toNumber(this.summary?.credit ?? 0);
+    if (limit === 0) return 0;
+    if (used < 0) return 0;
+    return round((used / limit) * 100);
+  }
+
+  private cssVar(name: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  private usageColor(pct: number): string {
+    if (pct < 40) return this.cssVar('--color-green-fill');
+    if (pct < 75) return this.cssVar('--color-yellow-fill');
+    return this.cssVar('--color-red-fill');
+  }
+
   private createChart(): void {
     const ctx = (
       document.getElementById('creditCardChart') as HTMLCanvasElement
@@ -51,11 +69,17 @@ export class CreditCardChartComponent implements OnInit, OnChanges {
       type: 'doughnut',
       data: this.getChartData(),
       options: {
+        cutout: '78%',
         plugins: {
+          legend: { display: false },
           tooltip: {
+            backgroundColor: '#1e293b',
+            titleColor: '#94a3b8',
+            bodyColor: '#f1f5f9',
+            padding: 10,
+            cornerRadius: 8,
             callbacks: {
-              label: (tooltipItem) =>
-                `${tooltipItem.label}: ${tooltipItem.raw}%`,
+              label: (item) => ` ${item.label}: ${item.raw}%`,
             },
           },
         },
@@ -64,33 +88,29 @@ export class CreditCardChartComponent implements OnInit, OnChanges {
   }
 
   private getChartData() {
-    const usedCredit = this.summary ? toNumber(this.summary.usedCredit) : 0;
-    const limitCredit = this.summary ? toNumber(this.summary.credit) : 0;
-    let usedPercentage = round((usedCredit / limitCredit) * 100);
-    let remainingPercentage = round(100 - usedPercentage);
+    const usedCredit = toNumber(this.summary?.usedCredit ?? 0);
+    const limitCredit = toNumber(this.summary?.credit ?? 0);
+    let usedPct = round((usedCredit / limitCredit) * 100);
+    let remainingPct = round(100 - usedPct);
 
-    let backgroundColor;
+    let usedColor: string;
+
     if (usedCredit < 0) {
-      remainingPercentage = (limitCredit + usedCredit * -1) / limitCredit;
-      remainingPercentage = round(remainingPercentage * 100);
-      usedPercentage = 0;
-      backgroundColor = ['black', '#beb9ef'];
+      remainingPct = round(((limitCredit + usedCredit * -1) / limitCredit) * 100);
+      usedPct = 0;
+      usedColor = this.cssVar('--color-text-subtle');
     } else {
-      if (usedPercentage < 40) {
-        backgroundColor = ['greenyellow', '#beb9ef'];
-      } else if (usedPercentage >= 40 && usedPercentage < 75) {
-        backgroundColor = ['gold', '#beb9ef'];
-      } else {
-        backgroundColor = ['#ff3c3c', '#beb9ef'];
-      }
+      usedColor = this.usageColor(usedPct);
     }
 
     return {
-      labels: ['Expenses', 'Available balance'],
+      labels: ['Used', 'Available'],
       datasets: [
         {
-          data: [usedPercentage, remainingPercentage],
-          backgroundColor,
+          data: [usedPct, remainingPct],
+          backgroundColor: [usedColor, 'rgba(0,0,0,0.05)'],
+          borderColor: [usedColor, 'rgba(0,0,0,0.06)'],
+          borderWidth: 1,
         },
       ],
     };

@@ -1,91 +1,138 @@
-.card-overview {
-  position: relative;
-  padding-left: 20px;
-  height: 380px;
-  min-width: 1200px;
+$teal: #087e8b;
 
-  h1 {
-    font-size: x-large;
-    font-weight: bold;
-  }
+:host {
+  display: block;
+}
+
+.card-overview {
+  padding: 4px 20px 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-left: 10px;
+  border-left: 3px solid $teal;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.days-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: $teal;
+  background: var(--color-teal-light);
+  border: 1px solid var(--color-teal-border);
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+// ── 3-column body ────────────────────────────────────────
+.overview-body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
+// Col 1 — data (40% of flexible space)
+.info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 2;
+  min-width: 0;
+}
+
+.balance-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(8, 126, 139, 0.07), rgba(8, 126, 139, 0.02));
+  border: 1px solid var(--color-teal-border);
+  border-radius: 12px;
+}
+
+.balance-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.balance-amount {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.cell-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cell-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+
+  &.danger { color: var(--color-danger); }
+}
+
+// Col 2 — card miniature (fixed, does not grow)
+.card-col {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// width/height set dynamically via style bindings (ResizeObserver → cardW/cardH)
+.mini-card-wrapper {
+  overflow: hidden;
+  position: relative;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 
   app-card-miniature {
     position: absolute;
-    right: 380px;
-    top: 40px;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
   }
 }
 
-.card-balance {
-  position: absolute;
-  width: 300px;
-  height: 72px;
-
-  h2 {
-    color: black;
-    font-size: large;
-    font-weight: bold;
-    margin-top: 5px;
-  }
-
-  p {
-    margin-top: 20px;
-    font-size: xx-large;
-    font-weight: bold;
-  }
-}
-
-.card-details {
-  position: absolute;
-  width: 320px;
-  top: 140px;
-
-  .left-column {
-    display: flex;
-    color: darkgray;
-    font-size: large;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: left;
-  }
-
-  mat-grid-list {
-    div {
-      width: 100%;
-      display: flex;
-      align-items: flex-start;
-    }
-  }
-
-  .column {
-    color: darkgray;
-    font-size: large;
-    margin: 0px;
-  }
-
-  .value {
-    font-weight: lighter;
-    .highlight {
-      font-weight: bold;
-      font-size: x-large;
-      margin: 0px;
-    }
-  }
-}
-
-.card-percentage {
-  position: absolute;
-  width: 337px;
-  left: 355px;
-  top: 0px;
-
-  canvas {
-    height: 250px;
-    width: 250px;
-  }
-}
-
-.card-notes {
-  position: absolute;
-  bottom: 10px;
+// Col 3 — doughnut chart (fixed, does not grow)
+.chart-col {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: left;
 }

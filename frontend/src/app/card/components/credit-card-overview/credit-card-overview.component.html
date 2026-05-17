@@ -1,39 +1,70 @@
 <div class="card-overview" *ngIf="summary">
-  <h1>Overview</h1>
-  <div class="card-balance">
-    <h2>Available Balance</h2>
-    <p>{{ summary.available }}</p>
-  </div>
-  <div class="card-details">
-    <mat-grid-list cols="2" rowHeight="28px">
-      <mat-grid-tile class="column"> Credit Limit </mat-grid-tile>
-      <mat-grid-tile class="column"> Used Credit </mat-grid-tile>
-      <mat-grid-tile class="value">{{ summary.credit }}</mat-grid-tile>
-      <mat-grid-tile class="value"><p class="highlight">{{ summary.usedCredit }}</p></mat-grid-tile>
-      <mat-grid-tile *ngIf="summary.installment" class="column"> Installments </mat-grid-tile>
-      <mat-grid-tile *ngIf="summary.installment" class="column"> Monthly Payment </mat-grid-tile>
-      <mat-grid-tile *ngIf="summary.installment" class="value">{{ summary.installment.balance }}</mat-grid-tile>
-      <mat-grid-tile *ngIf="summary.installment" class="value">{{ summary.installment.monthlyPayment }}</mat-grid-tile>
-      <mat-grid-tile class="column"> Cut date </mat-grid-tile>
-      <mat-grid-tile class="column"> Due date </mat-grid-tile>
-      <mat-grid-tile class="value">{{ cutDate }}</mat-grid-tile>
-      <mat-grid-tile class="value">{{ dueDate }}</mat-grid-tile>
-    </mat-grid-list>
+
+  <div class="section-header">
+    <span class="section-title">Overview</span>
+    <span *ngIf="isPending" class="days-badge">{{ daysToPay }} days to pay</span>
   </div>
 
-  <div class="card-percentage">
-    <app-credit-card-chart [summary]="summary" [size]="chartSize" />
-  </div>
+  <div class="overview-body">
 
-  <app-card-miniature
-    color="{{ summary.color }}"
-    banking="{{ summary.banking }}"
-    expiration="{{ summary.expiration }}"
-    ending="{{ summary.ending }}"
-    [cardType]="summary.type"
-  />
+    <!-- Col 1: balance + details -->
+    <div class="info-col" #infoCol>
+      <div class="balance-card">
+        <span class="balance-label">Available Balance</span>
+        <span class="balance-amount">{{ summary.available }}</span>
+      </div>
 
-  <div class="card-notes">
-    <p *ngIf="isPending">Dias para pagar {{ daysToPay }}</p>
+      <div class="details-grid">
+        <div class="detail-cell">
+          <span class="cell-label">Credit Limit</span>
+          <span class="cell-value">{{ summary.credit }}</span>
+        </div>
+        <div class="detail-cell">
+          <span class="cell-label">Used Credit</span>
+          <span class="cell-value danger">{{ summary.usedCredit }}</span>
+        </div>
+
+        <ng-container *ngIf="summary.installment">
+          <div class="detail-cell">
+            <span class="cell-label">Installments</span>
+            <span class="cell-value">{{ summary.installment.balance }}</span>
+          </div>
+          <div class="detail-cell">
+            <span class="cell-label">Monthly Payment</span>
+            <span class="cell-value">{{ summary.installment.monthlyPayment }}</span>
+          </div>
+        </ng-container>
+
+        <div class="detail-cell">
+          <span class="cell-label">Cut Date</span>
+          <span class="cell-value">{{ cutDate }}</span>
+        </div>
+        <div class="detail-cell">
+          <span class="cell-label">Due Date</span>
+          <span class="cell-value">{{ dueDate }}</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="chart-col">
+      <app-credit-card-chart [summary]="summary" [size]="chartSize" />
+    </div>
+
+    <div class="card-col">
+      <div class="mini-card-wrapper"
+           [style.width.px]="cardW"
+           [style.height.px]="cardH">
+        <app-card-miniature
+          [color]="summary.color"
+          [banking]="summary.banking"
+          [expiration]="summary.expiration"
+          [ending]="summary.ending"
+          [cardType]="summary.type"
+          [style.transform]="'scale(' + cardScale + ')'"
+        />
+      </div>
+    </div>
+
   </div>
 </div>
