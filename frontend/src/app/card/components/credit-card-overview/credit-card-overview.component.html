@@ -11,27 +11,27 @@
     <div class="info-col" #infoCol>
       <div class="balance-card">
         <span class="balance-label">Available Balance</span>
-        <span class="balance-amount">{{ summary.available }}</span>
+        <span class="balance-amount">{{ summary.available | maskCurrency:masked }}</span>
       </div>
 
       <div class="details-grid">
         <div class="detail-cell">
           <span class="cell-label">Credit Limit</span>
-          <span class="cell-value">{{ summary.credit }}</span>
+          <span class="cell-value">{{ summary.credit | maskCurrency:masked }}</span>
         </div>
         <div class="detail-cell">
           <span class="cell-label">Used Credit</span>
-          <span class="cell-value danger">{{ summary.usedCredit }}</span>
+          <span class="cell-value danger">{{ summary.usedCredit | maskCurrency:masked }}</span>
         </div>
 
         <ng-container *ngIf="summary.installment">
           <div class="detail-cell">
             <span class="cell-label">Installments</span>
-            <span class="cell-value">{{ summary.installment.balance }}</span>
+            <span class="cell-value">{{ summary.installment.balance | maskCurrency:masked }}</span>
           </div>
           <div class="detail-cell">
             <span class="cell-label">Monthly Payment</span>
-            <span class="cell-value">{{ summary.installment.monthlyPayment }}</span>
+            <span class="cell-value">{{ summary.installment.monthlyPayment | maskCurrency:masked }}</span>
           </div>
         </ng-container>
 
@@ -48,7 +48,7 @@
 
 
     <div class="chart-col">
-      <app-credit-card-chart [summary]="summary" [size]="chartSize" />
+      <app-credit-card-chart [summary]="summary" [size]="chartSize" [masked]="masked" />
     </div>
 
     <div class="card-col">

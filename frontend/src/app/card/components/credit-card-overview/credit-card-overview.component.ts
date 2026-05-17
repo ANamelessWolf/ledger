@@ -7,6 +7,7 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
+import { MaskCurrencyPipe } from '@common/pipes/mask-currency.pipe';
 import {
   CreditCardSummary,
   EMPTY_CREDIT_CARD_SUMMARY,
@@ -22,12 +23,13 @@ const CARD_HEIGHT_RATIO = 0.9;
 @Component({
   selector: 'app-credit-card-overview',
   standalone: true,
-  imports: [CommonModule, CardMiniatureComponent, CreditCardChartComponent],
+  imports: [CommonModule, CardMiniatureComponent, CreditCardChartComponent, MaskCurrencyPipe],
   templateUrl: './credit-card-overview.component.html',
   styleUrl: './credit-card-overview.component.scss',
 })
 export class CreditCardOverviewComponent implements AfterViewInit, OnDestroy {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
+  @Input() masked = false;
   @ViewChild('infoCol') infoColRef!: ElementRef<HTMLElement>;
 
   chartSize = '300px';

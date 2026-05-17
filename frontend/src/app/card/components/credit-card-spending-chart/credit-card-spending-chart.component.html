@@ -10,19 +10,19 @@
     <div class="stats-panel">
       <div class="stat-card">
         <span class="stat-label">Monthly Average</span>
-        <span class="stat-value">{{ cardSpending.average }}</span>
+        <span class="stat-value">{{ cardSpending.average | maskCurrency:masked }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Max Spending</span>
-        <span class="stat-value danger">{{ cardSpending.max }}</span>
+        <span class="stat-value danger">{{ cardSpending.max | maskCurrency:masked }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Min Spending</span>
-        <span class="stat-value success">{{ cardSpending.min }}</span>
+        <span class="stat-value success">{{ cardSpending.min | maskCurrency:masked }}</span>
       </div>
       <div class="stat-card accent">
         <span class="stat-label">Annual Total</span>
-        <span class="stat-value">{{ total | currencyFormat }}</span>
+        <span class="stat-value">{{ masked ? '$** **.**' : (total | currencyFormat) }}</span>
       </div>
     </div>
   </div>

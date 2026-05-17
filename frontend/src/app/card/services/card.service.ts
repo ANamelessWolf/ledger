@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CardListFilterComponent, CardFilterDialogData } from '@card/components/card-list-filter/card-list-filter.component';
 import { CreditCardEditFormComponent, CreditCardEditData } from '@card/components/credit-card-edit-form/credit-card-edit-form.component';
-import { CardPaymentFormComponent } from '@card/components/card-payment-form/card-payment-form.component';
+import { CardPaymentFormComponent, CardPaymentData } from '@card/components/card-payment-form/card-payment-form.component';
 import { DebitCardEditFormComponent } from '@card/components/debit-card-edit-form/debit-card-edit-form.component';
 import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
 import { DialogButton } from '@config/enums';
@@ -115,15 +115,30 @@ export class CardService {
     summary: CreditCardSummary,
     formSubmitted: (request: CreditCardPaymentRequest) => void
   ) {
-    const header: string = `Add payment to ${summary.card} - ${summary.status.billing.period}`;
-    const dialogRef = this.dialog.open(CardPaymentFormComponent, {
-      width: '600px',
+    const innerData: CardPaymentData = {
+      card: summary,
+      isValid: () => false,
+      getResult: () => ({ id: 0, body: {} as any }),
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '480px',
       data: {
-        header: header,
-        card: summary,
-        formSubmitted: formSubmitted,
+        header: `Add payment to ${summary.card} - ${summary.status.billing.period}`,
+        component: CardPaymentFormComponent,
+        data: innerData,
+        buttons: [DialogButton.CLOSE, DialogButton.SUBMIT],
+        validationData: null,
+        validate: () => innerData.isValid(),
       },
     });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.button === DialogButton.SUBMIT) {
+        formSubmitted(innerData.getResult());
+      }
+    });
+
     return dialogRef.afterClosed();
   }
 

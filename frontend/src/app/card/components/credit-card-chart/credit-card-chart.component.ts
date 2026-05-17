@@ -23,6 +23,7 @@ import { Chart, registerables } from 'chart.js';
 export class CreditCardChartComponent implements OnInit, OnChanges {
   @Input() summary: CreditCardSummary = EMPTY_CREDIT_CARD_SUMMARY;
   @Input() size: string = '220px';
+  @Input() masked = false;
   private chart!: any;
 
   ngOnInit(): void {
@@ -30,7 +31,7 @@ export class CreditCardChartComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['summary']) {
+    if (changes['summary'] || changes['masked']) {
       this.updateChart();
     }
   }
@@ -38,6 +39,7 @@ export class CreditCardChartComponent implements OnInit, OnChanges {
   private updateChart(): void {
     if (this.chart) {
       this.chart.data = this.getChartData();
+      this.chart.options.plugins.tooltip.enabled = !this.masked;
       this.chart.update();
     }
   }

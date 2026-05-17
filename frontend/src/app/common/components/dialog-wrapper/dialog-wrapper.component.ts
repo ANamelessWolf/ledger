@@ -53,7 +53,8 @@ export class DialogWrapperComponent implements OnInit, AfterViewInit {
   }
 
   onButtonClick(button: DialogButton): void {
-    if (this.dialogData.validate(this.dialogData.validationData)) {
+    const secondary: DialogButton[] = [DialogButton.CANCEL, DialogButton.NO, DialogButton.CLOSE];
+    if (secondary.includes(button) || this.dialogData.validate(this.dialogData.validationData)) {
       this.dialogRef.close({ data: this.dialogData.data, button });
     }
   }

@@ -14,6 +14,7 @@ import {
   EMPTY_CREDIT_CARD_SPENDING,
 } from '@common/types/creditCardSummary';
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
+import { MaskCurrencyPipe } from '@common/pipes/mask-currency.pipe';
 
 const ticksFormat = (value: string | number) => {
   return typeof value === 'number' ? toCurrency(value) : value;
@@ -22,12 +23,13 @@ const ticksFormat = (value: string | number) => {
 @Component({
   selector: 'app-credit-card-spending-chart',
   standalone: true,
-  imports: [CommonModule, CurrencyFormatPipe],
+  imports: [CommonModule, CurrencyFormatPipe, MaskCurrencyPipe],
   templateUrl: './credit-card-spending-chart.component.html',
   styleUrl: './credit-card-spending-chart.component.scss',
 })
 export class CreditCardSpendingChartComponent {
   @Input() cardSpending: CreditCardSpending = EMPTY_CREDIT_CARD_SPENDING;
+  @Input() masked = false;
   @Input() sizeWidth: string = '70%';
   @Input() sizeHeight: string = '400px';
   private chart!: any;
@@ -37,7 +39,7 @@ export class CreditCardSpendingChartComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['cardSpending']) {
+    if (changes['cardSpending'] || changes['masked']) {
       this.updateChart();
     }
   }
@@ -45,6 +47,10 @@ export class CreditCardSpendingChartComponent {
   private updateChart(): void {
     if (this.chart) {
       this.chart.data = this.getChartData();
+      this.chart.options.plugins.tooltip.enabled = !this.masked;
+      this.chart.options.scales.y.ticks.callback = this.masked
+        ? () => '••••'
+        : ticksFormat;
       this.chart.update();
     }
   }
