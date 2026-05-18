@@ -11,6 +11,7 @@ import walletRoutes from './walletRoutes';
 import monthlyRoute from './monthlyRoute';
 import budgetRoutes from './budgetRoutes';
 import subscriptionRoutes from './subscriptionRoutes';
+import accountRoutes from './accountRoutes';
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use('/wallet', walletRoutes);
 router.use('/monthly', monthlyRoute);
 router.use('/budget', budgetRoutes);
 router.use('/subscription', subscriptionRoutes);
+router.use('/accounts', accountRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

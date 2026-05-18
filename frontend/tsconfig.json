@@ -34,6 +34,7 @@
       "@config/*": ["app/config/*"],
       "@subscription/*": ["app/subscription/*"],
       "@budget/*": ["app/budget/*"],
+      "@account/*": ["app/account/*"],
     }
   },
   "angularCompilerOptions": {

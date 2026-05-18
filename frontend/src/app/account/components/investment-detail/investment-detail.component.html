@@ -1,0 +1,122 @@
+<div class="detail-container">
+
+  <!-- Overview Card -->
+  <div class="overview-card">
+    <div class="overview-header">
+      <div class="overview-icon investment-icon">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="overview-info">
+        <div class="account-name-row">
+          <h2 class="account-name">{{ account.name }}</h2>
+          <span class="financing-type-pill" *ngIf="account.typeName">{{ account.typeName }}</span>
+        </div>
+        <p class="account-desc">{{ account.description }}</p>
+        <span class="account-type-badge">Investment Account</span>
+      </div>
+      <button mat-icon-button type="button" class="edit-btn" (click)="openEditAccount()" matTooltip="Edit account">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+
+    <div class="overview-metrics">
+      <div class="metric">
+        <span class="metric-label">Total Balance</span>
+        <span class="metric-value">{{ detail.defaultCurrencySymbol }} {{ detail.totalBalance | number:'1.2-2' }}</span>
+      </div>
+      <div class="metric" *ngIf="mainSection">
+        <span class="metric-label">Main Balance</span>
+        <span class="metric-value main-bal">
+          {{ mainSection.currencySymbol }} {{ mainSection.balance | number:'1.2-2' }}
+          <span class="converted" *ngIf="mainSection.currencySymbol !== detail.defaultCurrencySymbol">
+            ≈ {{ detail.defaultCurrencySymbol }} {{ mainSection.balanceInDefault | number:'1.2-2' }}
+          </span>
+        </span>
+      </div>
+      <div class="metric" *ngIf="mainSection">
+        <span class="metric-label">Status</span>
+        <span class="metric-value">
+          <span class="status-badge" [class.locked]="mainSection.isLocked" [class.available]="mainSection.isAvailable">
+            {{ mainSection.isLocked ? 'Locked' : mainSection.isAvailable ? 'Available' : 'Unavailable' }}
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sections Table -->
+  <div class="sections-panel">
+    <div class="sections-header">
+      <h3>Sections</h3>
+      <button mat-flat-button class="btn-add" (click)="openAddSection()">
+        <mat-icon>add</mat-icon> Add Section
+      </button>
+    </div>
+
+    <div class="empty-sections" *ngIf="secondarySections.length === 0">
+      <mat-icon>folder_open</mat-icon>
+      <span>No additional sections. Click "Add Section" to create one.</span>
+    </div>
+
+    <table mat-table [dataSource]="secondarySections" class="sections-table" *ngIf="secondarySections.length > 0">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let s">{{ s.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let s">
+          <div class="section-name-cell">
+            <span class="section-name">{{ s.name }}</span>
+            <div class="section-badges">
+              <span class="badge badge-investment" *ngIf="s.isInvestment">Investment</span>
+              <span class="badge badge-locked" *ngIf="s.isLocked">Locked</span>
+              <span class="badge badge-unavailable" *ngIf="!s.isAvailable && !s.isLocked && !(s.isInvestment && !s.investmentStartDate && !s.investmentEndDate)">Unavailable</span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="balance">
+        <th mat-header-cell *matHeaderCellDef>Balance</th>
+        <td mat-cell *matCellDef="let s">
+          <div class="balance-cell">
+            <span class="balance-primary">{{ s.currencySymbol }} {{ s.balance | number:'1.2-2' }}</span>
+            <span class="balance-converted" *ngIf="s.currencySymbol !== detail.defaultCurrencySymbol">
+              ≈ {{ detail.defaultCurrencySymbol }} {{ s.balanceInDefault | number:'1.2-2' }}
+            </span>
+            <div class="investment-info" *ngIf="s.isInvestment">
+              <span class="inv-rate">{{ s.investmentRate }}% p/a · ends {{ formatDate(s.investmentEndDate) }}</span>
+              <span class="inv-earnings" *ngIf="projectedEarnings(s) !== null">
+                +{{ s.currencySymbol }} {{ projectedEarnings(s) | number:'1.2-2' }} projected
+              </span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let s">
+          <button mat-icon-button [matMenuTriggerFor]="sectionMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #sectionMenu="matMenu">
+            <button mat-menu-item (click)="openEditSection(s)">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-menu-item class="delete-item" (click)="deleteSection(s)">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+</div>

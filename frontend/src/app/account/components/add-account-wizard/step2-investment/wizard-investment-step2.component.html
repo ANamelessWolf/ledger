@@ -1,0 +1,42 @@
+<div class="step-content" [formGroup]="form">
+  <h3 class="step-title">Investment Details</h3>
+  <p class="step-subtitle">Configure your investment account</p>
+
+  <div class="info-box">
+    <mat-icon>info_outline</mat-icon>
+    <span>The initial balance will be locked and set as unavailable until a section is configured.</span>
+  </div>
+
+  <div class="form-fields">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId">
+        <mat-option *ngFor="let c of currencies" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Initial Balance</mat-label>
+      <input matInput type="number" formControlName="balance" placeholder="0.00" />
+      <mat-error *ngIf="form.get('balance')?.hasError('required')">Balance is required</mat-error>
+      <mat-error *ngIf="form.get('balance')?.hasError('min')">Balance must be 0 or greater</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="step-actions">
+    <button mat-stroked-button type="button" (click)="cancel.emit()">Cancel</button>
+    <button mat-stroked-button type="button" (click)="previous.emit()">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+    <button
+      mat-flat-button
+      class="btn-primary"
+      type="button"
+      [disabled]="form.invalid"
+      (click)="confirm.emit()"
+    >
+      Create Account
+    </button>
+  </div>
+</div>

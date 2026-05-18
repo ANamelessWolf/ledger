@@ -1,0 +1,33 @@
+<div class="page-container">
+  <div class="account-list-area">
+    <app-account-list-view
+      (accountSelected)="onAccountSelected($event)"
+      (addRequested)="onAddRequested()"
+    ></app-account-list-view>
+  </div>
+
+  <div class="account-main-area">
+    <div class="loading-overlay" *ngIf="isLoadingDetail">
+      <app-spinner></app-spinner>
+    </div>
+
+    <ng-container *ngIf="!isLoadingDetail && accountDetail">
+      <app-savings-detail
+        *ngIf="isSavings"
+        [detail]="accountDetail"
+        (refresh)="onDetailRefresh()"
+      ></app-savings-detail>
+
+      <app-investment-detail
+        *ngIf="!isSavings"
+        [detail]="accountDetail"
+        (refresh)="onDetailRefresh()"
+      ></app-investment-detail>
+    </ng-container>
+
+    <div class="empty-state" *ngIf="!isLoadingDetail && !accountDetail">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>Select an account to view details</span>
+    </div>
+  </div>
+</div>

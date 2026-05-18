@@ -1,0 +1,66 @@
+<div class="step-content" [formGroup]="form">
+  <h3 class="step-title">Savings Details</h3>
+  <p class="step-subtitle">Configure your savings account</p>
+
+  <div class="form-fields">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Wallet Group</mat-label>
+      <mat-select formControlName="walletGroupId" (selectionChange)="onGroupOrCurrencyChange()">
+        <mat-option *ngFor="let group of walletGroups" [value]="group.id">{{ group.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('walletGroupId')?.hasError('required')">Wallet group is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId" (selectionChange)="onGroupOrCurrencyChange()">
+        <mat-option *ngFor="let c of currencies" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+    </mat-form-field>
+
+    <div class="wallet-resolve" *ngIf="isResolvingWallet">
+      <mat-icon class="spin">sync</mat-icon>
+      <span>Looking up preferred wallet…</span>
+    </div>
+    <div class="wallet-found" *ngIf="preferredWalletName && !isResolvingWallet">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>Preferred wallet: <strong>{{ preferredWalletName }}</strong></span>
+    </div>
+    <div class="wallet-error" *ngIf="walletError && !isResolvingWallet">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ walletError }}</span>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Financing Entity</mat-label>
+      <mat-select formControlName="entityId">
+        <mat-option *ngFor="let e of entities" [value]="e.id">{{ e.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('entityId')?.hasError('required')">Entity is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Initial Balance</mat-label>
+      <input matInput type="number" formControlName="balance" placeholder="0.00" />
+      <mat-error *ngIf="form.get('balance')?.hasError('required')">Balance is required</mat-error>
+      <mat-error *ngIf="form.get('balance')?.hasError('min')">Balance must be 0 or greater</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="step-actions">
+    <button mat-stroked-button type="button" (click)="cancel.emit()">Cancel</button>
+    <button mat-stroked-button type="button" (click)="previous.emit()">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+    <button
+      mat-flat-button
+      class="btn-primary"
+      type="button"
+      [disabled]="form.invalid || !preferredWalletName"
+      (click)="confirm.emit()"
+    >
+      Create Account
+    </button>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<h2 mat-dialog-title class="wizard-title">
+  <mat-icon>account_balance</mat-icon>
+  New Financing Account
+</h2>
+
+<mat-dialog-content class="wizard-content">
+  <mat-stepper [linear]="true" #stepper orientation="horizontal">
+
+    <mat-step label="Account Info" [completed]="isStep1Valid">
+      <app-wizard-account-step1
+        [form]="step1Form"
+        [financingTypes]="data.financingTypes"
+        (cancel)="cancel()"
+        (next)="onStep1Next()"
+      ></app-wizard-account-step1>
+    </mat-step>
+
+    <mat-step label="Details">
+      <app-wizard-savings-step2
+        *ngIf="isSavingsType"
+        [form]="savingsForm"
+        [currencies]="data.currencies"
+        [entities]="data.entities"
+        [walletGroups]="data.walletGroups"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (confirm)="onConfirm()"
+      ></app-wizard-savings-step2>
+
+      <app-wizard-investment-step2
+        *ngIf="!isSavingsType"
+        [form]="investmentForm"
+        [currencies]="data.currencies"
+        (cancel)="cancel()"
+        (previous)="stepper.previous()"
+        (confirm)="onConfirm()"
+      ></app-wizard-investment-step2>
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>

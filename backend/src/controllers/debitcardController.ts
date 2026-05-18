@@ -36,15 +36,13 @@ export const getDebitcardSummary = asyncErrorHandler(
           ) {
             result.push({
               id: dc.id,
-              walletId: saving.walletId,
+              walletId: saving.preferredWalletId,
               entityId: saving.entityId,
               card: wallet.name,
               banking: banking.name,
-              investmentRate: formatPercent(saving.interestRate),
-              yearlyGain: formatPercent(
-                (saving.interestRate / 100) * saving.total
-              ),
-              total: formatMoney(saving.total),
+              investmentRate: formatPercent(0),
+              yearlyGain: formatPercent(0),
+              total: formatMoney(saving.balance),
               expiration: dc.expiration,
               cutDay: dc.cutDay,
               type: dc.cardType,
@@ -120,13 +118,13 @@ export const getDebitcardSummarybyId = asyncErrorHandler(
 
       const result = {
         id: dc.id,
-        walletId: saving.walletId,
+        walletId: saving.preferredWalletId,
         entityId: saving.entityId,
         card: wallet.name,
         banking: banking.name,
-        investmentRate: formatPercent(saving.interestRate),
-        yearlyGain: formatMoney((saving.interestRate / 100) * saving.total),
-        total: formatMoney(saving.total),
+        investmentRate: formatPercent(0),
+        yearlyGain: formatMoney(0),
+        total: formatMoney(saving.balance),
         expiration: dc.expiration,
         cutDay: dc.cutDay,
         type: dc.cardType,
@@ -189,8 +187,7 @@ export const updateDebitcard = asyncErrorHandler(
         );
       }
 
-      const { active, color, cutDay, ending, expiration, interestRate, total } =
-        req.body;
+      const { active, color, cutDay, ending, expiration, total } = req.body;
 
       // Update debit card
       debitCard.active = active;
@@ -200,8 +197,7 @@ export const updateDebitcard = asyncErrorHandler(
       debitCard.expiration = expiration;
 
       // Update savings
-      saving.interestRate = interestRate;
-      saving.total = total;
+      saving.balance = total;
 
       // Save the record
       const result = {

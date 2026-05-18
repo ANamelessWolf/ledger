@@ -1,0 +1,100 @@
+<div class="modal-body" [formGroup]="form">
+
+  <div class="section-type-row" *ngIf="!isEditing">
+    <p class="field-label">Section Type</p>
+    <div class="type-toggle">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="sectionType === 'banking'"
+        (click)="form.get('sectionType')?.setValue('banking')"
+      >
+        <mat-icon>account_balance</mat-icon> Banking Section
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="sectionType === 'investment'"
+        (click)="form.get('sectionType')?.setValue('investment')"
+      >
+        <mat-icon>trending_up</mat-icon> Investment Section
+      </button>
+    </div>
+  </div>
+
+  <div class="type-badge" *ngIf="isEditing">
+    <mat-icon>{{ isInvestmentSection ? 'trending_up' : 'account_balance' }}</mat-icon>
+    <span>{{ isInvestmentSection ? 'Investment Section' : 'Banking Section' }}</span>
+  </div>
+
+  <div class="form-grid">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Section Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Emergency reserve" />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId">
+        <mat-option *ngFor="let c of data.currencies" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Balance</mat-label>
+      <input matInput type="number" formControlName="balance" placeholder="0.00" />
+      <mat-error *ngIf="form.get('balance')?.hasError('required')">Balance is required</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="locked-row">
+    <mat-checkbox formControlName="isLocked">Locked balance (not available for use)</mat-checkbox>
+  </div>
+
+  <ng-container *ngIf="isInvestmentSection">
+    <div class="investment-section">
+      <p class="field-label">Investment Details</p>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Annual Rate (%)</mat-label>
+        <input matInput type="number" formControlName="investmentRate" placeholder="e.g. 8.5" />
+        <mat-error *ngIf="form.get('investmentRate')?.hasError('required')">Rate is required</mat-error>
+      </mat-form-field>
+
+      <div class="always-available-row">
+        <mat-checkbox formControlName="alwaysAvailable">
+          Always available — calculate projected earnings for one year
+        </mat-checkbox>
+      </div>
+
+      <div class="date-row" *ngIf="!isAlwaysAvailable">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="investmentStartDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          <mat-error *ngIf="form.get('investmentStartDate')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="investmentEndDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+          <mat-error *ngIf="form.get('investmentEndDate')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="earnings-preview" *ngIf="projectedEarnings > 0">
+        <mat-icon>calculate</mat-icon>
+        <div>
+          <span class="preview-label">Projected earnings{{ isAlwaysAvailable ? ' (yearly)' : '' }}</span>
+          <span class="preview-value">+{{ projectedEarnings | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

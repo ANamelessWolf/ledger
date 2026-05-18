@@ -1,0 +1,276 @@
+$teal: #087e8b;
+$green: #16a34a;
+$purple: #7c3aed;
+
+.detail-container {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// ── OVERVIEW CARD ────────────────────────────────────────
+.overview-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+}
+
+.overview-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+
+  .edit-btn {
+    margin-left: auto;
+    color: #94a3b8;
+    flex-shrink: 0;
+    &:hover { color: #1e293b; }
+  }
+  margin-bottom: 28px;
+}
+
+.overview-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  &.savings-icon {
+    background: rgba(22, 163, 74, 0.1);
+    color: $green;
+  }
+}
+
+.overview-info {
+  flex: 1;
+}
+
+.account-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 4px;
+}
+
+.account-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.financing-type-pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #e2e8f0;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.account-desc {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 10px;
+}
+
+.account-type-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(22, 163, 74, 0.1);
+  color: $green;
+}
+
+.overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.metric-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+
+  &.main-bal {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+.converted {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+// ── SECTIONS PANEL ───────────────────────────────────────
+.sections-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.sections-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .btn-add {
+    background: $teal;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+  }
+}
+
+.empty-sections {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 10px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+
+  mat-icon { font-size: 24px; width: 24px; height: 24px; }
+}
+
+.sections-table {
+  width: 100%;
+}
+
+.section-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.section-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &-investment { background: rgba(124, 58, 237, 0.1); color: $purple; }
+  &-locked { background: #fee2e2; color: #991b1b; }
+  &-unavailable { background: #fef3c7; color: #92400e; }
+}
+
+.balance-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.balance-primary {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.balance-converted {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.investment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 4px;
+
+  .inv-rate {
+    font-size: 0.72rem;
+    color: #94a3b8;
+  }
+
+  .inv-earnings {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $purple;
+  }
+}
+
+.delete-item {
+  color: #ef4444;
+}
+
+th.mat-header-cell {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+tr.mat-row:hover td {
+  background: #f8fafc;
+}

@@ -8,6 +8,7 @@ import { WALLET_BASE } from './wallet/wallet.routes';
 import { MONTHLY_NO_INT_BASE } from './monthly/mo-no-int.routes';
 import { SUBSCRIPTION_BASE } from './subscription/subscription.routes';
 import { BUDGET_BASE } from './budget/budget.routes';
+import { ACCOUNT_BASE } from '@account/account.routes';
 
 export const routes: Routes = [
   {
@@ -53,6 +54,11 @@ export const routes: Routes = [
         path: BUDGET_BASE,
         loadChildren: () =>
           import('@budget/budget.routes').then((mod) => mod.BUDGET_ROUTES),
+      },
+      {
+        path: ACCOUNT_BASE,
+        loadChildren: () =>
+          import('@account/account.routes').then((mod) => mod.ACCOUNT_ROUTES),
       },
     ],
   },
