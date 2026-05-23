@@ -36,6 +36,7 @@ export class CardIndexPageComponent implements OnInit {
   selectedCard: CardItem = EMPTY_CARD_ITEM;
   cardSummary: CreditCardSummary | DebitCardSummary | null = null;
   creditCardSpending: CreditCardSpending = EMPTY_CREDIT_CARD_SPENDING;
+  listCollapsed = false;
   isLoading = true;
   error = false;
 
