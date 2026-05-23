@@ -66,6 +66,7 @@ export class SectionModalComponent implements OnInit {
       name: [s?.name ?? '', Validators.required],
       balance: [s?.balance ?? 0, [Validators.required, Validators.min(0)]],
       currencyId: [s?.currencyId ?? null, Validators.required],
+      displayCurrencyId: [s?.displayCurrencyId ?? null],
       isLocked: [s ? !!s.isLocked : false],
       alwaysAvailable: [alwaysAvailable],
       investmentRate: [s?.investmentRate ?? null],
@@ -133,6 +134,7 @@ export class SectionModalComponent implements OnInit {
 
     return {
       currencyId: raw.currencyId,
+      displayCurrencyId: raw.displayCurrencyId ?? null,
       name: raw.name,
       balance: raw.balance,
       isInvestment,

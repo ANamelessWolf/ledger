@@ -11,6 +11,7 @@ import { DialogButton } from '@config/enums';
 import { DialogData } from '@common/types/DialogData';
 import { SectionModalComponent, SectionModalData } from '../section-modal/section-modal.component';
 import { EditAccountModalComponent, EditAccountModalData } from '../edit-account-modal/edit-account-modal.component';
+import { MoveBalanceModalComponent, MoveBalanceModalData } from '../move-balance-modal/move-balance-modal.component';
 import { AccountService } from '../../services/account.service';
 import {
   FinancingAccountDetail,
@@ -64,6 +65,12 @@ export class InvestmentDetailComponent {
 
   get secondarySections(): FinancingSection[] {
     return this.detail.sections.filter((s) => s.name !== 'main');
+  }
+
+  get totalProjectedEarnings(): number {
+    return this.detail.sections
+      .filter((s) => s.isInvestment && s.investmentRate)
+      .reduce((sum, s) => sum + (this.projectedEarnings(s) ?? 0), 0);
   }
 
   private openSectionDialog(section?: FinancingSection): void {
@@ -138,11 +145,54 @@ export class InvestmentDetailComponent {
     this.openSectionDialog(section);
   }
 
+  openMoveBalance(section: FinancingSection): void {
+    this.catalogService.getCurrencies().subscribe({
+      next: (response) => {
+        const modalData: MoveBalanceModalData = {
+          section,
+          allSections: this.detail.sections,
+          isSavings: false,
+          currencies: response.data,
+        };
+
+        const dialogData: DialogData = {
+          header: 'Mover Saldo',
+          component: MoveBalanceModalComponent,
+          data: modalData,
+          validationData: modalData,
+          buttons: [DialogButton.SAVE, DialogButton.CANCEL],
+          validate: (d: MoveBalanceModalData) => d.onValidate ? d.onValidate() : false,
+        };
+
+        const ref = this.dialog.open(DialogWrapperComponent, {
+          width: '520px',
+          maxWidth: '95vw',
+          data: dialogData,
+        });
+
+        ref.afterClosed().subscribe((result: any) => {
+          if (result?.button === DialogButton.SAVE && modalData.result) {
+            this.accountService.moveBalance(section.id, modalData.result).subscribe({
+              next: () => this.refresh.emit(),
+              error: (err: HttpErrorResponse) => this.notifService.showError(err),
+            });
+          }
+        });
+      },
+      error: (err: HttpErrorResponse) => this.notifService.showError(err),
+    });
+  }
+
   deleteSection(section: FinancingSection): void {
     this.accountService.deleteSection(section.id).subscribe({
       next: () => this.refresh.emit(),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
+  }
+
+  isSectionComplete(section: FinancingSection): boolean {
+    if (!section.isInvestment || !section.investmentEndDate) return false;
+    return new Date(section.investmentEndDate) < new Date();
   }
 
   projectedEarnings(section: FinancingSection): number | null {

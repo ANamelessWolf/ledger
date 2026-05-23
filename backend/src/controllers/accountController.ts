@@ -84,13 +84,22 @@ export const getAccountById = asyncErrorHandler(
       const sectionsWithCurrency = sections.map((s) => {
         const currency = currencies.find((c) => c.id === s.currencyId);
         const balanceInDefault = currency
-          ? s.balance / currency.conversion
+          ? s.balance * currency.conversion
           : s.balance;
+        const displayCurrency = s.displayCurrencyId
+          ? currencies.find((c) => c.id === s.displayCurrencyId)
+          : null;
+        const balanceInDisplay = displayCurrency
+          ? balanceInDefault / displayCurrency.conversion
+          : null;
         return {
           ...s,
           currencySymbol: currency?.symbol ?? "",
           currencyName: currency?.name ?? "",
           balanceInDefault,
+          displayCurrencySymbol: displayCurrency?.symbol ?? null,
+          displayCurrencyName: displayCurrency?.name ?? null,
+          balanceInDisplay,
         };
       });
 
@@ -214,19 +223,21 @@ export const createAccount = asyncErrorHandler(
         await investmentRepo.save(newInvestment);
       }
 
-      const mainSection = sectionRepo.create({
-        financingAccountId: accountId,
-        currencyId,
-        name: "main",
-        balance: isSavings ? (savings?.balance ?? 0) : Number(investment?.balance ?? 0),
-        isInvestment: 0,
-        isLocked: 0,
-        isAvailable: 1,
-        investmentRate: null,
-        investmentStartDate: null,
-        investmentEndDate: null,
-      });
-      await sectionRepo.save(mainSection);
+      if (isSavings) {
+        const mainSection = sectionRepo.create({
+          financingAccountId: accountId,
+          currencyId,
+          name: "main",
+          balance: savings?.balance ?? 0,
+          isInvestment: 0,
+          isLocked: 0,
+          isAvailable: 1,
+          investmentRate: null,
+          investmentStartDate: null,
+          investmentEndDate: null,
+        });
+        await sectionRepo.save(mainSection);
+      }
 
       res.status(HTTP_STATUS.OK).json(
         new HttpResponse({ data: { id: accountId, name, description, financingTypeId } })
@@ -359,6 +370,7 @@ export const createSection = asyncErrorHandler(
         investmentRate,
         investmentStartDate,
         investmentEndDate,
+        displayCurrencyId,
       } = req.body;
 
       const account = await AppDataSource.manager.findOne(FinancingAccount, {
@@ -380,6 +392,7 @@ export const createSection = asyncErrorHandler(
         investmentRate: investmentRate ?? null,
         investmentStartDate: investmentStartDate ?? null,
         investmentEndDate: investmentEndDate ?? null,
+        displayCurrencyId: displayCurrencyId ?? null,
       });
       const saved = await sectionRepo.save(section);
 
@@ -409,6 +422,7 @@ export const updateSection = asyncErrorHandler(
         investmentRate,
         investmentStartDate,
         investmentEndDate,
+        displayCurrencyId,
       } = req.body;
 
       const section = await AppDataSource.manager.findOne(FinancingSection, {
@@ -431,6 +445,7 @@ export const updateSection = asyncErrorHandler(
         investmentRate: investmentRate ?? null,
         investmentStartDate: investmentStartDate ?? null,
         investmentEndDate: investmentEndDate ?? null,
+        displayCurrencyId: displayCurrencyId ?? null,
       });
 
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { id: sid } }));
@@ -466,6 +481,87 @@ export const deleteSection = asyncErrorHandler(
     } catch (error) {
       return next(
         new Exception("An error occurred deleting the section", HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      );
+    }
+  }
+);
+
+// ─── SECTION: MOVE BALANCE ────────────────────────────────────────────────────
+
+export const moveBalance = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { sectionId } = req.params;
+      const sid = parseInt(sectionId, 10);
+      const { amount, destinationType, targetSectionId, newSection } = req.body;
+
+      const sectionRepo = AppDataSource.getRepository(FinancingSection);
+
+      const source = await sectionRepo.findOne({ where: { id: sid } });
+      if (!source) {
+        return next(new Exception("Source section not found", HTTP_STATUS.NOT_FOUND));
+      }
+
+      const moveAmount = Number(amount);
+      if (isNaN(moveAmount) || moveAmount <= 0) {
+        return next(new Exception("Invalid amount", HTTP_STATUS.BAD_REQUEST));
+      }
+      if (moveAmount > source.balance) {
+        return next(new Exception("Amount exceeds source balance", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      await sectionRepo.update(sid, { balance: source.balance - moveAmount });
+
+      if (destinationType === "account") {
+        const main = await sectionRepo.findOne({
+          where: { financingAccountId: source.financingAccountId, name: "main" },
+        });
+        if (!main) {
+          return next(new Exception("Main section not found", HTTP_STATUS.NOT_FOUND));
+        }
+        await sectionRepo.update(main.id, { balance: main.balance + moveAmount });
+
+        const saving = await AppDataSource.manager.findOne(Saving, {
+          where: { financingAccountId: source.financingAccountId },
+        });
+        if (saving) {
+          await AppDataSource.getRepository(Saving).update(saving.id, {
+            balance: main.balance + moveAmount,
+          });
+        }
+      } else if (destinationType === "section") {
+        const target = await sectionRepo.findOne({ where: { id: parseInt(targetSectionId, 10) } });
+        if (!target) {
+          return next(new Exception("Target section not found", HTTP_STATUS.NOT_FOUND));
+        }
+        await sectionRepo.update(target.id, { balance: target.balance + moveAmount });
+      } else if (destinationType === "new") {
+        const {
+          currencyId, name, isInvestment, isLocked, isAvailable,
+          investmentRate, investmentStartDate, investmentEndDate, displayCurrencyId,
+        } = newSection;
+        const created = sectionRepo.create({
+          financingAccountId: source.financingAccountId,
+          currencyId,
+          name,
+          balance: moveAmount,
+          isInvestment: isInvestment ? 1 : 0,
+          isLocked: isLocked ? 1 : 0,
+          isAvailable: isAvailable ? 1 : 0,
+          investmentRate: investmentRate ?? null,
+          investmentStartDate: investmentStartDate ?? null,
+          investmentEndDate: investmentEndDate ?? null,
+          displayCurrencyId: displayCurrencyId ?? null,
+        });
+        await sectionRepo.save(created);
+      } else {
+        return next(new Exception("Invalid destination type", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { moved: moveAmount } }));
+    } catch (error) {
+      return next(
+        new Exception("An error occurred moving the balance", HTTP_STATUS.INTERNAL_SERVER_ERROR)
       );
     }
   }

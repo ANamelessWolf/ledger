@@ -5,6 +5,7 @@ import { LEDGER_API } from '@config/constants';
 import {
   CreateAccountPayload,
   CreateSectionPayload,
+  MoveBalancePayload,
   UpdateAccountPayload,
 } from '../types/account.types';
 
@@ -44,5 +45,9 @@ export class AccountService {
 
   deleteSection(sectionId: number): Observable<any> {
     return this.http.delete(`${LEDGER_API.ACCOUNTS}/sections/${sectionId}`);
+  }
+
+  moveBalance(sectionId: number, payload: MoveBalancePayload): Observable<any> {
+    return this.http.post(`${LEDGER_API.ACCOUNTS}/sections/${sectionId}/move`, payload);
   }
 }

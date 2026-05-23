@@ -1,0 +1,232 @@
+$teal: #087e8b;
+$purple: #7c3aed;
+
+.modal-body {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.source-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.source-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.source-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.source-name {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.source-balance {
+  font-weight: 700;
+  color: $teal;
+  font-size: 0.9rem;
+}
+
+.amount-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  .amount-field { flex: 1; }
+
+  .all-btn {
+    margin-top: 4px;
+    white-space: nowrap;
+    color: $teal;
+    border-color: $teal;
+    font-size: 0.8rem;
+    height: 40px;
+  }
+}
+
+.dest-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.dest-radio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  ::ng-deep .mat-mdc-radio-button .mdc-form-field {
+    width: 100%;
+  }
+}
+
+mat-radio-button {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.15s;
+
+  &:has(input:checked) {
+    border-color: $teal;
+    background: rgba(8, 126, 139, 0.04);
+  }
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 0;
+
+  mat-icon {
+    color: #64748b;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+.radio-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #1e293b;
+}
+
+.radio-desc {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.dest-options {
+  margin-top: -8px;
+}
+
+.full-width { width: 100%; }
+.half-width { flex: 1; }
+
+// New section form
+.new-section-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  margin-top: -4px;
+}
+
+.type-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.15s ease;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover { border-color: #94a3b8; }
+
+  &.active {
+    border-color: $teal;
+    color: $teal;
+    background: rgba(8, 126, 139, 0.05);
+  }
+}
+
+.locked-row {
+  margin-bottom: 4px;
+}
+
+.always-available-row {
+  margin-bottom: 8px;
+}
+
+.investment-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.earnings-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(124, 58, 237, 0.02));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 10px;
+  margin-top: 8px;
+
+  mat-icon {
+    color: $purple;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .preview-label {
+    display: block;
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .preview-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: $purple;
+  }
+}

@@ -9,6 +9,7 @@ import {
   createSection,
   updateSection,
   deleteSection,
+  moveBalance,
 } from "../controllers/accountController";
 
 const router = Router();
@@ -194,5 +195,24 @@ router.put("/sections/:sectionId", updateSection);
  *         description: Deleted section
  */
 router.delete("/sections/:sectionId", deleteSection);
+
+/**
+ * @swagger
+ * /accounts/sections/{sectionId}/move:
+ *   post:
+ *     summary: Move balance from a section to account, another section, or a new section
+ *     operationId: moveBalance
+ *     tags: [Accounts]
+ *     parameters:
+ *       - in: path
+ *         name: sectionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Balance moved
+ */
+router.post("/sections/:sectionId/move", moveBalance);
 
 export default router;

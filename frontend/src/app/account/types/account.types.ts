@@ -11,6 +11,7 @@ export interface FinancingSection {
   id: number;
   financingAccountId: number;
   currencyId: number;
+  displayCurrencyId: number | null;
   name: string;
   balance: number;
   isInvestment: number;
@@ -22,6 +23,9 @@ export interface FinancingSection {
   currencySymbol: string;
   currencyName: string;
   balanceInDefault: number;
+  displayCurrencySymbol: string | null;
+  displayCurrencyName: string | null;
+  balanceInDisplay: number | null;
 }
 
 export interface SavingDetail {
@@ -84,6 +88,7 @@ export interface UpdateAccountPayload {
 
 export interface CreateSectionPayload {
   currencyId: number;
+  displayCurrencyId?: number | null;
   name: string;
   balance: number;
   isInvestment: boolean;
@@ -105,6 +110,13 @@ export interface PreferredWallet {
   id: number;
   name: string;
   currencyId: number;
+}
+
+export interface MoveBalancePayload {
+  amount: number;
+  destinationType: 'account' | 'section' | 'new';
+  targetSectionId?: number;
+  newSection?: CreateSectionPayload;
 }
 
 export type AccountType = 'savings' | 'investment';

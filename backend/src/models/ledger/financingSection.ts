@@ -34,4 +34,7 @@ export class FinancingSection {
 
   @Column({ type: "date", name: "investment_end_date", nullable: true })
   investmentEndDate: Date | null;
+
+  @Column({ type: "int", name: "display_currency_id", nullable: true })
+  displayCurrencyId: number | null;
 }
