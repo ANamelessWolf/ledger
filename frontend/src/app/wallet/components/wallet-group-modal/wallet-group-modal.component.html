@@ -1,0 +1,17 @@
+<form [formGroup]="form" class="modal-form">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Wallet Group Name</mat-label>
+    <input matInput formControlName="name" placeholder="e.g. BBVA Platino" maxlength="40" />
+    <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+    <mat-error *ngIf="form.get('name')?.hasError('maxlength')">Max 40 characters</mat-error>
+  </mat-form-field>
+
+  <div class="currency-section" *ngIf="isAdd">
+    <p class="currency-label">Select Currencies</p>
+    <app-currency-dual-list
+      [initialAdded]="[]"
+      [initialAvailable]="data.currencies"
+      [showPendingBadge]="false">
+    </app-currency-dual-list>
+  </div>
+</form>

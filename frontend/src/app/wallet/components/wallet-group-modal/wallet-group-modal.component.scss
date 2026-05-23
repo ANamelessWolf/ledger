@@ -1,0 +1,19 @@
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.currency-section {
+  .currency-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 10px;
+  }
+}

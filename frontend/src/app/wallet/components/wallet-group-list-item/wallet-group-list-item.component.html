@@ -1,0 +1,12 @@
+<div class="item" [class.selected]="isSelected">
+  <div class="item-icon">
+    <mat-icon>account_balance_wallet</mat-icon>
+  </div>
+  <div class="item-info">
+    <span class="item-name">{{ data.name }}</span>
+    <span class="item-sub">{{ currencySummary }}</span>
+  </div>
+  <div class="item-badge" *ngIf="data && data.walletCount > 0">
+    <span>{{ data.walletCount }}</span>
+  </div>
+</div>

@@ -8,12 +8,84 @@ import {
   ExpenseSearchOptions,
 } from '@expense/types/expensesTypes';
 import { Observable } from 'rxjs';
+import {
+  AddCurrencyToGroupPayload,
+  CreateCurrencyPayload,
+  CreateWalletGroupPayload,
+  UpdateCurrencyPayload,
+  UpdateMemberPayload,
+  UpdateWalletGroupPayload,
+} from '../types/wallet.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WalletService {
   constructor(private http: HttpClient) {}
+
+  // ─── Currencies ──────────────────────────────────────────────────────────────
+
+  getCurrencies(): Observable<any> {
+    return this.http.get(`${LEDGER_API.WALLET}/currencies`);
+  }
+
+  createCurrency(payload: CreateCurrencyPayload): Observable<any> {
+    return this.http.post(`${LEDGER_API.WALLET}/currencies`, payload);
+  }
+
+  updateCurrency(id: number, payload: UpdateCurrencyPayload): Observable<any> {
+    return this.http.put(`${LEDGER_API.WALLET}/currencies/${id}`, payload);
+  }
+
+  deleteCurrency(id: number): Observable<any> {
+    return this.http.delete(`${LEDGER_API.WALLET}/currencies/${id}`);
+  }
+
+  setDefaultCurrency(id: number): Observable<any> {
+    return this.http.post(`${LEDGER_API.WALLET}/currencies/${id}/set-default`, {});
+  }
+
+  // ─── Wallet Groups ────────────────────────────────────────────────────────────
+
+  getWalletGroups(): Observable<any> {
+    return this.http.get(`${LEDGER_API.WALLET}/groups`);
+  }
+
+  getWalletGroupById(id: number): Observable<any> {
+    return this.http.get(`${LEDGER_API.WALLET}/groups/${id}`);
+  }
+
+  createWalletGroup(payload: CreateWalletGroupPayload): Observable<any> {
+    return this.http.post(`${LEDGER_API.WALLET}/groups`, payload);
+  }
+
+  updateWalletGroup(id: number, payload: UpdateWalletGroupPayload): Observable<any> {
+    return this.http.put(`${LEDGER_API.WALLET}/groups/${id}`, payload);
+  }
+
+  deleteWalletGroup(id: number): Observable<any> {
+    return this.http.delete(`${LEDGER_API.WALLET}/groups/${id}`);
+  }
+
+  // ─── Wallet Members ───────────────────────────────────────────────────────────
+
+  addCurrencyToGroup(groupId: number, payload: AddCurrencyToGroupPayload): Observable<any> {
+    return this.http.post(`${LEDGER_API.WALLET}/groups/${groupId}/wallets`, payload);
+  }
+
+  removeCurrencyFromGroup(memberId: number): Observable<any> {
+    return this.http.delete(`${LEDGER_API.WALLET}/members/${memberId}`);
+  }
+
+  updateMember(memberId: number, payload: UpdateMemberPayload): Observable<any> {
+    return this.http.put(`${LEDGER_API.WALLET}/members/${memberId}`, payload);
+  }
+
+  // ─── All Wallets ──────────────────────────────────────────────────────────────
+
+  getAllWallets(): Observable<any> {
+    return this.http.get(`${LEDGER_API.WALLET}/all`);
+  }
 
   getWalletExpenses(
     walletGroupId: number,

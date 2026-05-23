@@ -1,0 +1,75 @@
+<div class="detail-container" *ngIf="detail">
+  <div class="detail-header">
+    <div class="header-info">
+      <mat-icon class="header-icon">account_balance_wallet</mat-icon>
+      <h2>{{ detail.name }}</h2>
+    </div>
+    <div class="header-actions">
+      <button mat-icon-button matTooltip="Edit group name" (click)="openEditGroup()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Add currency" (click)="openAddCurrency()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Delete group" color="warn" (click)="deleteGroup()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span>Wallets ({{ detail.members.length }})</span>
+  </div>
+
+  <table mat-table [dataSource]="detail.members" class="members-table">
+    <ng-container matColumnDef="walletName">
+      <th mat-header-cell *matHeaderCellDef>Wallet</th>
+      <td mat-cell *matCellDef="let m">{{ m.walletName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="currency">
+      <th mat-header-cell *matHeaderCellDef>Currency</th>
+      <td mat-cell *matCellDef="let m">
+        <span class="currency-chip">{{ m.currencySymbol }} {{ m.currencyName }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="forward">
+      <th mat-header-cell *matHeaderCellDef>Forward Wallet</th>
+      <td mat-cell *matCellDef="let m">
+        <span *ngIf="m.forwardWalletName" class="forward-chip">{{ m.forwardWalletName }}</span>
+        <span *ngIf="!m.forwardWalletName" class="no-forward">—</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let m">
+        <button mat-icon-button [matMenuTriggerFor]="memberMenu" (click)="$event.stopPropagation()">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #memberMenu="matMenu">
+          <button mat-menu-item (click)="openEditMember(m)">
+            <mat-icon>edit</mat-icon>
+            <span>Edit forward wallet</span>
+          </button>
+          <button mat-menu-item (click)="removeMember(m)" class="danger-item">
+            <mat-icon>remove_circle_outline</mat-icon>
+            <span>Remove from group</span>
+          </button>
+        </mat-menu>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <div class="empty-members" *ngIf="detail.members.length === 0">
+    <mat-icon>wallet</mat-icon>
+    <span>No currencies added yet</span>
+    <button mat-stroked-button (click)="openAddCurrency()">
+      <mat-icon>add</mat-icon> Add Currency
+    </button>
+  </div>
+</div>
