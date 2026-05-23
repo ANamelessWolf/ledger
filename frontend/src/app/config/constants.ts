@@ -21,6 +21,7 @@ export const LEDGER_API = {
   MO_NO_INT: `${LEDGER_API_URL}/monthly`,
   BUDGET: `${LEDGER_API_URL}/budget`,
   SUBSCRIPTION: `${LEDGER_API_URL}/subscription`,
+  ACCOUNTS: `${LEDGER_API_URL}/accounts`,
 };
 
 export const APP_CATALOGS = {

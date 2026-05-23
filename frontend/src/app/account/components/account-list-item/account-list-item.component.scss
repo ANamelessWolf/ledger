@@ -1,0 +1,152 @@
+$teal: #087e8b;
+$green: #16a34a;
+$purple: #7c3aed;
+
+:host {
+  display: block;
+}
+
+.item {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+// ── SELECTED ─────────────────────────────────────────────
+.selected {
+  background: linear-gradient(to right, rgba(8, 126, 139, 0.07) 0%, #ffffff 60%);
+  padding: 14px 16px;
+  border-left: 3px solid $teal;
+  border-bottom: 1px solid #d9eef1;
+  min-height: 100px;
+
+  .selected-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .icon-col {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+
+    &.savings-icon {
+      background: rgba(22, 163, 74, 0.12);
+      color: $green;
+    }
+
+    &.investment-icon {
+      background: rgba(124, 58, 237, 0.12);
+      color: $purple;
+    }
+  }
+
+  .info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .account-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  .account-type {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .account-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ── NOT SELECTED ──────────────────────────────────────────
+.not-selected {
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf2;
+  padding: 12px 16px;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f5fbfc;
+  }
+
+  .main-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .account-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sub-info {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .type-icon-sm {
+    color: #94a3b8;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+// ── SHARED ────────────────────────────────────────────────
+.type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.savings-dot {
+    background: $green;
+    box-shadow: 0 0 5px rgba(22, 163, 74, 0.5);
+  }
+
+  &.investment-dot {
+    background: $purple;
+    box-shadow: 0 0 5px rgba(124, 58, 237, 0.5);
+  }
+}

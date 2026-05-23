@@ -58,4 +58,8 @@ export class CatalogService {
   getWalletGroups(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/wallet-groups`);
   }
+
+  getFinancingTypes(): Observable<any> {
+    return this.http.get(`${LEDGER_API.CATALOG}/financing-types`);
+  }
 }

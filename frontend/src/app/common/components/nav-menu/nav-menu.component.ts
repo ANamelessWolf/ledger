@@ -30,5 +30,6 @@ export class NavMenuComponent {
     { header: '0% Interest Financing', route: '/monoint', icon: 'percent', exact: false },
     { header: 'Subscriptions', route: '/subscription', icon: 'receipt', exact: false },
     { header: 'Budget', route: '/budget', icon: 'savings', exact: false },
+    { header: 'Accounts', route: '/accounts', icon: 'account_balance', exact: false },
   ];
 }

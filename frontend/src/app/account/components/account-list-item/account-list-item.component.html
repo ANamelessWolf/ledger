@@ -1,0 +1,25 @@
+<div class="item" [class.selected]="isSelected" [class.not-selected]="!isSelected">
+
+  <!-- Selected layout -->
+  <div *ngIf="isSelected" class="selected-content">
+    <div class="icon-col" [class.savings-icon]="isSavings" [class.investment-icon]="!isSavings">
+      <mat-icon>{{ typeIcon }}</mat-icon>
+    </div>
+    <div class="info-col">
+      <span class="account-name">{{ data.name }}</span>
+      <span class="account-type">{{ typeLabel }}</span>
+      <span class="account-desc">{{ data.description }}</span>
+    </div>
+  </div>
+
+  <!-- Not selected layout -->
+  <ng-container *ngIf="!isSelected">
+    <div class="type-dot" [class.savings-dot]="isSavings" [class.investment-dot]="!isSavings"></div>
+    <div class="main-info">
+      <span class="account-name">{{ data.name }}</span>
+      <span class="sub-info">{{ typeLabel }}</span>
+    </div>
+    <mat-icon class="type-icon-sm">{{ typeIcon }}</mat-icon>
+  </ng-container>
+
+</div>

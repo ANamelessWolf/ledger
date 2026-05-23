@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Exception, HTTP_STATUS, HttpResponse } from "../common";
 import { asyncErrorHandler } from "../middlewares";
 import { AppDataSource } from "..";
-import { CardItem, ExpenseType, Vendor } from "../models/catalogs";
+import { CardItem, ExpenseType, FinancingType, Vendor } from "../models/catalogs";
 import { Expense } from "../models/expenses";
 import { Currency, PaymentFrequency } from "../models/settings";
 import { WalletGroup } from "../models/ledger";
@@ -299,6 +299,20 @@ export const getExpenseYearRange = asyncErrorHandler(
     } catch (error) {
       console.error(error);
       return next(new Exception("An error occurred getting the expense year range", HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    }
+  }
+);
+
+export const getFinancingTypeList = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const types: FinancingType[] = await AppDataSource.manager.find(FinancingType, {
+        order: { description: "ASC" },
+      });
+      const result: CatalogItem[] = types.map((t) => ({ id: t.id, name: t.description }));
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      return next(new Exception("An error occurred getting the financing type list", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }
 );

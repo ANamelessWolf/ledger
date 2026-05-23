@@ -40,7 +40,7 @@
  *           description: Catalog item name
  */
 import { Router } from "express";
-import { getCardList, getCurrencyList, getExpenseYearRange, getExpensesTypesList, getFinancingEnityList, getPaymentFrequencyList, getVendorList, getWalletGroupList, getWalletList } from "../controllers/catalogController";
+import { getCardList, getCurrencyList, getExpenseYearRange, getExpensesTypesList, getFinancingEnityList, getFinancingTypeList, getPaymentFrequencyList, getVendorList, getWalletGroupList, getWalletList } from "../controllers/catalogController";
 
 const router = Router();
 /**
@@ -146,5 +146,6 @@ router.route('/vendors').get(getVendorList);
 router.route('/expense-year-range').get(getExpenseYearRange);
 router.route('/payment-frequencies').get(getPaymentFrequencyList);
 router.route('/wallet-groups').get(getWalletGroupList);
+router.route('/financing-types').get(getFinancingTypeList);
 
 export default router;

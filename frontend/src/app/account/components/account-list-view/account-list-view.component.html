@@ -1,0 +1,34 @@
+<div class="list-header">
+  <div class="position">
+    <p>Accounts</p>
+    <div class="btn-group">
+      <button mat-icon-button aria-label="Add new account" (click)="onAdd()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="divider-pad">
+  <hr />
+</div>
+<div class="scrollable-container">
+  <mat-nav-list *ngIf="!isLoading">
+    <mat-list-item
+      *ngFor="let account of accounts"
+      (click)="onAccountClick(account)"
+    >
+      <app-account-list-item
+        [isSelected]="account.isSelected"
+        [data]="account"
+      ></app-account-list-item>
+    </mat-list-item>
+    <div class="empty-state" *ngIf="accounts.length === 0">
+      <mat-icon>account_balance</mat-icon>
+      <span>No accounts yet</span>
+      <span class="hint">Click + to add your first account</span>
+    </div>
+  </mat-nav-list>
+</div>
+<div class="spinner-container" *ngIf="isLoading">
+  <app-spinner></app-spinner>
+</div>

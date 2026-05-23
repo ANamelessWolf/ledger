@@ -1,0 +1,72 @@
+$teal: #087e8b;
+
+.step-content { padding: 8px 0; }
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.step-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 24px;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.full-width { width: 100%; }
+
+.wallet-resolve,
+.wallet-found,
+.wallet-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.wallet-resolve {
+  color: #64748b;
+  background: #f1f5f9;
+  .spin { animation: spin 1s linear infinite; }
+}
+
+.wallet-found {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.wallet-error {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+
+  .btn-primary {
+    background: $teal;
+    color: white;
+  }
+}

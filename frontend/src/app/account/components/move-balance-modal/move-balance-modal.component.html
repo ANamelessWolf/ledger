@@ -1,0 +1,149 @@
+<div class="modal-body" [formGroup]="form">
+
+  <!-- Source info -->
+  <div class="source-info">
+    <span class="source-label">Moving from</span>
+    <div class="source-section">
+      <span class="source-name">{{ source.name }}</span>
+      <span class="source-balance">{{ source.currencySymbol }} {{ source.balance | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Amount -->
+  <div class="amount-row">
+    <mat-form-field appearance="outline" class="amount-field">
+      <mat-label>Amount to move</mat-label>
+      <span matTextPrefix>{{ source.currencySymbol }}&nbsp;</span>
+      <input matInput type="number" formControlName="amount" placeholder="0.00" />
+      <mat-error *ngIf="form.get('amount')?.hasError('required')">Amount is required</mat-error>
+      <mat-error *ngIf="form.get('amount')?.hasError('min')">Must be greater than 0</mat-error>
+      <mat-error *ngIf="form.get('amount')?.hasError('max')">Cannot exceed available balance</mat-error>
+    </mat-form-field>
+    <button mat-stroked-button type="button" class="all-btn" (click)="setAll()">Move all</button>
+  </div>
+
+  <!-- Destination type -->
+  <div class="dest-section">
+    <p class="field-label">Move to</p>
+    <mat-radio-group formControlName="destinationType" class="dest-radio">
+      <mat-radio-button value="account" *ngIf="data.isSavings && hasMainSection">
+        <div class="radio-option">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div>
+            <span class="radio-title">Main account</span>
+            <span class="radio-desc">Transfer back to the main balance</span>
+          </div>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button value="section" *ngIf="otherSections.length > 0">
+        <div class="radio-option">
+          <mat-icon>swap_horiz</mat-icon>
+          <div>
+            <span class="radio-title">Existing section</span>
+            <span class="radio-desc">Move to another section in this account</span>
+          </div>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button value="new">
+        <div class="radio-option">
+          <mat-icon>add_circle_outline</mat-icon>
+          <div>
+            <span class="radio-title">New section</span>
+            <span class="radio-desc">Create a new section with this balance</span>
+          </div>
+        </div>
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <!-- Existing section select -->
+  <div *ngIf="destinationType === 'section'" class="dest-options">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Target section</mat-label>
+      <mat-select formControlName="targetSectionId">
+        <mat-option *ngFor="let s of otherSections" [value]="s.id">
+          {{ s.name }} — {{ s.currencySymbol }} {{ s.balance | number:'1.2-2' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('targetSectionId')?.hasError('required')">Select a section</mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- New section form -->
+  <div *ngIf="destinationType === 'new'" class="new-section-form">
+    <p class="field-label">New section details</p>
+
+    <div class="type-toggle">
+      <button type="button" class="toggle-btn" [class.active]="sectionType === 'banking'"
+        (click)="form.get('sectionType')?.setValue('banking')">
+        <mat-icon>account_balance</mat-icon> Banking
+      </button>
+      <button type="button" class="toggle-btn" [class.active]="sectionType === 'investment'"
+        (click)="form.get('sectionType')?.setValue('investment')">
+        <mat-icon>trending_up</mat-icon> Investment
+      </button>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Section Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Emergency reserve" />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId">
+        <mat-option *ngFor="let c of data.currencies" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+    </mat-form-field>
+
+    <div class="locked-row">
+      <mat-checkbox formControlName="isLocked">Locked balance (not available for use)</mat-checkbox>
+    </div>
+
+    <ng-container *ngIf="isInvestmentSection">
+      <div class="investment-section">
+        <p class="field-label">Investment Details</p>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Annual Rate (%)</mat-label>
+          <input matInput type="number" formControlName="investmentRate" placeholder="e.g. 8.5" />
+          <mat-error *ngIf="form.get('investmentRate')?.hasError('required')">Rate is required</mat-error>
+        </mat-form-field>
+
+        <div class="always-available-row">
+          <mat-checkbox formControlName="alwaysAvailable">
+            Always available — calculate projected earnings for one year
+          </mat-checkbox>
+        </div>
+
+        <div class="date-row" *ngIf="!isAlwaysAvailable">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="investmentStartDate" placeholder="MM/DD/YYYY" />
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+            <mat-error *ngIf="form.get('investmentStartDate')?.hasError('required')">Required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="investmentEndDate" placeholder="MM/DD/YYYY" />
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-error *ngIf="form.get('investmentEndDate')?.hasError('required')">Required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="earnings-preview" *ngIf="projectedEarnings > 0">
+          <mat-icon>calculate</mat-icon>
+          <div>
+            <span class="preview-label">Projected earnings{{ isAlwaysAvailable ? ' (yearly)' : '' }}</span>
+            <span class="preview-value">+{{ projectedEarnings | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+</div>

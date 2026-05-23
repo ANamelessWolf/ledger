@@ -1,0 +1,62 @@
+<div class="step-content" [formGroup]="form">
+  <h3 class="step-title">Account Information</h3>
+  <p class="step-subtitle">Set up your new financing account</p>
+
+  <div class="form-fields">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Account Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Emergency Fund" />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="2" placeholder="Optional description"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="type-section">
+    <p class="type-label">Account Kind</p>
+    <div class="type-cards">
+      <div
+        *ngFor="let kind of kinds"
+        class="type-card"
+        [class.type-card--active]="form.get('accountKind')?.value === kind.value"
+        (click)="selectKind(kind.value)"
+      >
+        <mat-icon class="type-icon">{{ kind.icon }}</mat-icon>
+        <div class="type-info">
+          <span class="type-name">{{ kind.label }}</span>
+          <span class="type-desc">{{ kind.description }}</span>
+        </div>
+        <div class="type-check" *ngIf="form.get('accountKind')?.value === kind.value">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+      </div>
+    </div>
+    <mat-error *ngIf="form.get('accountKind')?.touched && form.get('accountKind')?.hasError('required')">
+      Please select an account kind
+    </mat-error>
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Institution Type</mat-label>
+    <mat-select formControlName="financingTypeId">
+      <mat-option *ngFor="let type of financingTypes" [value]="type.id">{{ type.name }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('financingTypeId')?.hasError('required')">Please select an institution type</mat-error>
+  </mat-form-field>
+
+  <div class="step-actions">
+    <button mat-stroked-button type="button" (click)="cancel.emit()">Cancel</button>
+    <button
+      mat-flat-button
+      class="btn-primary"
+      type="button"
+      [disabled]="form.invalid"
+      (click)="next.emit()"
+    >
+      Next <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+</div>

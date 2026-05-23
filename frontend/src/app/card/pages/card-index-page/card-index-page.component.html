@@ -1,11 +1,17 @@
 <div class="page-container">
-  <div class="card-list-area">
+  <div class="card-list-area" [class.collapsed]="listCollapsed">
     <app-card-list-view
+      *ngIf="!listCollapsed"
       [selectedCard]="selectedCard"
       (cardSelected)="onCardSelected($event)"
       [cardId]="cardId"
     >
     </app-card-list-view>
+  </div>
+  <div class="collapse-divider">
+    <button type="button" class="collapse-btn" (click)="listCollapsed = !listCollapsed" [title]="listCollapsed ? 'Expandir panel' : 'Colapsar panel'">
+      <span class="collapse-arrow" [class.flipped]="listCollapsed">&#8249;</span>
+    </button>
   </div>
   <div class="card-main-area">
     <app-card-summary
