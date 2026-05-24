@@ -15,6 +15,7 @@ import {
   removeCurrencyFromGroup,
   updateMember,
   getAllWallets,
+  toggleWalletGroupActive,
 } from "../controllers/walletManageController";
 
 const router = Router();
@@ -251,6 +252,7 @@ router.delete("/groups/:id", deleteWalletGroup);
  *         description: Added wallet to group
  */
 router.post("/groups/:id/wallets", addCurrencyToGroup);
+router.post("/groups/:id/toggle-active", toggleWalletGroupActive);
 
 // ─── Wallet Members ────────────────────────────────────────────────────────────
 

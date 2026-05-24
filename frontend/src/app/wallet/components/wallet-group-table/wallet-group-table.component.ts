@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
@@ -36,6 +37,7 @@ import {
     MatTooltipModule,
     MatDialogModule,
     MatSortModule,
+    MatSlideToggleModule,
   ],
   templateUrl: './wallet-group-table.component.html',
   styleUrl: './wallet-group-table.component.scss',
@@ -46,7 +48,7 @@ export class WalletGroupTableComponent implements OnChanges, AfterViewInit {
   @Output() refresh = new EventEmitter<void>();
   @ViewChild(MatSort) sort!: MatSort;
 
-  columns = ['name', 'currencies', 'actions'];
+  columns = ['name', 'currencies', 'active', 'actions'];
   dataSource = new MatTableDataSource<WalletGroupItem>();
 
   constructor(
@@ -61,38 +63,62 @@ export class WalletGroupTableComponent implements OnChanges, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.sort.sort({ id: 'name', start: 'desc', disableClear: false });
+    this.sort.sort({ id: 'name', start: 'asc', disableClear: false });
   }
 
   openEditGroup(group: WalletGroupItem): void {
-    const modalData: WalletGroupModalData = {
-      mode: 'edit',
-      currencies: [],
-      group: { id: group.id, name: group.name, members: [] },
-    };
+    forkJoin({
+      detail: this.walletService.getWalletGroupById(group.id),
+      wallets: this.walletService.getAllWallets(),
+    }).subscribe({
+      next: ({ detail, wallets }) => {
+        const modalData: WalletGroupModalData = {
+          mode: 'edit',
+          currencies: [],
+          group: { id: detail.data.id, name: detail.data.name, members: detail.data.members },
+          availableWallets: wallets.data,
+        };
 
-    const dialogData: DialogData = {
-      header: 'Edit Wallet Group',
-      component: WalletGroupModalComponent,
-      data: modalData,
-      validationData: modalData,
-      buttons: [DialogButton.SAVE, DialogButton.CANCEL],
-      validate: (d: WalletGroupModalData) => (d.onValidate ? d.onValidate() : false),
-    };
+        const dialogData: DialogData = {
+          header: 'Edit Wallet Group',
+          component: WalletGroupModalComponent,
+          data: modalData,
+          validationData: modalData,
+          buttons: [DialogButton.SAVE, DialogButton.CANCEL],
+          validate: (d: WalletGroupModalData) => (d.onValidate ? d.onValidate() : false),
+        };
 
-    const ref = this.dialog.open(DialogWrapperComponent, {
-      width: '480px',
-      maxWidth: '95vw',
-      data: dialogData,
-    });
-
-    ref.afterClosed().subscribe((result: any) => {
-      if (result?.button === DialogButton.SAVE && modalData.result) {
-        this.walletService.updateWalletGroup(group.id, { name: modalData.result.name }).subscribe({
-          next: () => this.refresh.emit(),
-          error: (err: HttpErrorResponse) => this.notifService.showError(err),
+        const ref = this.dialog.open(DialogWrapperComponent, {
+          width: '520px',
+          maxWidth: '95vw',
+          data: dialogData,
         });
-      }
+
+        ref.afterClosed().subscribe((result: any) => {
+          if (result?.button !== DialogButton.SAVE || !modalData.result) return;
+
+          const { name, memberUpdates } = modalData.result;
+          const calls: any[] = [];
+
+          if (name !== group.name) {
+            calls.push(this.walletService.updateWalletGroup(group.id, { name }));
+          }
+
+          if (memberUpdates?.length) {
+            for (const u of memberUpdates) {
+              calls.push(this.walletService.updateMember(u.memberId, { forwardWalletId: u.forwardWalletId }));
+            }
+          }
+
+          if (calls.length === 0) return;
+
+          forkJoin(calls).subscribe({
+            next: () => this.refresh.emit(),
+            error: (err: HttpErrorResponse) => this.notifService.showError(err),
+          });
+        });
+      },
+      error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
   }
 
@@ -150,6 +176,13 @@ export class WalletGroupTableComponent implements OnChanges, AfterViewInit {
           });
         });
       },
+      error: (err: HttpErrorResponse) => this.notifService.showError(err),
+    });
+  }
+
+  toggleActive(group: WalletGroupItem): void {
+    this.walletService.toggleWalletGroupActive(group.id).subscribe({
+      next: () => this.refresh.emit(),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
   }

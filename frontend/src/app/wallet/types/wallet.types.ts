@@ -9,6 +9,7 @@ export interface CurrencyItem {
 export interface WalletGroupItem {
   id: number;
   name: string;
+  isActive: number;
   walletCount: number;
   currencies: string[];
 }
@@ -36,6 +37,9 @@ export interface WalletItem {
   currencyId: number;
   currencyName: string;
   currencySymbol: string;
+  walletGroupId: number | null;
+  walletGroupName: string | null;
+  walletGroupIsActive: number;
 }
 
 export interface CreateWalletGroupPayload {

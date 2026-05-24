@@ -5,11 +5,7 @@
 <form class="dialog-form" [formGroup]="expensesForm" (ngSubmit)="onSubmit()">
   <h2>Paying Options</h2>
   <div class="form-group">
-    <app-catalog-item-select
-      header="Wallet"
-      [items]="data.options.wallets"
-      [control]="walletControl"
-    ></app-catalog-item-select>
+    <app-wallet-picker [control]="walletControl"></app-wallet-picker>
     <mat-form-field appearance="fill">
       <mat-label>Total</mat-label>
       <input

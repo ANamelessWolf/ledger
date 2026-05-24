@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -9,12 +9,14 @@ import { WalletGroupTableComponent } from '../../components/wallet-group-table/w
 import { CurrencyListComponent } from '../../components/currency-list/currency-list.component';
 import { WalletSummaryComponent, WalletSummaryData } from '../../components/wallet-summary/wallet-summary.component';
 import { WalletGroupModalComponent, WalletGroupModalData } from '../../components/wallet-group-modal/wallet-group-modal.component';
+import { WalletFilterDialogComponent, WalletFilterDialogData, WalletGroupFilter, DEFAULT_WALLET_GROUP_FILTER } from '../../components/wallet-filter-dialog/wallet-filter-dialog.component';
 import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
 import { DialogData } from '@common/types/DialogData';
 import { DialogButton } from '@config/enums';
 import { NotificationService } from '@common/services/notification.service';
 import { WalletService } from '../../services/wallet.service';
 import { WalletGroupItem } from '../../types/wallet.types';
+import { CatalogItem } from '@common/types/catalogTypes';
 
 @Component({
   selector: 'app-wallet-index-page',
@@ -33,9 +35,15 @@ import { WalletGroupItem } from '../../types/wallet.types';
   providers: [NotificationService],
 })
 export class WalletIndexPageComponent implements OnInit {
+  @ViewChild(CurrencyListComponent) currencyList!: CurrencyListComponent;
+
   groups: WalletGroupItem[] = [];
+  availableCurrencies: CatalogItem[] = [];
   summary: WalletSummaryData = { groupCount: 0, walletCount: 0, currencyCount: 0 };
   isLoading = false;
+  activeTab = 0;
+  searchQuery = '';
+  currentFilter: WalletGroupFilter = { ...DEFAULT_WALLET_GROUP_FILTER };
 
   constructor(
     private walletService: WalletService,
@@ -47,6 +55,29 @@ export class WalletIndexPageComponent implements OnInit {
     this.loadAll();
   }
 
+  get filteredGroups(): WalletGroupItem[] {
+    let result = this.groups;
+
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(g => g.name.toLowerCase().includes(q));
+    }
+
+    if (this.currentFilter.status !== 'any') {
+      const active = this.currentFilter.status === 'active' ? 1 : 0;
+      result = result.filter(g => g.isActive === active);
+    }
+
+    if (this.currentFilter.currencies.length > 0) {
+      const names = this.currentFilter.currencies.map(c => c.name.toLowerCase());
+      result = result.filter(g =>
+        g.currencies.some(c => names.includes(c.toLowerCase()))
+      );
+    }
+
+    return result;
+  }
+
   loadAll(): void {
     this.isLoading = true;
     forkJoin({
@@ -55,6 +86,10 @@ export class WalletIndexPageComponent implements OnInit {
     }).subscribe({
       next: ({ groups, currencies }) => {
         this.groups = groups.data;
+        this.availableCurrencies = currencies.data.map((c: any) => ({
+          id: c.id,
+          name: c.symbol,
+        }));
         const walletCount = this.groups.reduce(
           (sum: number, g: WalletGroupItem) => sum + g.walletCount, 0
         );
@@ -69,7 +104,34 @@ export class WalletIndexPageComponent implements OnInit {
     });
   }
 
+  onSearch(query: string): void {
+    this.searchQuery = query;
+  }
+
+  onOpenFilter(): void {
+    const dialogData: WalletFilterDialogData = {
+      current: { ...this.currentFilter, currencies: [...this.currentFilter.currencies] },
+      availableCurrencies: this.availableCurrencies,
+    };
+
+    const ref = this.dialog.open(WalletFilterDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: dialogData,
+    });
+
+    ref.afterClosed().subscribe((result: WalletGroupFilter | null) => {
+      if (result !== null && result !== undefined) {
+        this.currentFilter = result;
+      }
+    });
+  }
+
   onAddRequested(): void {
+    if (this.activeTab === 1) {
+      this.currencyList.openAdd();
+      return;
+    }
     this.walletService.getCurrencies().subscribe({
       next: (res: any) => {
         const modalData: WalletGroupModalData = { mode: 'add', currencies: res.data };

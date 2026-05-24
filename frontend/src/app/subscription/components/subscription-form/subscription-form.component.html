@@ -26,23 +26,12 @@
       </mat-form-field>
     </div>
 
-    <div class="row-two">
-      <mat-form-field appearance="outline">
-        <mat-label>Wallet</mat-label>
-        <mat-select formControlName="walletGroupId">
-          <mat-option *ngFor="let w of data.walletGroups" [value]="w.id">{{ w.name }}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="form.get('walletGroupId')?.hasError('required')">Wallet is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Currency</mat-label>
-        <mat-select formControlName="currencyId">
-          <mat-option *ngFor="let c of data.currencies" [value]="c.id">{{ c.name }}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
-      </mat-form-field>
-    </div>
+    <app-wallet-picker
+      [control]="walletControl"
+      [initialGroupId]="data.subscription?.walletGroupId ?? null"
+      [initialCurrencyId]="data.subscription?.currencyId ?? null"
+      (walletChanged)="onWalletChanged($event)">
+    </app-wallet-picker>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Payment Frequency</mat-label>

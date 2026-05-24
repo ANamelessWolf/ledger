@@ -161,6 +161,7 @@ export const getAllWalletGroups = asyncErrorHandler(
         return {
           id: g.id,
           name: g.name,
+          isActive: g.isActive,
           walletCount: members.length,
           currencies: members.map((m) => m.currency),
         };
@@ -250,7 +251,7 @@ export const createWalletGroup = asyncErrorHandler(
       const walletRepo = AppDataSource.getRepository(Wallet);
       const memberRepo = AppDataSource.getRepository(WalletMember);
 
-      const newGroup = groupRepo.create({ name });
+      const newGroup = groupRepo.create({ name, isActive: 1 });
       const savedGroup = await groupRepo.save(newGroup);
 
       for (const currencyId of currencyIds) {
@@ -365,6 +366,27 @@ export const deleteWalletGroup = asyncErrorHandler(
     } catch (err) {
       console.error("[deleteWalletGroup]", err);
       return next(new Exception("An error occurred deleting the wallet group", HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    }
+  }
+);
+
+export const toggleWalletGroupActive = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+
+      const group = await AppDataSource.manager.findOne(WalletGroup, { where: { id } });
+      if (!group) {
+        return next(new Exception("Wallet group not found", HTTP_STATUS.NOT_FOUND));
+      }
+
+      const newValue = group.isActive === 1 ? 0 : 1;
+      await AppDataSource.getRepository(WalletGroup).update(id, { isActive: newValue });
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { id, isActive: newValue } }));
+    } catch (err) {
+      console.error("[toggleWalletGroupActive]", err);
+      return next(new Exception("An error occurred toggling the wallet group status", HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }
   }
 );
@@ -489,15 +511,22 @@ export const getAllWallets = asyncErrorHandler(
     try {
       const wallets: Wallet[] = await AppDataSource.manager.find(Wallet, { order: { name: "ASC" } });
       const currencies = await AppDataSource.manager.find(Currency);
+      const members = await AppDataSource.manager.find(WalletMember);
+      const groups = await AppDataSource.manager.find(WalletGroup);
 
       const result = wallets.map((w) => {
         const currency = currencies.find((c) => c.id === w.currencyId);
+        const member = members.find((m) => m.walletId === w.id);
+        const group = member ? groups.find((g) => g.id === member.walletGroupId) : null;
         return {
           id: w.id,
           name: w.name,
           currencyId: w.currencyId,
           currencyName: currency?.name ?? "",
           currencySymbol: currency?.symbol ?? "",
+          walletGroupId: group?.id ?? null,
+          walletGroupName: group?.name ?? null,
+          walletGroupIsActive: group?.isActive ?? 0,
         };
       });
 

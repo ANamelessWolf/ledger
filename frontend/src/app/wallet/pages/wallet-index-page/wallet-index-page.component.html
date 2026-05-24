@@ -1,7 +1,9 @@
 <app-page-layout
   title="Wallets"
-  [hasFilter]="false"
+  [hasFilter]="true"
   [hasWidget]="true"
+  (onSearch)="onSearch($event)"
+  (openFilter)="onOpenFilter()"
   (add)="onAddRequested()">
 
   <div widget>
@@ -9,12 +11,12 @@
   </div>
 
   <div main class="main-content">
-    <mat-tab-group animationDuration="150ms" class="wallet-tabs">
+    <mat-tab-group animationDuration="150ms" class="wallet-tabs" (selectedIndexChange)="activeTab = $event">
 
       <mat-tab label="Wallet Groups">
         <div class="tab-content">
           <app-wallet-group-table
-            [groups]="groups"
+            [groups]="filteredGroups"
             (refresh)="loadAll()">
           </app-wallet-group-table>
         </div>

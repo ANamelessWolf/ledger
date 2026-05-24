@@ -20,6 +20,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
+import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import { AddExpense } from '@expense/types/expensesTypes';
 import { AddPaymentDialogData, ExpenseSearchResult } from '@subscription/types/subscriptionTypes';
@@ -46,6 +47,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
     MatNativeDateModule,
     MatTooltipModule,
     CatalogItemSelectComponent,
+    WalletPickerComponent,
   ],
   templateUrl: './subscription-add-payment.component.html',
   styleUrl: './subscription-add-payment.component.scss',
@@ -166,7 +168,7 @@ export class SubscriptionAddPaymentComponent implements OnInit, OnDestroy {
       total: +v.total,
       buyDate: toRequestFormat(new Date(v.expenseDate)),
       description: v.description,
-      walletId: (this.walletControl.value as any).id,
+      walletId: this.walletControl.value,
       expenseTypeId: (this.expenseTypeControl.value as any).id,
       vendorId: (this.vendorControl.value as any).id,
     };

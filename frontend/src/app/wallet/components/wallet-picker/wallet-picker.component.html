@@ -1,0 +1,33 @@
+<mat-form-field appearance="fill" class="wallet-picker-field">
+  <mat-label>Wallet</mat-label>
+  <input
+    matInput
+    [formControl]="searchControl"
+    [matAutocomplete]="walletAuto"
+    placeholder="Search wallet..."
+  />
+  <button
+    matSuffix
+    mat-icon-button
+    type="button"
+    class="arrow-btn"
+    (click)="openPanel()"
+    tabindex="-1">
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-autocomplete
+    #walletAuto="matAutocomplete"
+    [displayWith]="displayFn"
+    (optionSelected)="onSelected($event)">
+    <ng-container *ngFor="let group of groupedWallets$ | async">
+      <mat-optgroup [label]="group.groupName">
+        <mat-option *ngFor="let wallet of group.wallets" [value]="wallet">
+          <div class="wallet-option">
+            <span class="currency-badge">{{ wallet.currencySymbol }}</span>
+            <span class="wallet-name">{{ wallet.currencyName }}</span>
+          </div>
+        </mat-option>
+      </mat-optgroup>
+    </ng-container>
+  </mat-autocomplete>
+</mat-form-field>

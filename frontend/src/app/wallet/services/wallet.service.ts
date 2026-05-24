@@ -67,6 +67,10 @@ export class WalletService {
     return this.http.delete(`${LEDGER_API.WALLET}/groups/${id}`);
   }
 
+  toggleWalletGroupActive(id: number): Observable<any> {
+    return this.http.post(`${LEDGER_API.WALLET}/groups/${id}/toggle-active`, {});
+  }
+
   // ─── Wallet Members ───────────────────────────────────────────────────────────
 
   addCurrencyToGroup(groupId: number, payload: AddCurrencyToGroupPayload): Observable<any> {

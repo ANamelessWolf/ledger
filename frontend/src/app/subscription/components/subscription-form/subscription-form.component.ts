@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AddSubscription, SubscriptionFormData } from '@subscription/types/subscriptionTypes';
+import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
+import { WalletItem } from '@wallet/types/wallet.types';
 
 @Component({
   selector: 'app-subscription-form',
@@ -25,6 +27,7 @@ import { AddSubscription, SubscriptionFormData } from '@subscription/types/subsc
     MatDatepickerModule,
     MatNativeDateModule,
     MatSlideToggleModule,
+    WalletPickerComponent,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './subscription-form.component.html',
@@ -32,6 +35,7 @@ import { AddSubscription, SubscriptionFormData } from '@subscription/types/subsc
 })
 export class SubscriptionFormComponent implements OnInit {
   form!: FormGroup;
+  walletControl = new FormControl();
   chargeDays = Array.from({ length: 28 }, (_, i) => i + 1);
 
   get isEdit(): boolean {
@@ -59,6 +63,13 @@ export class SubscriptionFormComponent implements OnInit {
       chargeDay: [sub?.chargeDay ?? 1, [Validators.required, Validators.min(1), Validators.max(28)]],
       lastPaymentDate: [sub?.lastPaymentDate ? this.parseDate(sub.lastPaymentDate) : new Date(), Validators.required],
       active: [sub?.active !== undefined ? sub.active === 1 : true],
+    });
+  }
+
+  onWalletChanged(wallet: WalletItem): void {
+    this.form.patchValue({
+      walletGroupId: wallet.walletGroupId,
+      currencyId: wallet.currencyId,
     });
   }
 

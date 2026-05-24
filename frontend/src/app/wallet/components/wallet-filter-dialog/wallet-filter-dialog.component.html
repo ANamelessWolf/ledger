@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Filter Wallets</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="filter-form">
+
+    <div class="filter-section">
+      <label class="filter-label">Status</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let opt of statusOptions" [value]="opt.value">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="filter-section">
+      <label class="filter-label">Currencies</label>
+      <app-catalog-item-multi-select
+        header=""
+        placeholder="All currencies..."
+        [items]="data.availableCurrencies"
+        [control]="currencyControl">
+      </app-catalog-item-multi-select>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="clear()">
+    <mat-icon>clear_all</mat-icon>
+    Clear
+  </button>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="apply()">Apply</button>
+</mat-dialog-actions>

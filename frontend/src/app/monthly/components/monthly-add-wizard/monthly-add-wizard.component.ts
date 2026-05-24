@@ -51,9 +51,8 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
 
   // Step 2
   newExpenseForm!: FormGroup;
-  cardWallets: WizardWallet[] = [];
-  cardWalletItems: CatalogItem[] = [];
-  walletControl = new FormControl<CatalogItem | null>(null, Validators.required);
+  currentWalletGroupId: number | null = null;
+  walletControl = new FormControl<number | null>(null, Validators.required);
   expenseTypeControl = new FormControl<CatalogItem | null>(null, Validators.required);
   vendorControl = new FormControl<CatalogItem | null>(null, Validators.required);
   searchControl = new FormControl('');
@@ -92,18 +91,11 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
         if (!item) return;
         const card = this.data.creditCards.find((c) => c.id === item.id);
         this.walletControl.setValue(null);
-        this.cardWallets = [];
-        this.cardWalletItems = [];
+        this.currentWalletGroupId = null;
         this.searchResults = [];
         this.selectedExisting = null;
         if (card) {
-          this.data.onLoadWallets(card.walletGroupId, (wallets) => {
-            this.cardWallets = wallets;
-            this.cardWalletItems = wallets.map((w) => ({
-              id: w.id,
-              name: `${w.name} (${w.currency})`,
-            }));
-          });
+          this.currentWalletGroupId = card.walletGroupId;
         }
       });
 
@@ -144,7 +136,7 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
     if (this.activeTab === 0) {
       return (
         this.newExpenseForm.valid &&
-        !!this.walletControl.value &&
+        this.walletControl.value != null &&
         !!this.expenseTypeControl.value &&
         !!this.vendorControl.value
       );
@@ -200,7 +192,7 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
       buyDate = new Date(this.newExpenseForm.get('buyDate')!.value);
       description = this.newExpenseForm.get('description')!.value as string;
       total = +this.newExpenseForm.get('total')!.value;
-      walletId = this.walletControl.value!.id;
+      walletId = this.walletControl.value!;
     } else {
       const exp = this.selectedExisting!;
       buyDate = new Date(exp.buyDate);
@@ -241,7 +233,7 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
 
     if (this.activeTab === 0) {
       mainExpense = {
-        walletId: this.walletControl.value!.id,
+        walletId: this.walletControl.value!,
         expenseTypeId: this.expenseTypeControl.value!.id,
         vendorId: this.vendorControl.value!.id,
         total: +this.newExpenseForm.get('total')!.value,

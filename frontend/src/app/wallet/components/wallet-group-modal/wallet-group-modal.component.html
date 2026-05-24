@@ -6,6 +6,7 @@
     <mat-error *ngIf="form.get('name')?.hasError('maxlength')">Max 40 characters</mat-error>
   </mat-form-field>
 
+  <!-- Add mode: dual-list currency picker -->
   <div class="currency-section" *ngIf="isAdd">
     <p class="currency-label">Select Currencies</p>
     <app-currency-dual-list
@@ -13,5 +14,35 @@
       [initialAvailable]="data.currencies"
       [showPendingBadge]="false">
     </app-currency-dual-list>
+  </div>
+
+  <!-- Edit mode: forward wallet per member -->
+  <div class="forward-section" *ngIf="!isAdd && members.length > 0">
+    <mat-divider></mat-divider>
+    <p class="section-label">Forward Wallets</p>
+    <table class="forward-table">
+      <thead>
+        <tr>
+          <th>Currency</th>
+          <th>Forward to</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of members; let i = index">
+          <td>
+            <div class="currency-cell">
+              <span class="currency-badge">{{ m.currencySymbol }}</span>
+              {{ m.currencyName }}
+            </div>
+          </td>
+          <td class="select-cell">
+            <mat-select [formControl]="memberControls[i]" class="forward-select">
+              <mat-option [value]="null">— None —</mat-option>
+              <mat-option *ngFor="let w of forwardWalletsFor(m)" [value]="w.id">{{ w.name }}</mat-option>
+            </mat-select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </form>

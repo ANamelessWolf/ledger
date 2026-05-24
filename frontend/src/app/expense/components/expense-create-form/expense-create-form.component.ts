@@ -18,6 +18,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
+import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import {
   AddExpense,
@@ -38,7 +39,8 @@ import {
     ReactiveFormsModule,
     DialogModule,
     MatButtonModule,
-    CatalogItemSelectComponent
+    CatalogItemSelectComponent,
+    WalletPickerComponent,
   ],
   templateUrl: './expense-create-form.component.html',
   styleUrl: './expense-create-form.component.scss',
@@ -78,7 +80,7 @@ export class ExpenseCreateFormComponent implements OnInit {
         total: +this.expensesForm.value.total,
         buyDate: toRequestFormat(expenseDate),
         description: this.expensesForm.value.description,
-        walletId: this.walletControl.value.id,
+        walletId: this.walletControl.value,
         expenseTypeId: this.expenseTypeControl.value.id,
         vendorId: this.vendorControl.value.id,
       };

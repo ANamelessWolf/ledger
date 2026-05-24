@@ -60,7 +60,7 @@
       <div class="tab-body">
         <form [formGroup]="expenseForm">
           <div class="form-group">
-            <app-catalog-item-select header="Wallet" [items]="data.expenseOptions.wallets" [control]="walletControl" [isRequired]="true"></app-catalog-item-select>
+            <app-wallet-picker [control]="walletControl"></app-wallet-picker>
             <mat-form-field appearance="fill">
               <mat-label>Total</mat-label>
               <input matInput formControlName="total" type="number" placeholder="0.00" required />
