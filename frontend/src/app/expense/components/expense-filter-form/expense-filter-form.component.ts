@@ -27,7 +27,9 @@ import {
   DateRange,
   ExpenseFilter,
   ExpenseFilterOptions,
+  ExpenseTypeItem,
 } from '@expense/types/expensesTypes';
+import { ExpenseTypeMultiSelectComponent } from '../expense-type-multi-select/expense-type-multi-select.component';
 
 @Component({
   selector: 'app-expense-filter-form',
@@ -43,6 +45,7 @@ import {
     ReactiveFormsModule,
     DialogModule,
     CatalogItemMultiSelectComponent,
+    ExpenseTypeMultiSelectComponent,
     RangeSliderComponent,
   ],
   templateUrl: './expense-filter-form.component.html',
@@ -58,7 +61,7 @@ export class ExpenseFilterFormComponent {
   @ViewChild('walletMultiSelect')
   walletMultiSelect!: CatalogItemMultiSelectComponent;
   @ViewChild('expenseTypeMultiSelect')
-  expenseTypeMultiSelect!: CatalogItemMultiSelectComponent;
+  expenseTypeMultiSelect!: ExpenseTypeMultiSelectComponent;
   @ViewChild('vendorMultiSelect')
   vendorMultiSelect!: CatalogItemMultiSelectComponent;
   @ViewChild('expenseRange') expenseRange!: RangeSliderComponent;
@@ -83,7 +86,7 @@ export class ExpenseFilterFormComponent {
       filter.wallet?.includes(x.id)
     );
     this.walletControl.setValue(wallet);
-    const exTypes: CatalogItem[] = data.options.expenseTypes.filter((x) =>
+    const exTypes: ExpenseTypeItem[] = data.options.expenseTypes.filter((x) =>
       filter.expenseTypes?.includes(x.id)
     );
     this.expenseTypeControl.setValue(exTypes);

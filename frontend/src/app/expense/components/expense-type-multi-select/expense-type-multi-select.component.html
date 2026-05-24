@@ -1,0 +1,29 @@
+<mat-form-field appearance="fill" class="full-width">
+  <mat-label>{{ header }}</mat-label>
+  <mat-chip-grid #chipGrid>
+    <mat-chip-row *ngFor="let name of selectedNames()" (removed)="remove(name)">
+      <app-ledger-icon [iconName]="iconFor(name)" iconSize="1x" class="chip-icon"></app-ledger-icon>
+      {{ name }}
+      <button matChipRemove>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+  </mat-chip-grid>
+
+  <input
+    [placeholder]="placeholder"
+    [matChipInputFor]="chipGrid"
+    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+    [matAutocomplete]="auto"
+    [(ngModel)]="current"
+  />
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let item of filtered()" [value]="item">
+      <div class="option-row">
+        <app-ledger-icon [iconName]="item.icon" iconSize="1x"></app-ledger-icon>
+        <span>{{ item.name }}</span>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

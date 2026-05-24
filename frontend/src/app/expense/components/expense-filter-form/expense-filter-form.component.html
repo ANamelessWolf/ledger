@@ -53,12 +53,12 @@
     </div>
     <h2>Expense Category</h2>
     <div *ngIf="visibility.enableExpenseTypes">
-      <app-catalog-item-multi-select
+      <app-expense-type-multi-select
         #expenseTypeMultiSelect
         header="Expense Type"
         [items]="data.options.expenseTypes"
         [control]="expenseTypeControl"
-      ></app-catalog-item-multi-select>
+      ></app-expense-type-multi-select>
     </div>
     <div *ngIf="visibility.enableVendors">
       <app-catalog-item-multi-select

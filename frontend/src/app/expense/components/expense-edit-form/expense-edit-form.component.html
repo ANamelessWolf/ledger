@@ -29,11 +29,11 @@
   </div>
   <h2>Expense Category</h2>
   <div class="form-group">
-    <app-catalog-item-select
+    <app-expense-type-select
       header="Type"
       [items]="data.options.expenseTypes"
       [control]="expenseTypeControl"
-    ></app-catalog-item-select>
+    ></app-expense-type-select>
     <app-catalog-item-select
       header="Vendor"
       [items]="data.options.vendors"

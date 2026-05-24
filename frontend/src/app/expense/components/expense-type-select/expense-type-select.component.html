@@ -1,0 +1,28 @@
+<mat-form-field appearance="fill">
+  <mat-label>{{ header }}</mat-label>
+
+  <span matPrefix class="icon-prefix" *ngIf="selectedItem">
+    <app-ledger-icon [iconName]="selectedItem.icon" iconSize="1x"></app-ledger-icon>
+  </span>
+
+  <input
+    type="text"
+    matInput
+    placeholder="Search..."
+    [formControl]="control"
+    [matAutocomplete]="auto"
+  />
+
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="display">
+    <mat-option *ngFor="let item of filteredItems | async" [value]="item">
+      <div class="option-row">
+        <app-ledger-icon [iconName]="item.icon" iconSize="1x"></app-ledger-icon>
+        <span>{{ item.name }}</span>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+
+  <mat-error *ngIf="isRequired && isInvalid">
+    <span *ngIf="control?.errors?.['required']">{{ errMessage }}</span>
+  </mat-error>
+</mat-form-field>

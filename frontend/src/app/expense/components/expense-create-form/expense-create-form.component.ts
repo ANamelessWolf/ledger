@@ -18,6 +18,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
+import { ExpenseTypeSelectComponent } from '../expense-type-select/expense-type-select.component';
 import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import {
@@ -40,6 +41,7 @@ import {
     DialogModule,
     MatButtonModule,
     CatalogItemSelectComponent,
+    ExpenseTypeSelectComponent,
     WalletPickerComponent,
   ],
   templateUrl: './expense-create-form.component.html',

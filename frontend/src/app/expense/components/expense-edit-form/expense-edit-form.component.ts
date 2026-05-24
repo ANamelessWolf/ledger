@@ -18,10 +18,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
+import { ExpenseTypeSelectComponent } from '../expense-type-select/expense-type-select.component';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import {
   ExpenseOptions,
   ExpenseRequest,
+  ExpenseTypeItem,
   UpdateExpense,
 } from '@expense/types/expensesTypes';
 import { CatalogItem } from '@common/types/catalogTypes';
@@ -40,6 +42,7 @@ import { CatalogItem } from '@common/types/catalogTypes';
     DialogModule,
     MatButtonModule,
     CatalogItemSelectComponent,
+    ExpenseTypeSelectComponent,
   ],
   templateUrl: './expense-edit-form.component.html',
   styleUrl: './expense-edit-form.component.scss',
@@ -75,7 +78,7 @@ export class ExpenseEditFormComponent implements OnInit {
     if (wallets.length > 0) {
       this.walletControl.setValue(wallets[0]);
     }
-    const exTypes: CatalogItem[] = data.options.expenseTypes.filter(
+    const exTypes: ExpenseTypeItem[] = data.options.expenseTypes.filter(
       (x) => x.id === data.expense.expenseTypeId
     );
     if (exTypes.length > 0) {
