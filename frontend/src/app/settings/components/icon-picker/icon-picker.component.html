@@ -1,0 +1,47 @@
+<div class="icon-picker">
+
+  <!-- Search -->
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput placeholder="Search icons…" [formControl]="searchControl" />
+    <button mat-icon-button matSuffix *ngIf="searchControl.value" (click)="clearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <!-- Current selection -->
+  <div class="current-selection" *ngIf="control.value">
+    <app-ledger-icon [iconName]="control.value" iconSize="1x" class="preview-icon"></app-ledger-icon>
+    <span class="preview-name">{{ control.value }}</span>
+  </div>
+
+  <!-- Icon grid by category -->
+  <div class="grid-scroll">
+    <ng-container *ngIf="filteredIcons.length > 0; else noResults">
+      <div *ngFor="let cat of categories" class="icon-category">
+        <p class="cat-label">{{ cat }}</p>
+        <div class="icon-grid">
+          <button
+            *ngFor="let icon of iconsForCategory(cat)"
+            type="button"
+            class="icon-cell"
+            [class.selected]="isSelected(icon.name)"
+            title="{{icon.name}}"
+            [matTooltip]="icon.name"
+            matTooltipPosition="above"
+            (click)="pick(icon.name)">
+            <app-ledger-icon [iconName]="icon.name" iconSize="1x"></app-ledger-icon>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noResults>
+      <div class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <span>No icons found</span>
+      </div>
+    </ng-template>
+  </div>
+
+</div>

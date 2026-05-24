@@ -1,0 +1,142 @@
+:host {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ── Page container — mirrors account-index-page ────────────────────────────
+
+.page-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ── Left nav — mirrors .account-list-area ──────────────────────────────────
+
+.settings-list-area {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--color-border);
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// Header — mirrors account-list-view .list-header
+.list-header {
+  position: relative;
+  width: 100%;
+  padding: 16px 0 16px 16px;
+  box-sizing: border-box;
+  margin-top: 30px;
+  height: 110px;
+}
+
+.header-position {
+  width: 100%;
+  position: relative;
+  top: 50px;
+  display: flex;
+
+  p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    font-size: xx-large;
+    margin: 0 0 0 4px;
+    color: black;
+    font-weight: normal;
+    line-height: 1;
+
+    mat-icon {
+      color: var(--color-teal);
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+  }
+}
+
+// Divider — mirrors account-list-view .divider-pad
+.divider-pad {
+  padding: 0 16px;
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0;
+  }
+}
+
+// Scrollable nav list — mirrors account-list-view .scrollable-container
+.scrollable-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-subtle);
+  margin: 12px 16px 4px;
+  padding: 0;
+}
+
+// Nav items — mirrors account-list-item .not-selected style
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-height: 48px;
+  transition: background 0.15s ease;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-subtle);
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  &:hover {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+
+    mat-icon { color: var(--color-teal); }
+  }
+
+  &.active {
+    background: var(--color-teal-light);
+    color: var(--color-teal);
+    font-weight: 600;
+    border-left: 3px solid var(--color-teal);
+    padding-left: 13px;
+
+    mat-icon { color: var(--color-teal); }
+  }
+}
+
+// ── Right content — mirrors .account-main-area ────────────────────────────
+
+.settings-main-area {
+  flex: 1;
+  overflow: hidden;
+  background: var(--color-surface);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

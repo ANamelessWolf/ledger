@@ -31,5 +31,6 @@ export class NavMenuComponent {
     { header: 'Subscriptions', route: '/subscription', icon: 'receipt', exact: false },
     { header: 'Budget', route: '/budget', icon: 'savings', exact: false },
     { header: 'Accounts', route: '/accounts', icon: 'account_balance', exact: false },
+    { header: 'Settings', route: '/settings', icon: 'settings', exact: false },
   ];
 }

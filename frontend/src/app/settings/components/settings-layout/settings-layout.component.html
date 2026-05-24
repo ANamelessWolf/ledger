@@ -1,0 +1,45 @@
+<div class="page-container">
+
+  <!-- Left nav area — mirrors account-index-page / account-list-area -->
+  <div class="settings-list-area">
+
+    <div class="list-header">
+      <div class="header-position">
+        <p>
+          <mat-icon>settings</mat-icon>
+          Settings
+        </p>
+      </div>
+    </div>
+
+    <div class="divider-pad"><hr /></div>
+
+    <div class="scrollable-container">
+      <a class="nav-item"
+         routerLink="hub"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>dashboard</mat-icon>
+        <span>Overview</span>
+      </a>
+
+      <ng-container *ngFor="let section of sections">
+        <p class="section-label">{{ section.label }}</p>
+        <a class="nav-item"
+           *ngFor="let item of section.items"
+           [routerLink]="['catalog', item.id]"
+           routerLinkActive="active">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      </ng-container>
+    </div>
+
+  </div>
+
+  <!-- Right content area — mirrors account-index-page / account-main-area -->
+  <div class="settings-main-area">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

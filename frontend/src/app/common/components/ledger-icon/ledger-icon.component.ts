@@ -2,11 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { IconType } from '@config/commonTypes';
-
-// Icons served from assets/icons/<name>.svg instead of mat-icon
-const CUSTOM_SVG_ICONS = new Set<string>([
-  // Add icon filenames (without .svg) here as custom assets are added
-]);
+import { CUSTOM_SVG_ICON_NAMES } from '@config/svg-icon-registry';
 
 const SIZE_MAP: Record<string, string> = {
   '1x': '24px',
@@ -28,7 +24,7 @@ export class LedgerIconComponent {
   @Input() iconSize = '1x';
 
   get isCustomSvg(): boolean {
-    return CUSTOM_SVG_ICONS.has(this.iconName);
+    return CUSTOM_SVG_ICON_NAMES.has(this.iconName);
   }
 
   get svgPath(): string {
