@@ -41,6 +41,18 @@ $color-wallet:   #7c3aed;
   grid-template-columns: minmax(80px, 26%) 1fr auto;
   align-items: center;
   gap: 10px;
+
+  &.clickable {
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: var(--color-bg-subtle, #f1f5f9);
+
+      .row-label { text-decoration: underline; }
+    }
+  }
 }
 
 .row-label {

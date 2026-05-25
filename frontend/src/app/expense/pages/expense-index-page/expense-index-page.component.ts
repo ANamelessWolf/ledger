@@ -32,6 +32,7 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { WalletService } from '@wallet/services/wallet.service';
 import { WalletItem } from '@wallet/types/wallet.types';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-expense-index-page',
@@ -63,6 +64,7 @@ export class ExpenseIndexPageComponent implements OnInit {
   totalItems: number = 0;
   chartExpenses: Expense[] = [];
   walletItems: WalletItem[] = [];
+  walletGroupCardMap: Map<string, string> = new Map();
 
   get chartTotal(): number {
     return this.chartExpenses
@@ -100,7 +102,7 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.getExpenses();
     this.getChartExpenses();
     this.getCatalog();
-    this.loadWallets();
+    this.loadWalletCardLinks();
   }
 
   private applyQueryParams(): void {
@@ -214,9 +216,32 @@ export class ExpenseIndexPageComponent implements OnInit {
     );
   }
 
-  private loadWallets(): void {
-    this.walletService.getAllWallets().subscribe({
-      next: (response) => { this.walletItems = response.data; },
+  private loadWalletCardLinks(): void {
+    forkJoin({
+      wallets: this.walletService.getAllWallets(),
+      cards: this.catalogService.getCreditCardsWithWalletGroup(),
+    }).subscribe({
+      next: ({ wallets, cards }: any) => {
+        this.walletItems = wallets.data ?? [];
+
+        const groupNameMap = new Map<number, string>();
+        for (const w of this.walletItems) {
+          if (w.walletGroupId && w.walletGroupName) {
+            groupNameMap.set(w.walletGroupId, w.walletGroupName);
+          }
+        }
+
+        const cardMap = new Map<string, string>();
+        for (const card of (cards.data ?? [])) {
+          if (card.walletGroupId) {
+            const groupName = groupNameMap.get(card.walletGroupId);
+            if (groupName && !cardMap.has(groupName)) {
+              cardMap.set(groupName, `/cards/cc/${card.id}`);
+            }
+          }
+        }
+        this.walletGroupCardMap = cardMap;
+      },
     });
   }
 

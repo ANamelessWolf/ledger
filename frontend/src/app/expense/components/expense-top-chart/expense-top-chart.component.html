@@ -7,7 +7,10 @@
   <div class="chart-empty" *ngIf="isEmpty">No data available</div>
 
   <div class="chart-rows" *ngIf="!isEmpty">
-    <div class="chart-row" *ngFor="let item of top10">
+    <div class="chart-row"
+         *ngFor="let item of top10"
+         [class.clickable]="groupBy === 'wallet' && getLink(item[0]) !== null"
+         (click)="navigate(item[0])">
       <span class="row-label" [title]="item[0]">{{ item[0] }}</span>
       <div class="row-track">
         <div class="row-bar" [style.width.%]="barPct(item[1])"></div>

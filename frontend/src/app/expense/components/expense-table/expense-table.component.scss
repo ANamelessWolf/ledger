@@ -87,3 +87,9 @@ h1 {
   font-size: x-large;
   font-weight: bold;
 }
+
+.delete-item {
+  color: #e53935;
+
+  mat-icon { color: #e53935; }
+}

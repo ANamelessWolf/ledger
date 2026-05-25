@@ -1,6 +1,5 @@
-import { DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -8,25 +7,31 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  MatNativeDateModule,
-  provideNativeDateAdapter,
-} from '@angular/material/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CatalogItemSelectComponent } from '@common/components/catalog-item-select/catalog-item-select.component';
-import { ExpenseTypeSelectComponent } from '../expense-type-select/expense-type-select.component';
+import { CurrencyInputDirective } from '@common/directives/currency-input.directive';
 import { toRequestFormat } from '@common/utils/formatUtils';
+import { CatalogItem } from '@common/types/catalogTypes';
+import { ExpenseTypeSelectComponent } from '../expense-type-select/expense-type-select.component';
 import {
   ExpenseOptions,
   ExpenseRequest,
   ExpenseTypeItem,
   UpdateExpense,
 } from '@expense/types/expensesTypes';
-import { CatalogItem } from '@common/types/catalogTypes';
+import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
+import { WalletService } from '@wallet/services/wallet.service';
+import { WalletItem } from '@wallet/types/wallet.types';
+
+export interface ExpenseEditData {
+  expense: UpdateExpense;
+  options: ExpenseOptions;
+  isValid: () => boolean;
+  getResult: () => ExpenseRequest;
+}
 
 @Component({
   selector: 'app-expense-edit-form',
@@ -39,93 +44,95 @@ import { CatalogItem } from '@common/types/catalogTypes';
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    DialogModule,
-    MatButtonModule,
     CatalogItemSelectComponent,
     ExpenseTypeSelectComponent,
+    WalletPickerComponent,
+    CurrencyInputDirective,
   ],
   templateUrl: './expense-edit-form.component.html',
   styleUrl: './expense-edit-form.component.scss',
 })
 export class ExpenseEditFormComponent implements OnInit {
-  expensesForm: FormGroup;
-  walletControl = new FormControl();
-  expenseTypeControl = new FormControl();
-  vendorControl = new FormControl();
+  data!: ExpenseEditData;
 
-  constructor(
-    public dialogRef: MatDialogRef<ExpenseEditFormComponent>,
-    private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      header: string;
-      expense: UpdateExpense;
-      options: ExpenseOptions;
-      expenseUpdated: (request: ExpenseRequest) => void;
-    }
-  ) {
-    this.expensesForm = this.fb.group({
-      total: [
-        this.data.expense.total,
-        [Validators.required, Validators.pattern(/^-?\d+(\.\d{1,2})?$/)],
-      ],
-      expenseDate: [new Date(this.data.expense.buyDate), Validators.required],
-      description: [this.data.expense.description, [Validators.required]],
+  form!: FormGroup;
+  walletControl = new FormControl<number | null>(null);
+  expenseTypeControl = new FormControl<ExpenseTypeItem | null>(null);
+  vendorControl = new FormControl<CatalogItem | null>(null);
+
+  initialWalletGroupId: number | null = null;
+  initialWalletCurrencyId: number | null = null;
+  walletPickerReady = false;
+  submitted = false;
+
+  constructor(private fb: FormBuilder, private walletService: WalletService) {}
+
+  ngOnInit(): void {
+    const exp = this.data.expense;
+
+    this.form = this.fb.group({
+      total:       [exp.total,                [Validators.required, Validators.min(0.01)]],
+      expenseDate: [new Date(exp.buyDate),    Validators.required],
+      description: [exp.description,         Validators.required],
     });
-    const wallets: CatalogItem[] = data.options.wallets.filter(
-      (x) => x.id === data.expense.walletId
+
+    const expType = this.data.options.expenseTypes.find(x => x.id === exp.expenseTypeId);
+    if (expType) this.expenseTypeControl.setValue(expType);
+
+    const vendor = this.data.options.vendors.find(x => x.id === exp.vendorId);
+    if (vendor) this.vendorControl.setValue(vendor);
+
+    this.walletService.getAllWallets().subscribe({
+      next: (res) => {
+        const allWallets: WalletItem[] = res.data ?? [];
+        const wallet = allWallets.find(w => w.id === exp.walletId);
+        if (wallet) {
+          this.initialWalletGroupId   = wallet.walletGroupId;
+          this.initialWalletCurrencyId = wallet.currencyId;
+        }
+        this.walletPickerReady = true;
+      },
+    });
+
+    this.data.isValid   = () => this.isFormValid();
+    this.data.getResult = () => this.buildResult();
+  }
+
+  get walletMissing(): boolean {
+    return this.submitted && this.walletControl.value === null;
+  }
+  get typeMissing(): boolean {
+    return this.submitted && this.expenseTypeControl.value === null;
+  }
+  get vendorMissing(): boolean {
+    return this.submitted && this.vendorControl.value === null;
+  }
+
+  get total()       { return this.form.get('total'); }
+  get expenseDate() { return this.form.get('expenseDate'); }
+  get description() { return this.form.get('description'); }
+
+  private isFormValid(): boolean {
+    this.submitted = true;
+    return (
+      this.form.valid &&
+      this.walletControl.value   !== null &&
+      this.expenseTypeControl.value !== null &&
+      this.vendorControl.value   !== null
     );
-    if (wallets.length > 0) {
-      this.walletControl.setValue(wallets[0]);
-    }
-    const exTypes: ExpenseTypeItem[] = data.options.expenseTypes.filter(
-      (x) => x.id === data.expense.expenseTypeId
-    );
-    if (exTypes.length > 0) {
-      this.expenseTypeControl.setValue(exTypes[0]);
-    }
-    const vendors: CatalogItem[] = data.options.vendors.filter(
-      (x) => x.id === data.expense.vendorId
-    );
-    if (vendors.length > 0) {
-      this.vendorControl.setValue(vendors[0]);
-    }
   }
 
-  ngOnInit(): void {}
-
-  onSubmit() {
-    if (this.expensesForm.valid) {
-      const expenseDate = new Date(this.expensesForm.value.expenseDate);
-      const id = this.data.expense.id;
-      const body: UpdateExpense = {
-        id: this.data.expense.id,
-        total: +this.expensesForm.value.total,
-        buyDate: toRequestFormat(expenseDate),
-        description: this.expensesForm.value.description,
-        walletId: this.walletControl.value.id,
-        expenseTypeId: this.expenseTypeControl.value.id,
-        vendorId: this.vendorControl.value.id,
-      };
-
-      this.data.expenseUpdated({ id, body });
-      this.dialogRef.close();
-    }
-  }
-
-  get total() {
-    return this.expensesForm.get('total');
-  }
-
-  get expenseDate() {
-    return this.expensesForm.get('expenseDate');
-  }
-
-  get description() {
-    return this.expensesForm.get('description');
-  }
-
-  close() {
-    this.dialogRef.close();
+  private buildResult(): ExpenseRequest {
+    const expenseDate = new Date(this.form.value.expenseDate);
+    const body: UpdateExpense = {
+      id:            this.data.expense.id,
+      total:         this.form.value.total,
+      buyDate:       toRequestFormat(expenseDate),
+      description:   this.form.value.description,
+      walletId:      this.walletControl.value!,
+      expenseTypeId: this.expenseTypeControl.value!.id,
+      vendorId:      this.vendorControl.value!.id,
+    };
+    return { id: this.data.expense.id, body };
   }
 }

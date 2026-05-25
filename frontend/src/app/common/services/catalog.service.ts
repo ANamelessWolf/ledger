@@ -62,4 +62,8 @@ export class CatalogService {
   getFinancingTypes(): Observable<any> {
     return this.http.get(`${LEDGER_API.CATALOG}/financing-types`);
   }
+
+  getCreditCardsWithWalletGroup(): Observable<any> {
+    return this.http.get(`${LEDGER_API.MO_NO_INT}/credit-cards`);
+  }
 }

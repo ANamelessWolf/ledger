@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { Expense } from '@expense/types/expensesTypes';
 import { WalletItem } from '@wallet/types/wallet.types';
@@ -18,6 +19,9 @@ export class ExpenseTopChartComponent implements OnChanges {
   @Input() groupBy: ChartGroupBy = 'expenseType';
   @Input() title = '';
   @Input() walletItems: WalletItem[] = [];
+  @Input() walletLinks: Map<string, string> = new Map();
+
+  constructor(private router: Router) {};
 
   top10: [string, number][] = [];
 
@@ -30,6 +34,15 @@ export class ExpenseTopChartComponent implements OnChanges {
 
   barPct(amount: number): number {
     return Math.round((amount / this.maxAmount) * 100);
+  }
+
+  getLink(name: string): string | null {
+    return this.walletLinks.get(name) ?? null;
+  }
+
+  navigate(name: string): void {
+    const route = this.getLink(name);
+    if (route) this.router.navigateByUrl(route);
   }
 
   private computeTop10(): [string, number][] {

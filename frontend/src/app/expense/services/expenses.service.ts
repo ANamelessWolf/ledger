@@ -1,13 +1,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { isValidDate } from '@common/utils/dateUtils';
 import { QueryBuilder } from '@common/utils/filterUtils';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
-import { ExpenseCreateFormComponent } from '@expense/components/expense-create-form/expense-create-form.component';
-import { ExpenseEditFormComponent } from '@expense/components/expense-edit-form/expense-edit-form.component';
-import { ExpenseFilterFormComponent } from '@expense/components/expense-filter-form/expense-filter-form.component';
+import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogData } from '@common/types/DialogData';
+import { DialogButton } from '@config/enums';
+import {
+  ExpenseCreateFormComponent,
+  ExpenseCreateData,
+} from '@expense/components/expense-create-form/expense-create-form.component';
+import {
+  ExpenseEditFormComponent,
+  ExpenseEditData,
+} from '@expense/components/expense-edit-form/expense-edit-form.component';
+import {
+  ExpenseFilterFormComponent,
+  ExpenseFilterData,
+} from '@expense/components/expense-filter-form/expense-filter-form.component';
 import {
   AddExpense,
   ExpenseFilter,
@@ -17,7 +28,7 @@ import {
   ExpenseSearchOptions,
   UpdateExpense,
 } from '@expense/types/expensesTypes';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -48,21 +59,41 @@ export class ExpensesService {
     return this.http.put(`${LEDGER_API.EXPENSES}/${id}`, body);
   }
 
+  deleteExpense(id: number): Observable<any> {
+    return this.http.delete(`${LEDGER_API.EXPENSES}/${id}`);
+  }
+
   // Dialogs
   showCreateExpenseDialog(
     header: string,
     options: ExpenseOptions,
     expenseAdded: (newExpense: AddExpense) => void
   ) {
-    const dialogRef = this.dialog.open(ExpenseCreateFormComponent, {
-      width: '600px',
+    const data: ExpenseCreateData = {
+      options,
+      isValid:   () => false,
+      getResult: () => ({} as AddExpense),
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '520px',
       data: {
-        header: header,
-        options: options,
-        expenseAdded: expenseAdded,
-      },
+        header,
+        component:      ExpenseCreateFormComponent,
+        data,
+        validationData: data,
+        buttons:        [DialogButton.CANCEL, DialogButton.SAVE],
+        validate:       (d: ExpenseCreateData) => d.isValid(),
+      } as DialogData,
     });
-    return dialogRef.afterClosed();
+
+    return dialogRef.afterClosed().pipe(
+      tap((result) => {
+        if (result?.button === DialogButton.SAVE) {
+          expenseAdded(data.getResult());
+        }
+      })
+    );
   }
 
   showEditExpenseDialog(
@@ -71,32 +102,65 @@ export class ExpensesService {
     options: ExpenseOptions,
     expenseUpdated: (request: ExpenseRequest) => void
   ) {
-    const dialogRef = this.dialog.open(ExpenseEditFormComponent, {
-      width: '600px',
+    const data: ExpenseEditData = {
+      expense,
+      options,
+      isValid:   () => false,
+      getResult: () => ({ id: expense.id, body: expense }),
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '520px',
       data: {
         header,
-        expense,
-        options,
-        expenseUpdated,
-      },
+        component:      ExpenseEditFormComponent,
+        data,
+        validationData: data,
+        buttons:        [DialogButton.CANCEL, DialogButton.SAVE],
+        validate:       (d: ExpenseEditData) => d.isValid(),
+      } as DialogData,
     });
-    return dialogRef.afterClosed();
+
+    return dialogRef.afterClosed().pipe(
+      tap((result) => {
+        if (result?.button === DialogButton.SAVE) {
+          expenseUpdated(data.getResult());
+        }
+      })
+    );
   }
 
   showFilterExpenseDialog(
     options: ExpenseFilterOptions,
     filterSelected: (filter: ExpenseFilter) => void
   ) {
-    const header: string = 'Expense Filters';
-    const dialogRef = this.dialog.open(ExpenseFilterFormComponent, {
-      width: '800px',
+    const data: ExpenseFilterData = {
+      options,
+      isValid:   () => true,
+      getResult: () => ({} as ExpenseFilter),
+      reset:     () => {},
+    };
+
+    const dialogRef = this.dialog.open(DialogWrapperComponent, {
+      width: '560px',
       data: {
-        header: header,
-        options: options,
-        filterSelected: filterSelected,
-      },
+        header:         'Expense Filters',
+        component:      ExpenseFilterFormComponent,
+        data,
+        validationData: data,
+        buttons:        [DialogButton.CLEAR, DialogButton.CANCEL, DialogButton.APPLY],
+        validate:       (d: ExpenseFilterData) => d.isValid(),
+        onClear:        () => data.reset(),
+      } as DialogData,
     });
-    return dialogRef.afterClosed();
+
+    return dialogRef.afterClosed().pipe(
+      tap((result) => {
+        if (result?.button === DialogButton.APPLY) {
+          filterSelected(data.getResult());
+        }
+      })
+    );
   }
 
   private getExpensesQueryString = (
