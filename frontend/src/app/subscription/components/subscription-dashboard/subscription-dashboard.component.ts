@@ -4,8 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -24,8 +22,6 @@ import { Subscription } from '@subscription/types/subscriptionTypes';
     MatSortModule,
     MatButtonModule,
     MatMenuModule,
-    MatSlideToggleModule,
-    MatCardModule,
     MatDividerModule,
     MoneyPipe,
   ],

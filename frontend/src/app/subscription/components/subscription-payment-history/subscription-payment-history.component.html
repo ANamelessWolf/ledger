@@ -1,6 +1,4 @@
-<h2 mat-dialog-title>Payment History — {{ data.subscriptionName }}</h2>
-
-<mat-dialog-content class="history-content">
+<div class="history-content">
   <div *ngIf="isLoading" class="spinner-wrapper">
     <mat-spinner diameter="36"></mat-spinner>
   </div>
@@ -19,14 +17,10 @@
       </div>
       <div matListItemMeta class="item-actions">
         <span class="item-total">${{ item.total | number:'1.2-2' }}</span>
-        <button mat-icon-button color="warn" matTooltip="Remove from history" (click)="removePayment(item)">
+        <button type="button" mat-icon-button color="warn" matTooltip="Remove from history" (click)="removePayment(item)">
           <mat-icon>delete_outline</mat-icon>
         </button>
       </div>
     </mat-list-item>
   </mat-list>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="close()">Close</button>
-</mat-dialog-actions>
+</div>

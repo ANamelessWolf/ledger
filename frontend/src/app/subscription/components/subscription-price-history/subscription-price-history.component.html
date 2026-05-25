@@ -1,6 +1,4 @@
-<h2 mat-dialog-title>Price History — {{ data.subscriptionName }}</h2>
-
-<mat-dialog-content class="price-history-content">
+<div class="price-history-content">
   <div *ngIf="loading" class="loading-container">
     <mat-spinner diameter="48"></mat-spinner>
   </div>
@@ -12,10 +10,6 @@
   <app-line-chart
     *ngIf="!loading && chartData.labels.length > 0"
     [data]="chartData"
-    [chartHeight]="340">
+    [chartHeight]="300">
   </app-line-chart>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button type="button" mat-button (click)="close()">Close</button>
-</mat-dialog-actions>
+</div>

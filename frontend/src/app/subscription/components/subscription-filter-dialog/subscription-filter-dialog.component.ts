@@ -1,17 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
+import { CatalogItem } from '@common/types/catalogTypes';
 import {
   DEFAULT_SUBSCRIPTION_FILTER,
   SubscriptionFilter,
-  SubscriptionFilterDialogData,
 } from '@subscription/types/subscriptionTypes';
+
+export interface SubscriptionFilterFormData {
+  current: SubscriptionFilter;
+  paymentFrequencies: CatalogItem[];
+  walletGroups: CatalogItem[];
+  isValid: () => boolean;
+  getResult: () => SubscriptionFilter;
+  reset: () => void;
+}
 
 @Component({
   selector: 'app-subscription-filter-dialog',
@@ -19,50 +24,34 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatButtonModule,
-    MatDividerModule,
-    MatIconModule,
   ],
   templateUrl: './subscription-filter-dialog.component.html',
   styleUrl: './subscription-filter-dialog.component.scss',
 })
 export class SubscriptionFilterDialogComponent implements OnInit {
+  data!: SubscriptionFilterFormData;
   form!: FormGroup;
 
   statusOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'active', label: 'Active' },
+    { value: 'all',      label: 'All' },
+    { value: 'active',   label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<SubscriptionFilterDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: SubscriptionFilterDialogData
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     const c = this.data.current;
     this.form = this.fb.group({
-      status: [c.status],
+      status:             [c.status],
       paymentFrequencyId: [c.paymentFrequencyId],
-      walletGroupId: [c.walletGroupId],
+      walletGroupId:      [c.walletGroupId],
     });
-  }
 
-  apply(): void {
-    const filter: SubscriptionFilter = this.form.value;
-    this.dialogRef.close(filter);
-  }
-
-  clear(): void {
-    this.dialogRef.close({ ...DEFAULT_SUBSCRIPTION_FILTER });
-  }
-
-  cancel(): void {
-    this.dialogRef.close(null);
+    this.data.isValid   = () => true;
+    this.data.getResult = () => this.form.value as SubscriptionFilter;
+    this.data.reset     = () => this.form.patchValue({ ...DEFAULT_SUBSCRIPTION_FILTER });
   }
 }

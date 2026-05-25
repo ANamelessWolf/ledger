@@ -1,9 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
 import { CatalogItem } from '@common/types/catalogTypes';
@@ -17,12 +14,9 @@ import {
   DEFAULT_SUBSCRIPTION_FILTER,
   Subscription,
   SubscriptionFilter,
-  SubscriptionFilterDialogData,
   SubscriptionSummary,
   UpdateSubscription,
 } from '@subscription/types/subscriptionTypes';
-import { SubscriptionFilterDialogComponent } from '@subscription/components/subscription-filter-dialog/subscription-filter-dialog.component';
-import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.component';
 
 @Component({
@@ -30,8 +24,6 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
     PageLayoutComponent,
     SubscriptionDashboardComponent,
     SubscriptionSummaryComponent,
@@ -42,7 +34,7 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
 })
 export class SubscriptionPageComponent implements OnInit {
   subscriptions: Subscription[] = [];
-  searchTerm: string = '';
+  searchTerm     = '';
   activeFilter: SubscriptionFilter = { ...DEFAULT_SUBSCRIPTION_FILTER };
   summary: SubscriptionSummary | null = null;
 
@@ -56,7 +48,7 @@ export class SubscriptionPageComponent implements OnInit {
     let result = this.subscriptions;
     const term = this.searchTerm.trim().toLowerCase();
     if (term) result = result.filter(s => s.name.toLowerCase().includes(term));
-    if (this.activeFilter.status === 'active') result = result.filter(s => s.active === 1);
+    if (this.activeFilter.status === 'active')   result = result.filter(s => s.active === 1);
     if (this.activeFilter.status === 'inactive') result = result.filter(s => s.active !== 1);
     if (this.activeFilter.paymentFrequencyId !== null)
       result = result.filter(s => s.paymentFrequencyId === this.activeFilter.paymentFrequencyId);
@@ -65,21 +57,16 @@ export class SubscriptionPageComponent implements OnInit {
     return result;
   }
 
-  walletGroups: CatalogItem[] = [];
-  currencies: CatalogItem[] = [];
-  paymentFrequencies: CatalogItem[] = [];
-  expenseOptions: ExpenseOptions = { wallets: [], expenseTypes: [], vendors: [] };
+  walletGroups:       CatalogItem[]  = [];
+  currencies:         CatalogItem[]  = [];
+  paymentFrequencies: CatalogItem[]  = [];
+  expenseOptions:     ExpenseOptions = { wallets: [], expenseTypes: [], vendors: [] };
 
   currencyConversionMap: Map<number, number> = new Map();
-  defaultCurrencySymbol: string = '';
+  defaultCurrencySymbol = '';
 
-  get activeTotal(): number {
-    return this.computeTotal(1);
-  }
-
-  get inactiveTotal(): number {
-    return this.computeTotal(0);
-  }
+  get activeTotal(): number   { return this.computeTotal(1); }
+  get inactiveTotal(): number { return this.computeTotal(0); }
 
   private computeTotal(activeStatus: number): number {
     return this.subscriptions
@@ -89,10 +76,9 @@ export class SubscriptionPageComponent implements OnInit {
 
   constructor(
     private subscriptionService: SubscriptionService,
-    private catalogService: CatalogService,
-    private expensesService: ExpensesService,
-    private notifService: NotificationService,
-    private dialog: MatDialog
+    private catalogService:      CatalogService,
+    private expensesService:     ExpensesService,
+    private notifService:        NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -102,22 +88,19 @@ export class SubscriptionPageComponent implements OnInit {
 
   onSummaryPeriodChange(period: { month: number; year: number }): void {
     this.subscriptionService.getSummary(period.month, period.year).subscribe({
-      next: (res) => (this.summary = res.data ?? null),
+      next:  (res) => (this.summary = res.data ?? null),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
   }
 
   addSubscription(): void {
     this.subscriptionService.showSubscriptionFormDialog({
-      walletGroups: this.walletGroups,
-      currencies: this.currencies,
+      walletGroups:       this.walletGroups,
+      currencies:         this.currencies,
       paymentFrequencies: this.paymentFrequencies,
       onSaved: (data: AddSubscription) => {
         this.subscriptionService.createSubscription(data).subscribe({
-          next: () => {
-            this.notifService.showNotification('Subscription created', 'success');
-            this.loadSubscriptions();
-          },
+          next:  () => { this.notifService.showNotification('Subscription created', 'success'); this.loadSubscriptions(); },
           error: (err: HttpErrorResponse) => this.notifService.showError(err),
         });
       },
@@ -126,27 +109,24 @@ export class SubscriptionPageComponent implements OnInit {
 
   onEdit(subscription: Subscription): void {
     const updateData: UpdateSubscription = {
-      id: subscription.id,
-      name: subscription.name,
-      price: subscription.price,
-      walletGroupId: subscription.walletGroupId,
-      currencyId: subscription.currencyId,
+      id:                 subscription.id,
+      name:               subscription.name,
+      price:              subscription.price,
+      walletGroupId:      subscription.walletGroupId,
+      currencyId:         subscription.currencyId,
       paymentFrequencyId: subscription.paymentFrequencyId,
-      chargeDay: subscription.chargeDay,
-      lastPaymentDate: subscription.lastPaymentDate,
-      active: subscription.active,
+      chargeDay:          subscription.chargeDay,
+      lastPaymentDate:    subscription.lastPaymentDate,
+      active:             subscription.active,
     };
     this.subscriptionService.showSubscriptionFormDialog({
-      subscription: updateData,
-      walletGroups: this.walletGroups,
-      currencies: this.currencies,
+      subscription:       updateData,
+      walletGroups:       this.walletGroups,
+      currencies:         this.currencies,
       paymentFrequencies: this.paymentFrequencies,
       onSaved: (data: AddSubscription) => {
         this.subscriptionService.updateSubscription(subscription.id, { ...data, id: subscription.id }).subscribe({
-          next: () => {
-            this.notifService.showNotification('Subscription updated', 'success');
-            this.loadSubscriptions();
-          },
+          next:  () => { this.notifService.showNotification('Subscription updated', 'success'); this.loadSubscriptions(); },
           error: (err: HttpErrorResponse) => this.notifService.showError(err),
         });
       },
@@ -154,24 +134,12 @@ export class SubscriptionPageComponent implements OnInit {
   }
 
   onDelete(subscription: Subscription): void {
-    const ref = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Delete Subscription',
-        message: `Delete "${subscription.name}"? This will also remove all associated payment history records.`,
-        confirmLabel: 'Delete',
-        cancelLabel: 'Cancel',
-      },
-    });
-    ref.afterClosed().subscribe((confirmed: boolean) => {
-      if (!confirmed) return;
+    this.subscriptionService.showDeleteConfirmDialog(subscription, () => {
       this.subscriptionService.deleteSubscription(subscription.id).subscribe({
         next: () => {
           this.notifService.showNotification('Subscription deleted', 'success');
           this.loadSubscriptions();
-          if (this.summary) {
-            this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
-          }
+          if (this.summary) this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
         },
         error: (err: HttpErrorResponse) => this.notifService.showError(err),
       });
@@ -183,18 +151,16 @@ export class SubscriptionPageComponent implements OnInit {
       next: (res) => {
         const existingPayments = (res.data ?? []).map((p: any) => ({ id: p.id, expenseId: p.expenseId }));
         this.subscriptionService.showAddPaymentDialog({
-          subscriptionId: subscription.id,
+          subscriptionId:   subscription.id,
           subscriptionName: subscription.name,
-          expenseOptions: this.expenseOptions,
+          expenseOptions:   this.expenseOptions,
           existingPayments,
           onPaymentsAdded: (expenseIds: number[]) => {
             this.subscriptionService.addPayments(subscription.id, expenseIds).subscribe({
               next: () => {
                 this.notifService.showNotification('Payment(s) added', 'success');
                 this.loadSubscriptions();
-                if (this.summary) {
-                  this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
-                }
+                if (this.summary) this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
               },
               error: (err: HttpErrorResponse) => this.notifService.showError(err),
             });
@@ -203,16 +169,14 @@ export class SubscriptionPageComponent implements OnInit {
             this.subscriptionService.removePayment(subscription.id, paymentHistoryId).subscribe({
               next: () => {
                 this.notifService.showNotification('Payment unlinked', 'success');
-                if (this.summary) {
-                  this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
-                }
+                if (this.summary) this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
               },
               error: (err: HttpErrorResponse) => this.notifService.showError(err),
             });
           },
           onExpenseCreated: (expense: AddExpense, onCreated: (id: number) => void) => {
             this.expensesService.createExpense(expense).subscribe({
-              next: (res) => onCreated(res.data?.id),
+              next:  (res) => onCreated(res.data?.id),
               error: (err: HttpErrorResponse) => this.notifService.showError(err),
             });
           },
@@ -224,15 +188,13 @@ export class SubscriptionPageComponent implements OnInit {
 
   onViewHistory(subscription: Subscription): void {
     this.subscriptionService.showPaymentHistoryDialog({
-      subscriptionId: subscription.id,
+      subscriptionId:   subscription.id,
       subscriptionName: subscription.name,
       onPaymentRemoved: (paymentId: number) => {
         this.subscriptionService.removePayment(subscription.id, paymentId).subscribe({
           next: () => {
             this.notifService.showNotification('Payment removed', 'success');
-            if (this.summary) {
-              this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
-            }
+            if (this.summary) this.onSummaryPeriodChange({ month: this.summary.month, year: this.summary.year });
           },
           error: (err: HttpErrorResponse) => this.notifService.showError(err),
         });
@@ -242,73 +204,59 @@ export class SubscriptionPageComponent implements OnInit {
 
   onViewPriceHistory(subscription: Subscription): void {
     this.subscriptionService.showPriceHistoryDialog({
-      subscriptionId: subscription.id,
-      subscriptionName: subscription.name,
+      subscriptionId:     subscription.id,
+      subscriptionName:   subscription.name,
       currencyConversion: this.currencyConversionMap.get(subscription.currencyId) ?? 1,
     }).subscribe();
   }
 
-  onSearch(term: string): void {
-    this.searchTerm = term;
-  }
+  onSearch(term: string): void { this.searchTerm = term; }
 
   openFilter(): void {
-    const data: SubscriptionFilterDialogData = {
-      current: { ...this.activeFilter },
-      paymentFrequencies: this.paymentFrequencies,
-      walletGroups: this.walletGroups,
-    };
-    this.dialog.open(SubscriptionFilterDialogComponent, { width: '420px', data })
-      .afterClosed()
-      .subscribe((result: SubscriptionFilter | null) => {
-        if (result !== null && result !== undefined) {
-          this.activeFilter = result;
-        }
-      });
+    this.subscriptionService.showFilterDialog(
+      this.activeFilter,
+      this.paymentFrequencies,
+      this.walletGroups,
+      (filter) => { this.activeFilter = filter; },
+    );
   }
 
   private loadSubscriptions(): void {
     this.subscriptionService.getSubscriptions().subscribe({
-      next: (res) => (this.subscriptions = res.data ?? []),
+      next:  (res) => (this.subscriptions = res.data ?? []),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
   }
 
   private loadCatalogs(): void {
     this.catalogService.getWalletGroups().subscribe({
-      next: (res) => (this.walletGroups = res.data ?? []),
+      next:  (res) => (this.walletGroups = res.data ?? []),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getWallets().subscribe({
-      next: (res) => {
-        this.expenseOptions = { ...this.expenseOptions, wallets: res.data ?? [] };
-      },
+      next:  (res) => { this.expenseOptions = { ...this.expenseOptions, wallets: res.data ?? [] }; },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getCurrencies().subscribe({
       next: (res) => {
         const list = res.data ?? [];
-        this.currencies = list;
+        this.currencies            = list;
         this.currencyConversionMap = new Map(list.map((c: any) => [c.id, c.conversion ?? 1]));
-        const def = list.find((c: any) => c.conversion === 1);
+        const def                  = list.find((c: any) => c.conversion === 1);
         this.defaultCurrencySymbol = def?.symbol ?? '';
       },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getPaymentFrequencies().subscribe({
-      next: (res) => (this.paymentFrequencies = res.data ?? []),
+      next:  (res) => (this.paymentFrequencies = res.data ?? []),
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getExpensesTypes().subscribe({
-      next: (res) => {
-        this.expenseOptions = { ...this.expenseOptions, expenseTypes: res.data ?? [] };
-      },
+      next:  (res) => { this.expenseOptions = { ...this.expenseOptions, expenseTypes: res.data ?? [] }; },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
     this.catalogService.getVendors().subscribe({
-      next: (res) => {
-        this.expenseOptions = { ...this.expenseOptions, vendors: res.data ?? [] };
-      },
+      next:  (res) => { this.expenseOptions = { ...this.expenseOptions, vendors: res.data ?? [] }; },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
     });
   }

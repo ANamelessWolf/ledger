@@ -122,6 +122,15 @@
   }
 }
 
-.full-width {
-  width: 100%;
+.full-width { width: 100%; }
+
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.btn-apply, .btn-create {
+  background: #087e8b !important;
+  color: white !important;
 }
