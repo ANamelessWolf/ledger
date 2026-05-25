@@ -1,56 +1,40 @@
-.monoint-index-page {
+:host {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
 
-  .header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 16px 0px 120px;
+// ── Widget area ───────────────────────────────────────────
+.monoint-widgets {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px;
+}
 
-    h1 {
-      min-width: 200px;
-      font-size: xx-large;
-      margin-top: 16px;
-      margin-left: 4px;
-      color: black;
-      margin: 0;
-    }
+.widget-top {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
 
-    .button-group {
-      display: flex;
-      gap: 8px;
+.widget-overview {
+  flex: 1;
+  min-width: 0;
+}
 
-      button {
-        margin: 0;
-      }
-    }
-  }
+.widget-chart {
+  flex-shrink: 0;
+}
 
-  hr {
-    margin: 0px;
-  }
-
-  .main-section {
-    flex: 1;
-    padding: 16px;
-    min-height: 80vh;
-  }
-
-  .overview {
-    width: 100%;
-    overflow: auto;
-
-    .overview-summary {
-      width: calc(100% - 480px);
-      padding: 10px;
-      float: left;
-    }
-
-    .overview-chart {
-      margin-left: 10px;
-      padding: 10px;
-      float: left;
-    }
-  }
+// ── Main content ──────────────────────────────────────────
+.main-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 24px;
+  overflow: hidden;
 }

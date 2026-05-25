@@ -16,7 +16,8 @@ export const EMPTY_FREE_MONTHLY_INT = {
 export interface ICardValue {
   card: string;
   color: string;
-  value: number;
+  value: number;   // percent for chart
+  balance: number; // actual amount for tooltip
 }
 
 const _now = new Date();

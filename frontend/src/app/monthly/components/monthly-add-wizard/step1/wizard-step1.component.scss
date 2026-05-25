@@ -19,13 +19,16 @@
   }
 }
 
-.months-field {
-  flex: 1;
-}
+.months-field { flex: 1; }
 
 .step-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
+}
+
+.btn-next {
+  background: #087e8b !important;
+  color: white !important;
 }

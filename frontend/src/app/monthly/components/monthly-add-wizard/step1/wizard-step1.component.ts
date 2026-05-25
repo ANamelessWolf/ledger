@@ -29,6 +29,5 @@ export class WizardStep1Component {
   @Input() monthsOptions: number[] = [];
   @Input() isValid = false;
 
-  @Output() cancel = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
 }

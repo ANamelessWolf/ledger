@@ -1,79 +1,80 @@
-import { CommonModule } from '@angular/common';
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
-import {
-  CardBalance,
-  CreditCardInstallmentTotal,
-  ICardValue,
-} from '@moNoInt/types/monthlyNoInterest';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { AfterViewInit, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ICardValue } from '@moNoInt/types/monthlyNoInterest';
+import { toCurrency } from '@common/utils/formatUtils';
 import { Chart } from 'chart.js';
-import { round, toCurrency, toNumber } from '@common/utils/formatUtils';
-import { MatCardModule } from '@angular/material/card';
-import {
-  createDoughnutChart,
-  getContext,
-  refreshChart,
-} from '@expense/utils/chartUtils';
-import { ChartData, IChartComponent } from '@expense/types/chartComponent';
+
+const CHART_COLORS = [
+  '#087e8b', // teal
+  '#f59e0b', // amber
+  '#8b5cf6', // violet
+  '#ef4444', // red
+  '#10b981', // emerald
+  '#f97316', // orange
+  '#3b82f6', // blue
+  '#ec4899', // pink
+  '#14b8a6', // cyan
+  '#6366f1', // indigo
+];
+
 @Component({
   selector: 'app-interest-free-credit-card-pie-chart',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule, DecimalPipe],
   templateUrl: './interest-free-credit-card-pie-chart.component.html',
   styleUrl: './interest-free-credit-card-pie-chart.component.scss',
 })
-export class InterestFreeCreditCardPieChartComponent
-  implements OnInit, OnChanges, IChartComponent
-{
+export class InterestFreeCreditCardPieChartComponent implements AfterViewInit, OnChanges {
   @Input() cards: ICardValue[] = [];
-  @Input() size: string = '200px';
-  chart!: any;
-  chartContainer: string = 'cardChartPieChart';
+  @Input() size: string = '160px';
 
-  ngOnInit(): void {
-    this.createChart();
-  }
+  private chart: Chart | null = null;
+
+  ngAfterViewInit(): void { this.createChart(); }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['cards']) {
-      this.updateChart();
-    }
+    if (changes['cards'] && this.chart) { this.refreshChart(); }
   }
 
-  updateChart(): void {
-    refreshChart(this);
+  getColor(index: number): string {
+    return CHART_COLORS[index % CHART_COLORS.length];
   }
 
-  createChart(): void {
-    const ctx = getContext(this);
-    this.chart = createDoughnutChart(ctx, this);
-  }
-
-  getChartData(): ChartData {
-    const backgroundColor: string[] = [];
-    const labels: string[] = [];
-    const data: number[] = [];
-    if (this.cards) {
-      for (let index = 0; index < this.cards.length; index++) {
-        const card = this.cards[index];
-        backgroundColor.push(card.color);
-        labels.push(card.card);
-        data.push(card.value);
-      }
-    }
-    return {
-      labels,
-      datasets: [
-        {
-          data,
-          backgroundColor,
+  private createChart(): void {
+    const canvas = document.getElementById('cardChartPieChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    this.chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: this.buildChartData(),
+      options: {
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (item) => ` ${toCurrency(this.cards[item.dataIndex]?.balance ?? 0)}`,
+            },
+          },
         },
-      ],
+      },
+    });
+  }
+
+  private refreshChart(): void {
+    if (!this.chart) return;
+    this.chart.data = this.buildChartData();
+    this.chart.update();
+  }
+
+  private buildChartData() {
+    return {
+      labels: this.cards.map(c => c.card),
+      datasets: [{
+        data:            this.cards.map(c => c.value),
+        backgroundColor: this.cards.map((_, i) => this.getColor(i)),
+        borderWidth: 2,
+        borderColor: '#fff',
+      }],
     };
   }
 }

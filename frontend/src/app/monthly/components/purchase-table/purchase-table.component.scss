@@ -1,70 +1,186 @@
-.balance {
-  color: #ff3c3c;
-}
+$teal:        #087e8b;
+$teal-light:  rgba(8, 126, 139, 0.08);
+$teal-border: rgba(8, 126, 139, 0.2);
 
-.expense-item {
-  display: flex;
-  min-height: 100px;
-}
-
-.expense-desc {
+// ── Host propagates flex height ───────────────────────────
+:host {
   display: flex;
   flex-direction: column;
-  text-align: left;
-  padding: 16px 0px;
-
-  p {
-    padding: 0px;
-    margin-bottom: 0px;
-    font-size: large;
-  }
+  flex: 1;
+  min-height: 0;
 }
 
-.expense-icon {
+// ── Wrapper ───────────────────────────────────────────────
+.table-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+  border: 1px solid var(--color-border, #e8edf2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+// ── Empty state ───────────────────────────────────────────
+.table-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 16px 16px 0px 0px;
-  min-width: 100px;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 24px;
+  color: var(--color-text-subtle, #94a3b8);
 
-  p {
-    margin-top: 5px;
-    width: 100px;
-    text-align: center;
-    font-weight: bold;
-  }
+  mat-icon { font-size: 40px; width: 40px; height: 40px; }
+  p        { font-size: 0.85rem; margin: 0; }
 }
 
-td h1 {
-  text-align: left;
-  margin: 0px;
+// ── Scroll area ───────────────────────────────────────────
+.table-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  table { width: 100%; }
 }
 
-.leftSpan {
-  text-align: left;
-  width: 100%;
+// ── Header ────────────────────────────────────────────────
+th.mat-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface, #f8fafc);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted, #64748b);
+  border-bottom: 1px solid var(--color-border, #e8edf2);
+  padding: 10px 12px;
+  white-space: nowrap;
 }
 
-.column {
-  color: darkgray;
-  font-size: large;
-  margin: 0px;
+// ── Cells ─────────────────────────────────────────────────
+td.mat-cell {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border, #e8edf2);
+  vertical-align: middle;
 }
 
-.value {
-  font-weight: lighter;
-  .highlight {
-    font-weight: bold;
-    font-size: x-large;
-    margin: 0px;
-  }
+tr.mat-row {
+  transition: background 0.12s;
+  &:hover td { background: var(--color-surface, #f8fafc); }
+  &.row-archived td { opacity: 0.55; }
 }
 
-.gray{
-  color: darkgray;
+// ── Card badge ────────────────────────────────────────────
+.card-badge {
+  display: inline-block;
+  background: $teal-light;
+  border: 1px solid $teal-border;
+  color: $teal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
 }
 
-.green{
-  color: greenyellow;
+// ── Purchase cell ─────────────────────────────────────────
+.purchase-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 300px;
+}
+
+.purchase-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.purchase-desc {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.purchase-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.purchase-vendor { font-weight: 500; }
+.meta-dot        { color: var(--color-text-subtle, #94a3b8); }
+
+.payment-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-paid    { background: #16a34a; }
+.dot-pending { background: #cbd5e1; }
+
+// ── Amount ────────────────────────────────────────────────
+.amount-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $teal;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// ── Balance ───────────────────────────────────────────────
+.balance-amount {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-danger, #b91c1c);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.balance-sub {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.balance-meta {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.balance-sep { font-size: 0.7rem; color: var(--color-text-subtle, #94a3b8); }
+
+// ── Date ─────────────────────────────────────────────────
+.date-text {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+// ── Actions ───────────────────────────────────────────────
+.action-btn {
+  color: var(--color-text-muted, #64748b);
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
 }

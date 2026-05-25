@@ -116,8 +116,7 @@
 
   <div class="step-actions">
     <button mat-button type="button" (click)="previous.emit()">Atrás</button>
-    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
-    <button mat-raised-button color="primary" type="button" [disabled]="!isValid" (click)="next.emit()">
+    <button mat-flat-button class="btn-next" type="button" [disabled]="!isValid" (click)="next.emit()">
       Siguiente
     </button>
   </div>

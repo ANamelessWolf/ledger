@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, tap } from 'rxjs';
 import {
   DEFAULT_MO_NO_INT_FILTER,
   InstallmentPayment,
   MoNoIntFilter,
-  MoNoIntFilterDialogData,
   MoNoIntSearchOptions,
 } from '@moNoInt/types/monthlyNoInterest';
-import { MoNoIntFilterDialogComponent } from '@moNoInt/components/mo-no-int-filter-dialog/mo-no-int-filter-dialog.component';
+import { MoNoIntFilterDialogComponent, MoNoIntFilterFormData } from '@moNoInt/components/mo-no-int-filter-dialog/mo-no-int-filter-dialog.component';
+import { PaymentListComponent, PaymentListFormData } from '@moNoInt/components/payment-list/payment-list.component';
+import { MonthlyAddWizardComponent } from '@moNoInt/components/monthly-add-wizard/monthly-add-wizard.component';
+import { MonthlyWizardFormData, MonthlyWizardPayload } from '@moNoInt/types/monthlyAddWizard.types';
+import { DialogWrapperComponent } from '@common/components/dialog-wrapper/dialog-wrapper.component';
+import { DialogData } from '@common/types/DialogData';
+import { DialogButton } from '@config/enums';
+import { CatalogItem } from '@common/types/catalogTypes';
 import { LEDGER_API } from '@config/constants';
 import { Pagination, SortType } from '@config/commonTypes';
 import { QueryBuilder } from '@common/utils/filterUtils';
-import { PaymentListComponent } from '@moNoInt/components/payment-list/payment-list.component';
-import { MonthlyAddWizardComponent } from '@moNoInt/components/monthly-add-wizard/monthly-add-wizard.component';
-import {
-  MonthlyWizardDialogData,
-  MonthlyWizardPayload,
-} from '@moNoInt/types/monthlyAddWizard.types';
 
 @Injectable({
   providedIn: 'root',
@@ -32,13 +32,12 @@ export class MoNoIntService {
     return this.http.get(`${LEDGER_API.MO_NO_INT}?${query}`);
   }
 
-  getPayments(installmentId: Number): Observable<any> {
+  getPayments(installmentId: number): Observable<any> {
     return this.http.get(`${LEDGER_API.MO_NO_INT}/payments/${installmentId}`);
   }
 
-  payInstallment(installmentId: Number, paymentId: Number): Observable<any> {
-    const body = { id: installmentId, paymentId: paymentId };
-    return this.http.put(`${LEDGER_API.MO_NO_INT}/pay`, body);
+  payInstallment(installmentId: number, paymentId: number): Observable<any> {
+    return this.http.put(`${LEDGER_API.MO_NO_INT}/pay`, { id: installmentId, paymentId });
   }
 
   getWalletGroups(): Observable<any> {
@@ -63,39 +62,81 @@ export class MoNoIntService {
     return this.http.post(`${LEDGER_API.MO_NO_INT}`, payload);
   }
 
-  // Dialogs
+  // ── Dialogs ───────────────────────────────────────────────
+
   showPaymentsDialog(
     header: string,
     payments: InstallmentPayment[],
-    installmentId: Number,
+    installmentId: number,
     onClose: () => void
-  ) {
-    const dialogRef = this.dialog.open(PaymentListComponent, {
-      width: '800px',
-      data: {
-        header: header,
-        installmentId: installmentId,
-        payments: payments,
-        pay: (installmentId: Number, paymentId: Number) => {
-          return this.payInstallment(installmentId, paymentId);
-        },
-        onClose: onClose,
-      },
-    });
-    return dialogRef.afterClosed();
+  ): Observable<any> {
+    const payData: PaymentListFormData = {
+      installmentId,
+      payments,
+      pay: (iId, pId) => this.payInstallment(iId, pId),
+      isValid:   () => true,
+      getResult: () => null,
+    };
+
+    const dialogData: DialogData = {
+      header,
+      component: PaymentListComponent,
+      data: payData,
+      validationData: payData,
+      buttons: [DialogButton.CLOSE],
+      validate: () => true,
+    };
+
+    return this.dialog
+      .open(DialogWrapperComponent, { width: '680px', data: dialogData })
+      .afterClosed()
+      .pipe(tap(() => onClose()));
   }
 
-  showAddWizardDialog(onCreated: () => void) {
+  showFilterDialog(
+    current: MoNoIntFilter,
+    walletGroups: CatalogItem[],
+    onApply: (filter: MoNoIntFilter) => void
+  ): void {
+    const filterData: MoNoIntFilterFormData = {
+      current: { ...current },
+      walletGroups,
+      isValid:   () => true,
+      getResult: () => ({ ...DEFAULT_MO_NO_INT_FILTER }),
+      reset:     () => {},
+    };
+
+    const dialogData: DialogData = {
+      header: 'Filtrar mensualidades',
+      component: MoNoIntFilterDialogComponent,
+      data: filterData,
+      validationData: filterData,
+      buttons: [DialogButton.CLEAR, DialogButton.CANCEL, DialogButton.APPLY],
+      validate: () => true,
+      onClear: () => filterData.reset(),
+    };
+
+    this.dialog
+      .open(DialogWrapperComponent, { width: '440px', data: dialogData })
+      .afterClosed()
+      .subscribe((result: any) => {
+        if (result?.button === DialogButton.APPLY) {
+          onApply(filterData.getResult());
+        }
+      });
+  }
+
+  showAddWizardDialog(onCreated: () => void): void {
     forkJoin({
-      cards: this.getCreditCardsForWizard(),
+      cards:        this.getCreditCardsForWizard(),
       expenseTypes: this.http.get(`${LEDGER_API.CATALOG}/expenseTypes`),
-      vendors: this.http.get(`${LEDGER_API.CATALOG}/vendors`),
+      vendors:      this.http.get(`${LEDGER_API.CATALOG}/vendors`),
     }).subscribe({
       next: ({ cards, expenseTypes, vendors }: any) => {
-        const data: MonthlyWizardDialogData = {
-          creditCards: cards.data ?? [],
+        const wizardData: MonthlyWizardFormData = {
+          creditCards:  cards.data        ?? [],
           expenseTypes: expenseTypes.data ?? [],
-          vendors: vendors.data ?? [],
+          vendors:      vendors.data      ?? [],
           onLoadWallets: (walletGroupId, callback) => {
             this.getWalletsByGroup(walletGroupId).subscribe({
               next: (res: any) => callback(res.data ?? []),
@@ -114,34 +155,30 @@ export class MoNoIntService {
               error: (err) => console.error('Error creating installment', err),
             });
           },
+          close:     () => {},
+          isValid:   () => true,
+          getResult: () => null,
+          reset:     () => {},
         };
 
-        this.dialog.open(MonthlyAddWizardComponent, {
-          width: '760px',
-          maxHeight: '90vh',
-          data,
+        const dialogData: DialogData = {
+          header:         'Nueva mensualidad sin intereses',
+          component:      MonthlyAddWizardComponent,
+          data:           wizardData,
+          validationData: wizardData,
+          buttons:        [DialogButton.CANCEL],
+          validate:       () => true,
+        };
+
+        const dialogRef = this.dialog.open(DialogWrapperComponent, {
+          width:        '780px',
+          maxHeight:    '90vh',
+          data:         dialogData,
           disableClose: true,
         });
-      },
-    });
-  }
 
-  showFilterDialog(current: MoNoIntFilter, onApply: (filter: MoNoIntFilter) => void): void {
-    forkJoin({
-      walletGroups: this.http.get<any>(`${LEDGER_API.CATALOG}/wallet-groups`),
-    }).subscribe(({ walletGroups }) => {
-      const data: MoNoIntFilterDialogData = {
-        current: { ...current },
-        walletGroups: walletGroups.data ?? [],
-      };
-      this.dialog
-        .open(MoNoIntFilterDialogComponent, { width: '420px', data })
-        .afterClosed()
-        .subscribe((result: MoNoIntFilter | null) => {
-          if (result !== null && result !== undefined) {
-            onApply(result);
-          }
-        });
+        wizardData.close = () => dialogRef.close();
+      },
     });
   }
 
@@ -151,11 +188,7 @@ export class MoNoIntService {
     sorting?: SortType
   ): string => {
     const query = new QueryBuilder();
-
-    // Pagination
     query.addPagination(pagination);
-
-    // Filter
     query.appendArrFilterProp('creditcardId', filter.creditCard);
     query.appendFilterProperty('status', filter.status);
     query.appendFilterProperty('fromMonth', filter.fromMonth);
@@ -163,8 +196,6 @@ export class MoNoIntService {
     query.appendFilterProperty('toMonth', filter.toMonth);
     query.appendFilterProperty('toYear', filter.toYear);
     query.appendFilterProperty('walletGroupId', filter.walletGroupId);
-
-    // Sorting
     query.addSorting(sorting);
     return query.queryAsString;
   };

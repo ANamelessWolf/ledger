@@ -1,29 +1,31 @@
-<div class="monoint-index-page">
-  <div class="header-section">
-    <h1>Interest-free Monthly Installments</h1>
-    <div class="button-group">
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
-      <button
-        mat-icon-button
-        aria-label="Open filter window"
-        (click)="openFilter()"
-      >
-        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
-        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
-      </button>
-      <button mat-icon-button (click)="addWallet()">
-        <mat-icon>add</mat-icon>
-      </button>
+<app-page-layout
+  [title]="'Interest-free Installments'"
+  [hasFilter]="true"
+  [hasWidget]="true"
+  (onSearch)="onSearch($event)"
+  (add)="addWallet()"
+  (openFilter)="openFilter()">
+
+  <!-- ── Widget: overview + chart + summary ──────────────── -->
+  <div widget class="monoint-widgets">
+
+    <div class="widget-top">
+      <app-interest-free-monthly-overview [intFreeMo]="overview" class="widget-overview" />
+      <app-interest-free-credit-card-pie-chart [cards]="cards" class="widget-chart" />
     </div>
+
+    <app-interest-free-summary [data]="summaryChartData" />
+
   </div>
-  <hr />
-  <div class="main-section">
-    <div class="overview">
-      <app-interest-free-monthly-overview [intFreeMo]="overview" class="overview-summary" />
-      <app-interest-free-credit-card-pie-chart [cards]="cards"
-      class="overview-chart" />
-    </div>
-    <app-interest-free-summary [data]="summaryChartData"></app-interest-free-summary>
-    <app-interest-free-details [installments]="installments" [statusFilter]="activeFilter.status" [showPaid]="activeFilter.showPaid" (refreshRequest)="loadInstallments()" />
+
+  <!-- ── Main: installments table ────────────────────────── -->
+  <div main class="main-content">
+    <app-interest-free-details
+      [installments]="installments"
+      [statusFilter]="activeFilter.status"
+      [showPaid]="activeFilter.showPaid"
+      (refreshRequest)="loadInstallments()"
+    />
   </div>
-</div>
+
+</app-page-layout>

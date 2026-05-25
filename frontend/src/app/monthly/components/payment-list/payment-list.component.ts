@@ -1,74 +1,62 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
-import { MatButtonModule } from '@angular/material/button';
-import { InstallmentPayment } from '@moNoInt/types/monthlyNoInterest';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogModule } from '@angular/cdk/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { InstallmentPayment } from '@moNoInt/types/monthlyNoInterest';
+import { Observable } from 'rxjs';
+
+export interface PaymentListFormData {
+  installmentId: number;
+  payments: InstallmentPayment[];
+  pay: (installmentId: number, paymentId: number) => Observable<any>;
+  isValid: () => boolean;
+  getResult: () => any;
+}
 
 @Component({
   selector: 'app-payment-list',
   standalone: true,
   imports: [
     CommonModule,
-    DialogModule,
-    MatIconModule,
-    MatTableModule,
-    MatSortModule,
     MatButtonModule,
+    MatIconModule,
     MatProgressSpinnerModule,
-    LedgerIconComponent,
   ],
   templateUrl: './payment-list.component.html',
   styleUrl: './payment-list.component.scss',
 })
-export class PaymentListComponent {
-  payments: InstallmentPayment[] = [];
-  installmentId: Number;
-  displayedColumns: string[] = ['expense', 'total', 'buyDate', 'actions'];
-  isProcessing: boolean = false;
-  error: boolean = false;
+export class PaymentListComponent implements OnInit {
+  data!: PaymentListFormData;
 
-  public constructor(
-    public dialogRef: MatDialogRef<PaymentListComponent>,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      header: string;
-      installmentId: Number;
-      payments: InstallmentPayment[];
-      pay: (installmentId: Number, paymentId: Number) => Observable<any>;
-      onClose: () => void;
-    }
-  ) {
-    this.installmentId = this.data.installmentId;
-    this.payments = this.data.payments;
+  payments: InstallmentPayment[] = [];
+  isProcessing = false;
+  error = false;
+
+  ngOnInit(): void {
+    this.payments = [...this.data.payments];
+    this.data.isValid   = () => true;
+    this.data.getResult = () => null;
   }
 
-  pay(row: InstallmentPayment) {
+  pay(row: InstallmentPayment): void {
     this.isProcessing = true;
     this.error = false;
-    this.data.pay(row.id, row.paymentId).subscribe({
+    this.data.pay(this.data.installmentId, row.paymentId).subscribe({
       next: () => {
         row.isPaid = true;
         this.payments = [...this.payments];
         this.isProcessing = false;
       },
       error: (err: HttpErrorResponse) => {
-        console.log(err.message);
+        console.error(err.message);
         this.error = true;
         this.isProcessing = false;
       },
     });
   }
 
-  close() {
-    this.data.onClose();
-    this.dialogRef.close();
-  }
+  get paidCount(): number    { return this.payments.filter(p => p.isPaid).length; }
+  get pendingCount(): number { return this.payments.filter(p => !p.isPaid).length; }
 }

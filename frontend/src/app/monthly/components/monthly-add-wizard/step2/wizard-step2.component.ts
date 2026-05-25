@@ -53,7 +53,6 @@ export class WizardStep2Component {
   @Input() selectedMonths = 0;
   @Input() descriptionHint = '';
 
-  @Output() cancel = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
   @Output() tabChange = new EventEmitter<number>();

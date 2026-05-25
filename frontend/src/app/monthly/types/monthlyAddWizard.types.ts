@@ -50,11 +50,15 @@ export type MonthlyWizardPayload = {
   payments: MonthlyPaymentPayload[];
 };
 
-export type MonthlyWizardDialogData = {
+export type MonthlyWizardFormData = {
   creditCards: WizardCreditCard[];
   expenseTypes: CatalogItem[];
   vendors: CatalogItem[];
   onLoadWallets: (walletGroupId: number, callback: (wallets: WizardWallet[]) => void) => void;
   onSearchExpenses: (walletGroupId: number, description: string, callback: (results: WizardExpenseSearchResult[]) => void) => void;
   onConfirm: (payload: MonthlyWizardPayload) => void;
+  close: () => void;
+  isValid: () => boolean;
+  getResult: () => any;
+  reset: () => void;
 };

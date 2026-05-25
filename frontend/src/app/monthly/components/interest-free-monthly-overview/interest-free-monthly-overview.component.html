@@ -1,27 +1,18 @@
-<mat-card class="overview-card">
-  <mat-card-header>
-    <mat-card-title>Overview</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <mat-grid-list cols="3" rowHeight="100px">
-      <mat-grid-tile>
-        <div>
-          <h2>Current Balance</h2>
-          <p>{{ intFreeMo.current | currencyFormat }}</p>
-        </div>
-      </mat-grid-tile>
-      <mat-grid-tile>
-        <div>
-          <h2>Monthly Payment</h2>
-          <p>{{ intFreeMo.monthly | currencyFormat }}</p>
-        </div>
-      </mat-grid-tile>
-      <mat-grid-tile>
-        <div>
-          <h2>Total Payment</h2>
-          <p>{{ intFreeMo.total | currencyFormat }}</p>
-        </div>
-      </mat-grid-tile>
-    </mat-grid-list>
-  </mat-card-content>
-</mat-card>
+<div class="overview-stats">
+
+  <div class="stat-card stat-balance">
+    <span class="stat-label">Current Balance</span>
+    <span class="stat-value">{{ intFreeMo.current | currencyFormat }}</span>
+  </div>
+
+  <div class="stat-card stat-monthly">
+    <span class="stat-label">Monthly Payment</span>
+    <span class="stat-value">{{ intFreeMo.monthly | currencyFormat }}</span>
+  </div>
+
+  <div class="stat-card stat-total">
+    <span class="stat-label">Total Payment</span>
+    <span class="stat-value">{{ intFreeMo.total | currencyFormat }}</span>
+  </div>
+
+</div>

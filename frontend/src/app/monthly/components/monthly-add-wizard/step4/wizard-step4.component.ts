@@ -24,7 +24,6 @@ export class WizardStep4Component {
   @Input() paymentTotal = 0;
   @Input() paymentRows: WizardPaymentRow[] = [];
 
-  @Output() cancel = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<void>();
 }
