@@ -1,71 +1,109 @@
-<div class="expense-daily-page">
-  <div class="header-section">
-    <h1>{{ monthName }}/{{ year }} - Daily Expenses - {{monthlyTotal | currencyFormat}}</h1>
-    <div class="button-group">
-      <button mat-icon-button (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
+<div class="daily-page">
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-center">
+      <h1 class="header-title">{{ monthName }} {{ year }}</h1>
+      <span class="header-total">{{ monthlyTotal | currencyFormat }}</span>
     </div>
+
+    <mat-form-field appearance="outline" class="month-picker" subscriptSizing="dynamic">
+      <mat-select
+        [(ngModel)]="selectedPeriod"
+        (selectionChange)="onMonthChange($event.value)"
+      >
+        <mat-option *ngFor="let opt of monthOptions" [value]="opt.value">
+          {{ opt.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-icon-button type="button" class="back-btn" (click)="goBack()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
   </div>
-  <hr />
-  <div class="content-container">
-    <div class="calendar-container">
-      <mat-grid-list cols="7" rowHeight="1:1">
-        <mat-grid-tile class="gridHeader" *ngFor="let day of daysInWeek">{{
-          day
-        }}</mat-grid-tile>
-        <mat-grid-tile class="tile" *ngFor="let day of daysInMonth">
-          <div class="tileContent">
-            <button
-              *ngIf="day > 0"
-              [ngClass]="isSelected(day) ? 'btn-selected' : ''"
-              mat-icon-button
-              (click)="getExpensesForDay(day)"
-            >
-              <p>{{ day }}</p>
-            </button>
-            <div class="total" *ngIf="day > 0">
-              {{ (dayExpenses[day] ? dayExpenses[day] : 0) | currencyFormat }}
-            </div>
-          </div>
-        </mat-grid-tile>
-      </mat-grid-list>
-    </div>
-    <div class="detail-container">
-      <h1 *ngIf="dailyExpenses.length > 0">Expenses Details</h1>
-      <mat-list *ngIf="dailyExpenses.length > 0">
-        @for (expense of dailyExpenses; track expense) {
-        <mat-list-item
-          [ngClass]="(expense.index || 0) % 2 !== 0 ? 'odd' : 'even'"
+
+  <!-- ── Content ─────────────────────────────────────────── -->
+  <div class="content">
+
+    <!-- Calendar -->
+    <div class="calendar-panel">
+
+      <!-- Day-of-week headers -->
+      <div class="cal-grid">
+        <div class="cal-day-header" *ngFor="let d of daysInWeek">{{ d }}</div>
+
+        <!-- Day cells -->
+        <div
+          *ngFor="let day of daysInMonth"
+          class="cal-cell"
+          [class.cal-cell--empty]="day === 0"
+          [class.cal-cell--today]="isToday(day)"
+          [class.cal-cell--selected]="isSelected(day)"
+          [class.cal-cell--has-expense]="hasExpense(day)"
+          (click)="clickDay(day)"
         >
-          <div class="expense-item">
-            <div class="expense-icon">
-              <p>{{ expense.vendor }}</p>
-              <app-ledger-icon
-                [iconName]="expense.expenseIcon"
-                iconSize="2x"
-              ></app-ledger-icon>
-              <p>{{ expense.expenseType }}</p>
-            </div>
-            <div class="expense-desc">
-              <p [innerHTML]="expense.description"></p>
-              <h2>
-                <app-ledger-icon
-                  iconName="credit-card"
-                  iconSize="1x"
-                ></app-ledger-icon>
-                {{ expense.wallet }} <br />
-              </h2>
-            </div>
+          <ng-container *ngIf="day > 0">
+            <span class="cell-day">{{ day }}</span>
+            <span class="cell-amount" *ngIf="hasExpense(day)">
+              {{ dayExpenses[day] | currencyFormat }}
+            </span>
+          </ng-container>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel">
+
+      <!-- Empty state -->
+      <div class="detail-empty" *ngIf="!selectedDay">
+        <mat-icon>touch_app</mat-icon>
+        <p>Select a day to see expenses</p>
+      </div>
+
+      <!-- Day detail -->
+      <ng-container *ngIf="selectedDay">
+        <div class="detail-header">
+          <div class="detail-date">{{ selectedDayLabel }}</div>
+          <div class="detail-stats">
+            <span class="detail-count">{{ dailyExpenses.length }} expense{{ dailyExpenses.length !== 1 ? 's' : '' }}</span>
+            <span class="detail-total">{{ selectedDayTotal | currencyFormat }}</span>
           </div>
-          <div>
-            <p [ngClass]="expense.value > 0 ? 'expense' : 'income'">
+        </div>
+
+        <div class="detail-empty" *ngIf="dailyExpenses.length === 0">
+          <mat-icon>receipt_long</mat-icon>
+          <p>No expenses recorded</p>
+        </div>
+
+        <div class="expense-list">
+          <div class="expense-item" *ngFor="let expense of dailyExpenses">
+            <div class="expense-icon-badge">
+              <app-ledger-icon [iconName]="expense.expenseIcon" iconSize="1x" />
+            </div>
+            <div class="expense-info">
+              <span class="expense-description">{{ expense.description }}</span>
+              <span class="expense-meta">
+                <span class="expense-vendor">{{ expense.vendor }}</span>
+                <span class="meta-dot">·</span>
+                <span class="expense-type">{{ expense.expenseType }}</span>
+              </span>
+              <span class="expense-wallet">
+                <mat-icon class="wallet-icon">account_balance_wallet</mat-icon>
+                {{ expense.wallet }}
+              </span>
+            </div>
+            <span class="expense-amount"
+              [class.amount-expense]="expense.value > 0"
+              [class.amount-income]="expense.value <= 0">
               {{ expense.total }}
-            </p>
+            </span>
           </div>
-        </mat-list-item>
-        }
-      </mat-list>
+        </div>
+      </ng-container>
+
     </div>
   </div>
+
 </div>

@@ -24,13 +24,13 @@ import { NavMenuFooterComponent } from '../nav-menu-footer/nav-menu-footer.compo
 export class NavMenuComponent {
   menu_links: MenuLinkType[] = [
     { header: 'Home', route: '/', icon: 'home', exact: true },
+    { header: 'Accounts', route: '/accounts', icon: 'account_balance', exact: false },
+    { header: 'Wallets', route: '/wallets', icon: 'wallet', exact: false },
     { header: 'Cards', route: '/cards', icon: 'credit_card', exact: false },
     { header: 'Expenses', route: '/expenses', icon: 'payments', exact: false },
-    { header: 'Wallets', route: '/wallets', icon: 'wallet', exact: false },
+    { header: 'Budget', route: '/budget', icon: 'savings', exact: false },
     { header: '0% Interest Financing', route: '/monoint', icon: 'percent', exact: false },
     { header: 'Subscriptions', route: '/subscription', icon: 'receipt', exact: false },
-    { header: 'Budget', route: '/budget', icon: 'savings', exact: false },
-    { header: 'Accounts', route: '/accounts', icon: 'account_balance', exact: false },
     { header: 'Settings', route: '/settings', icon: 'settings', exact: false },
   ];
 }

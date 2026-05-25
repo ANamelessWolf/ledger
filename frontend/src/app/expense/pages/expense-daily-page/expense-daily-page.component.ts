@@ -1,36 +1,42 @@
-import { CommonModule, Location } from '@angular/common';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatGridListModule } from '@angular/material/grid-list';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActivatedRoute } from '@angular/router';
+import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { NotificationService } from '@common/services/notification.service';
 import { getDaysOfMonth } from '@common/utils/formatUtils';
 import { SHORT_MONTH_NAME } from '@config/messages';
 import { ExpensesService } from '@expense/services/expenses.service';
-import {
-  DailyExpense,
-  Expense,
-  ExpenseSearchOptions,
-} from '@expense/types/expensesTypes';
+import { DailyExpense, Expense, ExpenseSearchOptions } from '@expense/types/expensesTypes';
 import { mapExpense } from '@expense/utils/expenseUtils';
-import { LedgerIconComponent } from '../../../common/components/ledger-icon/ledger-icon.component';
-import { getWeekOfMonth } from '@common/utils/dateUtils';
+import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
+const MONTH_LABELS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+export interface MonthOption {
+  value: string;
+  label: string;
+  month: number;
+  year: number;
+}
 
 @Component({
   selector: 'app-expense-daily-page',
   standalone: true,
   imports: [
     CommonModule,
-    MatGridListModule,
-    MatListModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
     CurrencyFormatPipe,
     LedgerIconComponent,
   ],
@@ -39,60 +45,116 @@ import { getWeekOfMonth } from '@common/utils/dateUtils';
   providers: [ExpensesService, NotificationService],
 })
 export class ExpenseDailyPageComponent implements OnInit {
-  month: number = new Date().getMonth() + 1;
-  year: number = new Date().getFullYear();
-  daysInWeek: string[] = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-  isLoading = true;
-  error = false;
-  expenses: DailyExpense[] = [];
-  dailyExpenses: Expense[] = [];
-  daysInMonth: number[] = [];
-  dayExpenses: { [key: number]: number } = {};
-  selectedDay: number | null = null;
-  monthlyTotal: number = 0;
+  month = new Date().getMonth() + 1;
+  year  = new Date().getFullYear();
+
+  daysInWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  isLoading      = true;
+  expenses:       DailyExpense[] = [];
+  dailyExpenses:  Expense[]      = [];
+  daysInMonth:    number[]       = [];
+  dayExpenses:    { [day: number]: number } = {};
+  selectedDay:    number | null  = null;
+  monthlyTotal    = 0;
+  selectedPeriod  = '';
+  monthOptions:   MonthOption[]  = [];
 
   constructor(
-    private route: ActivatedRoute,
-    private location: Location,
+    private route:          ActivatedRoute,
+    private router:         Router,
     private expenseService: ExpensesService,
-    private notifService: NotificationService
+    private notifService:   NotificationService,
   ) {}
 
-  get monthName() {
-    return SHORT_MONTH_NAME[this.month - 1];
+  // ── Getters ───────────────────────────────────────────────
+
+  get monthName(): string { return SHORT_MONTH_NAME[this.month - 1]; }
+
+  get selectedDayTotal(): number {
+    return this.selectedDay ? (this.dayExpenses[this.selectedDay] ?? 0) : 0;
   }
 
+  get selectedDayLabel(): string {
+    if (!this.selectedDay) return '';
+    return `${MONTH_LABELS[this.month - 1]} ${this.selectedDay}, ${this.year}`;
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────
+
   ngOnInit(): void {
+    this.buildMonthOptions();
     this.route.params.subscribe((params) => {
-      this.month = +params['month'];
-      this.year = +params['year'];
+      this.month  = +params['month'];
+      this.year   = +params['year'];
+      this.selectedPeriod  = `${this.month}-${this.year}`;
+      this.selectedDay     = null;
+      this.dailyExpenses   = [];
       this.getExpenses();
     });
   }
 
-  private getExpenses() {
+  private buildMonthOptions(): void {
+    const today = new Date();
+    const options: MonthOption[] = [];
+    for (let i = -24; i <= 12; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      const m = d.getMonth() + 1;
+      const y = d.getFullYear();
+      options.push({ value: `${m}-${y}`, label: `${MONTH_LABELS[m - 1]} ${y}`, month: m, year: y });
+    }
+    this.monthOptions = options;
+  }
+
+  // ── Navigation ────────────────────────────────────────────
+
+  goBack(): void {
+    this.router.navigate(['/expenses']);
+  }
+
+  onMonthChange(value: string): void {
+    const [month, year] = value.split('-').map(Number);
+    this.router.navigate(['/expenses/daily', month, year]);
+  }
+
+  // ── Calendar ──────────────────────────────────────────────
+
+  isSelected(day: number): boolean { return this.selectedDay === day; }
+
+  isToday(day: number): boolean {
+    const t = new Date();
+    return day > 0 && t.getDate() === day &&
+           t.getMonth() + 1 === this.month &&
+           t.getFullYear() === this.year;
+  }
+
+  hasExpense(day: number): boolean { return day > 0 && !!this.dayExpenses[day]; }
+
+  clickDay(day: number): void {
+    if (day <= 0) return;
+    if (this.selectedDay === day) {
+      this.selectedDay   = null;
+      this.dailyExpenses = [];
+    } else {
+      this.getExpensesForDay(day);
+    }
+  }
+
+  // ── Data ──────────────────────────────────────────────────
+
+  private getExpenses(): void {
     this.expenseService.getDailyExpenses(this.month, this.year).subscribe(
       (response) => {
-        this.expenses = response.data;
-        const totals = this.calculateExpenses(this.expenses);
-        this.monthlyTotal = totals.monthly;
+        this.expenses     = response.data;
+        this.monthlyTotal = this.calculateMonthlyTotal(this.expenses);
         this.initializeCalendar();
       },
-      this.errorResponse,
-      this.completed
+      (err: HttpErrorResponse) => { this.notifService.showError(err); }
     );
   }
 
-  initializeCalendar(): void {
-    const date = new Date(this.year, this.month - 1, 1);
+  private initializeCalendar(): void {
+    const date       = new Date(this.year, this.month - 1, 1);
     this.daysInMonth = getDaysOfMonth(date);
     this.dayExpenses = {};
     for (const expense of this.expenses) {
@@ -100,119 +162,24 @@ export class ExpenseDailyPageComponent implements OnInit {
     }
   }
 
-  getFilterOptions(day: number) {
-    const date = new Date(this.year, this.month - 1, day);
+  private getExpensesForDay(day: number): void {
+    this.selectedDay = day;
+    const date       = new Date(this.year, this.month - 1, day);
     const options: ExpenseSearchOptions = {
-      pagination: {
-        page: 1,
-        pageSize: 100,
-      },
-      sorting: {
-        orderBy: 'buyDate',
-        orderDirection: 'ASC',
-      },
-      filter: {
-        wallet: undefined,
-        expenseTypes: undefined,
-        vendors: undefined,
-        period: {
-          start: date,
-          end: date,
-        },
-        expenseRange: undefined,
-        description: undefined,
-      },
+      pagination: { page: 1, pageSize: 100 },
+      sorting:    { orderBy: 'buyDate', orderDirection: 'ASC' },
+      filter:     { period: { start: date, end: date } },
     };
-    return options;
+    this.expenseService.getExpenses(options).subscribe(
+      (response) => {
+        const { expenses } = mapExpense(response);
+        this.dailyExpenses = expenses.map((row, index) => ({ ...row, index }));
+      },
+      (err: HttpErrorResponse) => { this.notifService.showError(err); }
+    );
   }
 
-  getExpensesForDay(day: number): void {
-    if (this.selectedDay === day) {
-      this.selectedDay = null;
-      this.dailyExpenses = [];
-    } else {
-      this.selectedDay = day;
-      const options: ExpenseSearchOptions = this.getFilterOptions(day);
-      this.expenseService.getExpenses(options).subscribe(
-        (response) => {
-          const { expenses, totalItems } = mapExpense(response);
-          this.dailyExpenses = expenses.map((row: any, index: number) => {
-            return {
-              ...row,
-              index,
-            };
-          });
-          console.log(this.dailyExpenses);
-        },
-        this.errorResponse,
-        this.completed
-      );
-    }
-  }
-
-  isSelected(day: number): boolean {
-    return this.selectedDay === day;
-  }
-
-  goBack() {
-    this.location.back();
-  }
-
-  private errorResponse(err: HttpErrorResponse) {
-    this.error = true;
-    this.notifService.showError(err);
-  }
-
-  private completed() {
-    this.error = true;
-    this.isLoading = false;
-  }
-
-  private calculateExpenses(expenses: DailyExpense[]) {
-    const weeklyTotals: number[] = [];
-    let monthlyTotal = 0;
-    let minExpense = Number.MAX_VALUE;
-    let maxExpense = Number.MIN_VALUE;
-    let totalDays = 0;
-
-    // Group by weeks
-    const expensesByWeek = expenses.reduce((acc, expense) => {
-      const date = new Date(expense.buyDate);
-      // Calculate week number in the month
-      const weekOfMonth = getWeekOfMonth(date);
-      if (!acc[weekOfMonth]) {
-        acc[weekOfMonth] = [];
-      }
-      acc[weekOfMonth].push(expense);
-      return acc;
-    }, {} as { [week: number]: DailyExpense[] });
-
-    // Calculate totals per week
-    Object.keys(expensesByWeek).forEach((week: any) => {
-      const total = expensesByWeek[week].reduce(
-        (sum, { total }) => sum + total,
-        0
-      );
-      weeklyTotals.push(total);
-      monthlyTotal += total;
-      totalDays += expensesByWeek[week].length;
-
-      // Calculate min and max
-      expensesByWeek[week].forEach((expense) => {
-        if (expense.total < minExpense) minExpense = expense.total;
-        if (expense.total > maxExpense) maxExpense = expense.total;
-      });
-    });
-
-    // Calculate average
-    const averageExpense = totalDays > 0 ? monthlyTotal / totalDays : 0;
-
-    return {
-      weekly: weeklyTotals,
-      monthly: monthlyTotal,
-      average: averageExpense,
-      min: minExpense,
-      max: maxExpense,
-    };
+  private calculateMonthlyTotal(expenses: DailyExpense[]): number {
+    return expenses.reduce((sum, e) => sum + e.total, 0);
   }
 }
