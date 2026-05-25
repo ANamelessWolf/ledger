@@ -6,6 +6,7 @@ export interface CatalogColumn {
   type?: CatalogFieldType;
   sortable?: boolean;
   width?: string;
+  readonly?: boolean;
 }
 
 export interface CatalogFormField {
@@ -38,8 +39,9 @@ export const CATALOG_CONFIGS: Record<string, CatalogConfig> = {
     apiPath: 'expense-types',
     labelField: 'description',
     columns: [
-      { field: 'icon',        header: 'Icon',        type: 'icon',  width: '64px'  },
-      { field: 'description', header: 'Description', type: 'text',  sortable: true },
+      { field: 'id',          header: 'ID',          type: 'number', width: '60px', readonly: true },
+      { field: 'icon',        header: 'Icon',        type: 'icon',   width: '64px' },
+      { field: 'description', header: 'Description', type: 'text',   sortable: true },
     ],
     formFields: [
       { field: 'description', label: 'Description', type: 'text', required: true, maxLength: 100, placeholder: 'e.g. Groceries' },
@@ -54,7 +56,8 @@ export const CATALOG_CONFIGS: Record<string, CatalogConfig> = {
     apiPath: 'financing-types',
     labelField: 'description',
     columns: [
-      { field: 'description', header: 'Description', type: 'text', sortable: true },
+      { field: 'id',          header: 'ID',          type: 'number', width: '60px', readonly: true },
+      { field: 'description', header: 'Description', type: 'text',   sortable: true },
     ],
     formFields: [
       { field: 'description', label: 'Description', type: 'text', required: true, maxLength: 100, placeholder: 'e.g. Personal loan' },
@@ -68,7 +71,8 @@ export const CATALOG_CONFIGS: Record<string, CatalogConfig> = {
     apiPath: 'vendors',
     labelField: 'description',
     columns: [
-      { field: 'description', header: 'Name', type: 'text', sortable: true },
+      { field: 'id',          header: 'ID',   type: 'number', width: '60px', readonly: true },
+      { field: 'description', header: 'Name', type: 'text',   sortable: true },
     ],
     formFields: [
       { field: 'description', label: 'Name', type: 'text', required: true, maxLength: 45, placeholder: 'e.g. Amazon' },
@@ -82,7 +86,8 @@ export const CATALOG_CONFIGS: Record<string, CatalogConfig> = {
     apiPath: 'wallet-types',
     labelField: 'description',
     columns: [
-      { field: 'description', header: 'Name', type: 'text', sortable: true },
+      { field: 'id',          header: 'ID',   type: 'number', width: '60px', readonly: true },
+      { field: 'description', header: 'Name', type: 'text',   sortable: true },
     ],
     formFields: [
       { field: 'description', label: 'Name', type: 'text', required: true, maxLength: 40, placeholder: 'e.g. Checking account' },

@@ -65,8 +65,11 @@
 
               <!-- Editing -->
               <ng-container *ngIf="isRowEditing(row)">
+                <!-- Readonly field → show value as-is -->
+                <span *ngIf="col.readonly" class="readonly-id">{{ row[col.field] }}</span>
+
                 <!-- Icon field → button to open picker -->
-                <button *ngIf="col.type === 'icon'" type="button" mat-icon-button
+                <button *ngIf="!col.readonly && col.type === 'icon'" type="button" mat-icon-button
                   class="icon-pick-btn" matTooltip="Change icon" aria-label="Change icon"
                   (click)="openIconPicker()">
                   <app-ledger-icon
@@ -76,7 +79,7 @@
                 </button>
 
                 <!-- Text / number field → inline input -->
-                <mat-form-field *ngIf="col.type !== 'icon'" appearance="outline"
+                <mat-form-field *ngIf="!col.readonly && col.type !== 'icon'" appearance="outline"
                   subscriptSizing="dynamic" class="inline-field">
                   <input matInput
                     title="Edit value"

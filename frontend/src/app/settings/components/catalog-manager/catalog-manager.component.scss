@@ -167,6 +167,14 @@
   .save-btn   { color: var(--color-teal); }
 }
 
+// ── Readonly id cell ──────────────────────────────────────────────────────
+
+.readonly-id {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
 // ── Inline edit controls ───────────────────────────────────────────────────
 
 .inline-field {
