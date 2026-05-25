@@ -1,7 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 
 export interface WalletSummaryData {
   groupCount: number;
@@ -12,7 +10,7 @@ export interface WalletSummaryData {
 @Component({
   selector: 'app-wallet-summary',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [CommonModule],
   templateUrl: './wallet-summary.component.html',
   styleUrl: './wallet-summary.component.scss',
 })

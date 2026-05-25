@@ -1,13 +1,13 @@
 <div class="chart-card">
   <span class="chart-title">Card Distribution</span>
-  <div class="chart-body">
+  <div class="chart-canvas">
     <canvas id="cardChartPieChart" [style.width]="size" [style.height]="size"></canvas>
-    <div class="chart-legend" *ngIf="cards.length">
-      <div class="legend-item" *ngFor="let c of cards; let i = index">
-        <span class="legend-dot" [style.background]="getColor(i)"></span>
-        <span class="legend-label">{{ c.card }}</span>
-        <span class="legend-value">{{ c.value | number:'1.0-1' }}%</span>
-      </div>
+  </div>
+  <div class="chart-legend" *ngIf="cards.length">
+    <div class="legend-item" *ngFor="let c of cards; let i = index">
+      <span class="legend-dot" [style.background]="getColor(i)"></span>
+      <span class="legend-label">{{ c.card }}</span>
+      <span class="legend-value">{{ c.value | number:'1.0-1' }}%</span>
     </div>
   </div>
 </div>

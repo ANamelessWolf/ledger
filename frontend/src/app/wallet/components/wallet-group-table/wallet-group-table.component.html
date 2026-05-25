@@ -1,4 +1,4 @@
-<div class="table-wrap mat-elevation-z2">
+<div class="table-scroll-area">
   <table mat-table [dataSource]="dataSource" matSort>
 
     <!-- Name -->
@@ -13,14 +13,6 @@
       <td mat-cell *matCellDef="let g">
         <span class="currency-chip" *ngFor="let c of g.currencies">{{ c }}</span>
         <span *ngIf="!g.currencies?.length" class="no-data">—</span>
-      </td>
-    </ng-container>
-
-    <!-- Wallet count -->
-    <ng-container matColumnDef="wallets">
-      <th mat-header-cell *matHeaderCellDef>Wallets</th>
-      <td mat-cell *matCellDef="let g">
-        <span class="count-badge">{{ g.walletCount }}</span>
       </td>
     </ng-container>
 

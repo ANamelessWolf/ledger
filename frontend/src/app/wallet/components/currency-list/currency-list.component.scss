@@ -1,49 +1,50 @@
-.currency-section {
-  padding: 24px 32px;
-}
+$teal: #087e8b;
 
-.section-header {
+:host {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 
-.section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1e293b;
+.currency-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 0 24px;
 }
 
 .spinner-wrap {
   display: flex;
   justify-content: center;
-  padding: 24px;
+  padding: 32px;
+}
+
+.currency-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .currency-table {
   width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
-  th.mat-mdc-header-cell {
-    background: #f8fafc;
-    color: #64748b;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  th, td { padding: 0 16px; }
+
+  th.mat-header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-surface, #fff);
   }
 
-  td.mat-mdc-cell {
-    font-size: 0.88rem;
-    color: #1e293b;
-  }
-
-  tr.mat-mdc-row:hover {
-    background: #f8fafc;
-  }
+  tr.mat-mdc-row:hover { background: rgba(0, 0, 0, 0.03); }
 }
 
 .name-cell {
@@ -53,8 +54,8 @@
 }
 
 .default-badge {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(8, 126, 139, 0.12);
+  color: $teal;
   border-radius: 8px;
   padding: 2px 8px;
   font-size: 0.72rem;
@@ -62,19 +63,17 @@
 }
 
 .default-rate {
-  color: #94a3b8;
+  color: rgba(0, 0, 0, 0.38);
 }
 
 .empty-state {
-  text-align: center;
-  color: #94a3b8;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px;
+  color: rgba(0, 0, 0, 0.38);
   font-size: 0.9rem;
 }
 
-.danger-item {
-  color: #ef4444;
-  mat-icon {
-    color: #ef4444;
-  }
-}
+.danger-item span { color: #c62828; }
+.danger-item mat-icon { color: #c62828; }

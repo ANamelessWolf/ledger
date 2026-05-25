@@ -10,11 +10,12 @@
   <div widget class="monoint-widgets">
 
     <div class="widget-top">
-      <app-interest-free-monthly-overview [intFreeMo]="overview" class="widget-overview" />
+      <div class="widget-left">
+        <app-interest-free-monthly-overview [intFreeMo]="overview" />
+        <app-interest-free-summary [data]="summaryChartData" />
+      </div>
       <app-interest-free-credit-card-pie-chart [cards]="cards" class="widget-chart" />
     </div>
-
-    <app-interest-free-summary [data]="summaryChartData" />
 
   </div>
 
