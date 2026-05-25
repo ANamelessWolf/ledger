@@ -11,6 +11,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -38,6 +39,7 @@ import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-d
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatSelectModule,
     LedgerIconComponent,
     IconPickerComponent,
   ],
@@ -54,6 +56,7 @@ export class CatalogManagerComponent implements OnInit, OnChanges {
   dataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = [];
   isLoading = false;
+  selectOptions: Record<string, any[]> = {};
 
   // Inline editing
   editingRow: any | null = null;
@@ -93,7 +96,32 @@ export class CatalogManagerComponent implements OnInit, OnChanges {
     this.displayedColumns = [...this.config.columns.map(c => c.field), 'actions'];
     this.dataSource.filterPredicate = (item: any, filter) =>
       !!item._isNew || (item[this.config.labelField] ?? '').toLowerCase().includes(filter);
+    this.loadSelectOptions();
     this.loadData();
+  }
+
+  private loadSelectOptions(): void {
+    const seen = new Set<string>();
+    for (const col of this.config.columns) {
+      if (col.type === 'select' && col.optionsPath && !seen.has(col.optionsPath)) {
+        seen.add(col.optionsPath);
+        this.settingsService.getAll(col.optionsPath).subscribe({
+          next: (res) => {
+            for (const c of this.config.columns) {
+              if (c.optionsPath === col.optionsPath) this.selectOptions[c.field] = res.data ?? [];
+            }
+            for (const f of this.config.formFields) {
+              if (f.optionsPath === col.optionsPath) this.selectOptions[f.field] = res.data ?? [];
+            }
+          },
+        });
+      }
+    }
+  }
+
+  getOptionLabel(field: string, value: any, optionValue = 'id', optionLabel = 'description'): string {
+    const opt = (this.selectOptions[field] ?? []).find(o => o[optionValue] === value);
+    return opt ? opt[optionLabel] : value ?? '';
   }
 
   loadData(showSpinner = true): void {

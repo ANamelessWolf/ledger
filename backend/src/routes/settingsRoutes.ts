@@ -4,6 +4,7 @@ import {
   getFinancingTypes, createFinancingType, updateFinancingType, deleteFinancingType,
   getVendors, createVendor, updateVendor, deleteVendor,
   getWalletTypes, createWalletType, updateWalletType, deleteWalletType,
+  getFinancingEntities, createFinancingEntity, updateFinancingEntity, deleteFinancingEntity,
 } from '../controllers/settingsController';
 
 const router = Router();
@@ -27,5 +28,10 @@ router.get('/wallet-types',        getWalletTypes);
 router.post('/wallet-types',       createWalletType);
 router.put('/wallet-types/:id',    updateWalletType);
 router.delete('/wallet-types/:id', deleteWalletType);
+
+router.get('/financing-entities',        getFinancingEntities);
+router.post('/financing-entities',       createFinancingEntity);
+router.put('/financing-entities/:id',    updateFinancingEntity);
+router.delete('/financing-entities/:id', deleteFinancingEntity);
 
 export default router;

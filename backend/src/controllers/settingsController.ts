@@ -3,17 +3,19 @@ import { Exception, HTTP_STATUS, HttpResponse } from '../common';
 import { asyncErrorHandler } from '../middlewares';
 import { AppDataSource } from '..';
 import { ExpenseType, FinancingType, Vendor, WalletType } from '../models/catalogs';
+import { FinancingEntity } from '../models/banking';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const makeHandlers = <T extends { id: number }>(
   entity: new () => T,
   label: string,
-  mapFields: (body: any, item: T) => void
+  mapFields: (body: any, item: T) => void,
+  sortField = 'description'
 ) => ({
   getAll: asyncErrorHandler(async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const items = await AppDataSource.manager.find(entity, { order: { description: 'ASC' } as any });
+      const items = await AppDataSource.manager.find(entity, { order: { [sortField]: 'ASC' } as any });
       res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: items }));
     } catch (err) {
       console.error(`[settings.getAll:${label}]`, err);
@@ -114,3 +116,19 @@ export const getWalletTypes   = walletTypeHandlers.getAll;
 export const createWalletType = walletTypeHandlers.create;
 export const updateWalletType = walletTypeHandlers.update;
 export const deleteWalletType = walletTypeHandlers.remove;
+
+// ─── Financing Entities ───────────────────────────────────────────────────────
+
+const financingEntityHandlers = makeHandlers(
+  FinancingEntity,
+  'FinancingEntity',
+  (body, item) => {
+    item.name = body.name;
+    item.financingTypeId = parseInt(body.financingTypeId, 10);
+  },
+  'name'
+);
+export const getFinancingEntities   = financingEntityHandlers.getAll;
+export const createFinancingEntity  = financingEntityHandlers.create;
+export const updateFinancingEntity  = financingEntityHandlers.update;
+export const deleteFinancingEntity  = financingEntityHandlers.remove;

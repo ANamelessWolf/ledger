@@ -60,7 +60,10 @@
                 <app-ledger-icon *ngIf="col.type === 'icon'"
                   [iconName]="row[col.field]" iconSize="1x">
                 </app-ledger-icon>
-                <span *ngIf="col.type !== 'icon'">{{ row[col.field] }}</span>
+                <span *ngIf="col.type === 'select'">
+                  {{ getOptionLabel(col.field, row[col.field], col.optionValue || 'id', col.optionLabel || 'description') }}
+                </span>
+                <span *ngIf="col.type !== 'icon' && col.type !== 'select'">{{ row[col.field] }}</span>
               </ng-container>
 
               <!-- Editing -->
@@ -78,8 +81,19 @@
                   </app-ledger-icon>
                 </button>
 
+                <!-- Select field -->
+                <mat-form-field *ngIf="!col.readonly && col.type === 'select'" appearance="outline"
+                  subscriptSizing="dynamic" class="inline-field">
+                  <mat-select [formControl]="editControls[col.field]" [attr.aria-label]="col.header">
+                    <mat-option *ngFor="let opt of selectOptions[col.field]"
+                      [value]="opt[col.optionValue || 'id']">
+                      {{ opt[col.optionLabel || 'description'] }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
                 <!-- Text / number field → inline input -->
-                <mat-form-field *ngIf="!col.readonly && col.type !== 'icon'" appearance="outline"
+                <mat-form-field *ngIf="!col.readonly && col.type !== 'icon' && col.type !== 'select'" appearance="outline"
                   subscriptSizing="dynamic" class="inline-field">
                   <input matInput
                     title="Edit value"
@@ -117,11 +131,11 @@
               <!-- Editing -->
               <ng-container *ngIf="isRowEditing(row)">
                 <button type="button" mat-icon-button matTooltip="Save (Enter)" aria-label="Save"
-                  class="save-btn" (click)="saveInline()">
+                  class="save-btn" (click)="saveInline(); $event.stopPropagation()">
                   <mat-icon>check</mat-icon>
                 </button>
                 <button type="button" mat-icon-button matTooltip="Cancel (Esc)" aria-label="Cancel"
-                  (click)="cancelEdit()">
+                  (click)="cancelEdit(); $event.stopPropagation()">
                   <mat-icon>close</mat-icon>
                 </button>
               </ng-container>
