@@ -5,25 +5,48 @@
   (onSearch)="onSearch($event)"
   (add)="addExpense()"
   (openFilter)="openFilter()">
+
   <ng-container buttons>
     <button mat-icon-button (click)="goToDaily()">
       <mat-icon>calendar_month</mat-icon>
     </button>
   </ng-container>
-  <div widget>
-    <p>Widget Content</p>
+
+  <div widget class="expense-widgets">
+    <div class="widget-summary">
+      <span class="widget-period">{{ tableHeader }}</span>
+      <span class="widget-total">{{ chartTotal | currencyFormat }}</span>
+    </div>
+    <div class="widget-charts">
+      <app-expense-top-chart
+        [expenses]="chartExpenses"
+        [groupBy]="'expenseType'"
+        [title]="'Top Categories'"
+      />
+      <app-expense-top-chart
+        [expenses]="chartExpenses"
+        [groupBy]="'vendor'"
+        [title]="'Top Vendors'"
+      />
+      <app-expense-top-chart
+        [expenses]="chartExpenses"
+        [groupBy]="'wallet'"
+        [title]="'Top Wallet Groups'"
+        [walletItems]="walletItems"
+      />
+    </div>
   </div>
 
   <div main class="main-content">
     <app-expense-table
-    [header]="tableHeader"
-    [expenses]="expenses"
-    [totalItems]="totalItems"
-    [catalog]="catalog"
-    (pageChange)="loadExpenses($event)"
-    (sortChange)="sortExpenses($event)"
-    (expenseEdited)="refresh($event)"
-  ></app-expense-table>
+      [header]="tableHeader"
+      [expenses]="expenses"
+      [totalItems]="totalItems"
+      [catalog]="catalog"
+      (pageChange)="loadExpenses($event)"
+      (sortChange)="sortExpenses($event)"
+      (expenseEdited)="refresh($event)"
+    />
   </div>
-</app-page-layout>
 
+</app-page-layout>

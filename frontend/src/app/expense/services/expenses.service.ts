@@ -31,6 +31,11 @@ export class ExpensesService {
     return this.http.get(`${LEDGER_API.EXPENSES}?${query}`);
   }
 
+  getExpensesForChart(filter: ExpenseFilter): Observable<any> {
+    const query = this.getExpensesQueryString({ page: 1, pageSize: 1000 }, filter);
+    return this.http.get(`${LEDGER_API.EXPENSES}?${query}`);
+  }
+
   getDailyExpenses(month: number, year: number): Observable<any> {
     return this.http.get(`${LEDGER_API.EXPENSES}/daily/${month}/${year}`);
   }

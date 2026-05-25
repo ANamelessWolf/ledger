@@ -74,6 +74,7 @@ export const MATERIAL_ICONS: IconEntry[] = [
   { name: 'healing',            category: 'Health' },
   { name: 'vaccines',           category: 'Health' },
   { name: 'fitness_center',     category: 'Health' },
+  { name: 'self_improvement',     category: 'Health' },
   // Home
   { name: 'home',               category: 'Home' },
   { name: 'house',              category: 'Home' },

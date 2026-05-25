@@ -96,8 +96,8 @@ export class CatalogManagerComponent implements OnInit, OnChanges {
     this.loadData();
   }
 
-  loadData(): void {
-    this.isLoading = true;
+  loadData(showSpinner = true): void {
+    if (showSpinner) this.isLoading = true;
     this.settingsService.getAll(this.config.apiPath).subscribe({
       next: (res) => { this.dataSource.data = res.data ?? []; this.isLoading = false; },
       error: (err) => { this.notif.showError(err); this.isLoading = false; },
@@ -160,7 +160,7 @@ export class CatalogManagerComponent implements OnInit, OnChanges {
       : this.settingsService.update(this.config.apiPath, this.editingRow.id, data);
 
     obs.subscribe({
-      next: () => { this.cancelEdit(); this.loadData(); },
+      next: () => { this.cancelEdit(); this.loadData(false); },
       error: (err) => this.notif.showError(err),
     });
   }
@@ -214,7 +214,7 @@ export class CatalogManagerComponent implements OnInit, OnChanges {
 
   private deleteItem(item: any): void {
     this.settingsService.delete(this.config.apiPath, item.id).subscribe({
-      next: () => this.loadData(),
+      next: () => this.loadData(false),
       error: (err) => this.notif.showError(err),
     });
   }
