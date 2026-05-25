@@ -48,6 +48,7 @@ export class InterestFreeCreditCardPieChartComponent implements AfterViewInit, O
       type: 'doughnut',
       data: this.buildChartData(),
       options: {
+        responsive: false,
         plugins: {
           legend: { display: false },
           tooltip: {
