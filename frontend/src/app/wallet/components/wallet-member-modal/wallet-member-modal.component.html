@@ -1,0 +1,22 @@
+<form [formGroup]="form" class="modal-form">
+  <mat-form-field appearance="outline" class="full-width" *ngIf="isAdd">
+    <mat-label>Currency</mat-label>
+    <mat-select formControlName="currencyId">
+      <mat-option *ngFor="let c of data.currencies" [value]="c.id">
+        {{ c.name }} ({{ c.symbol }})
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('currencyId')?.hasError('required')">Currency is required</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ walletLabel }}</mat-label>
+    <mat-select formControlName="forwardWalletId">
+      <mat-option [value]="null">— None —</mat-option>
+      <mat-option *ngFor="let w of data.allWallets" [value]="w.id">
+        {{ w.name }} ({{ w.currencySymbol }})
+      </mat-option>
+    </mat-select>
+    <mat-hint>Expenses from this wallet will also appear in the forward wallet</mat-hint>
+  </mat-form-field>
+</form>

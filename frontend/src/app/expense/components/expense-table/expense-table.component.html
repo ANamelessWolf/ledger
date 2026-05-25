@@ -1,6 +1,6 @@
 <div class="table-wrapper">
-  <h1>{{ header }}</h1>
-  <div class="mat-elevation-z8 table-card">
+  <h1 class="table-header-h1">{{ header }}</h1>
+  <div class="mat-elevation-z2 table-card">
     <div class="table-scroll-area">
       <table
         mat-table
@@ -10,31 +10,35 @@
       >
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-          <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="row-id">{{ row.id }}</span>
+          </td>
         </ng-container>
 
         <!-- Wallet Column -->
         <ng-container matColumnDef="wallet">
           <th mat-header-cell *matHeaderCellDef>Wallet</th>
-          <td mat-cell *matCellDef="let row">{{ row.wallet }}</td>
+          <td mat-cell *matCellDef="let row">
+            <span class="wallet-badge">{{ row.wallet }}</span>
+          </td>
         </ng-container>
 
         <!-- Expense Column -->
         <ng-container matColumnDef="expense">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Expense</th>
           <td mat-cell *matCellDef="let row">
-            <div class="expense-item">
-              <div class="expense-icon">
-                <app-ledger-icon
-                  [iconName]="row.expenseIcon"
-                  iconSize="2x"
-                ></app-ledger-icon>
-                <p>{{ row.expenseType }}</p>
+            <div class="expense-cell">
+              <div class="expense-icon-badge">
+                <app-ledger-icon [iconName]="row.expenseIcon" iconSize="1x" />
               </div>
-              <div class="expense-desc">
-                <p [innerHTML]="row.description"></p>
-                <h2>{{ row.vendor }}</h2>
+              <div class="expense-info">
+                <span class="expense-description">{{ row.description }}</span>
+                <span class="expense-meta">
+                  <span class="expense-vendor">{{ row.vendor }}</span>
+                  <span class="meta-dot">·</span>
+                  <span class="expense-type">{{ row.expenseType }}</span>
+                </span>
               </div>
             </div>
           </td>
@@ -42,29 +46,27 @@
 
         <!-- Total Column -->
         <ng-container matColumnDef="total">
-          <th class="totalColumn" mat-header-cell *matHeaderCellDef mat-sort-header>
-            Total
-          </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
           <td mat-cell *matCellDef="let row">
-            <span [ngClass]="row.value > 0 ? 'expense' : 'income'">{{
-              row.total
-            }}</span>
+            <span class="amount" [class.amount-expense]="row.value > 0" [class.amount-income]="row.value <= 0">
+              {{ row.total }}
+            </span>
           </td>
         </ng-container>
 
         <!-- Buy Date Column -->
         <ng-container matColumnDef="buyDate">
-          <th class="dateColumn" mat-header-cell *matHeaderCellDef mat-sort-header>
-            Buy Date
-          </th>
-          <td mat-cell *matCellDef="let row">{{ row.buyDate | date }}</td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="date-text">{{ row.buyDate | date:'MMM d, y' }}</span>
+          </td>
         </ng-container>
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef aria-label="Actions"></th>
           <td mat-cell *matCellDef="let row">
-            <button mat-icon-button [matMenuTriggerFor]="menu">
+            <button mat-icon-button class="action-btn" [matMenuTriggerFor]="menu" aria-label="Row actions">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
@@ -72,8 +74,8 @@
                 <mat-icon>edit</mat-icon>
                 <span>Edit</span>
               </button>
-              <button mat-menu-item>
-                <mat-icon>delete</mat-icon>
+              <button mat-menu-item class="delete-item" (click)="deleteExpense(row)">
+                <mat-icon>delete_outline</mat-icon>
                 <span>Delete</span>
               </button>
             </mat-menu>
@@ -81,7 +83,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="expense-row"></tr>
       </table>
     </div>
     <mat-paginator
@@ -89,6 +91,6 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="pageSizeOptions"
       (page)="pageChanged($event)"
-    ></mat-paginator>
+    />
   </div>
 </div>

@@ -1,6 +1,8 @@
 import { CatalogItem } from '@common/types/catalogTypes';
 import { Pagination, SliderRange, SortType } from '@config/commonTypes';
 
+export type ExpenseTypeItem = CatalogItem & { icon: string };
+
 export type DateRange = {
   start: Date;
   end: Date;
@@ -26,7 +28,7 @@ export const EMPTY_EXPENSE_FILTER = {
 
 export type ExpenseFilterOptions = {
   wallets: CatalogItem[];
-  expenseTypes: CatalogItem[];
+  expenseTypes: ExpenseTypeItem[];
   vendors: CatalogItem[];
   visibility: {
     enableWallet: boolean;
@@ -71,7 +73,7 @@ export const EMPTY_NEW_EXPENSE = {
 
 export type ExpenseOptions = {
   wallets: CatalogItem[];
-  expenseTypes: CatalogItem[];
+  expenseTypes: ExpenseTypeItem[];
   vendors: CatalogItem[];
 };
 

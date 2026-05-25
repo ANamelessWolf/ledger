@@ -1,23 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatStepperModule, MatStepper } from '@angular/material/stepper';
 import { CatalogItem } from '@common/types/catalogTypes';
 import { toRequestFormat } from '@common/utils/formatUtils';
 import {
   MonthlyPaymentPayload,
-  MonthlyWizardDialogData,
+  MonthlyWizardFormData,
   MonthlyWizardPayload,
   WizardCreditCard,
   WizardExpenseSearchResult,
   WizardPaymentRow,
-  WizardWallet,
 } from '@moNoInt/types/monthlyAddWizard.types';
 import { WizardStep1Component } from './step1/wizard-step1.component';
 import { WizardStep2Component } from './step2/wizard-step2.component';
@@ -31,7 +29,6 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule,
     MatStepperModule,
     WizardStep1Component,
     WizardStep2Component,
@@ -44,6 +41,8 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') stepper!: MatStepper;
 
+  data!: MonthlyWizardFormData;
+
   // Step 1
   creditCardControl = new FormControl<CatalogItem | null>(null, Validators.required);
   step1Form!: FormGroup;
@@ -51,9 +50,8 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
 
   // Step 2
   newExpenseForm!: FormGroup;
-  cardWallets: WizardWallet[] = [];
-  cardWalletItems: CatalogItem[] = [];
-  walletControl = new FormControl<CatalogItem | null>(null, Validators.required);
+  currentWalletGroupId: number | null = null;
+  walletControl = new FormControl<number | null>(null, Validators.required);
   expenseTypeControl = new FormControl<CatalogItem | null>(null, Validators.required);
   vendorControl = new FormControl<CatalogItem | null>(null, Validators.required);
   searchControl = new FormControl('');
@@ -69,20 +67,20 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<MonthlyAddWizardComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: MonthlyWizardDialogData
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
+    this.data.isValid   = () => !!this.stepper && this.stepper.selectedIndex === 3;
+    this.data.getResult = () => null;
+    this.data.reset     = () => {};
+
     this.step1Form = this.fb.group({
       months: [null, [Validators.required, Validators.min(1), Validators.max(36)]],
     });
 
     this.newExpenseForm = this.fb.group({
-      total: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
-      buyDate: [new Date(), Validators.required],
+      total:       ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      buyDate:     [new Date(), Validators.required],
       description: ['', Validators.required],
     });
 
@@ -92,18 +90,11 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
         if (!item) return;
         const card = this.data.creditCards.find((c) => c.id === item.id);
         this.walletControl.setValue(null);
-        this.cardWallets = [];
-        this.cardWalletItems = [];
+        this.currentWalletGroupId = null;
         this.searchResults = [];
         this.selectedExisting = null;
         if (card) {
-          this.data.onLoadWallets(card.walletGroupId, (wallets) => {
-            this.cardWallets = wallets;
-            this.cardWalletItems = wallets.map((w) => ({
-              id: w.id,
-              name: `${w.name} (${w.currency})`,
-            }));
-          });
+          this.currentWalletGroupId = card.walletGroupId;
         }
       });
 
@@ -144,7 +135,7 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
     if (this.activeTab === 0) {
       return (
         this.newExpenseForm.valid &&
-        !!this.walletControl.value &&
+        this.walletControl.value != null &&
         !!this.expenseTypeControl.value &&
         !!this.vendorControl.value
       );
@@ -197,16 +188,16 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
     let walletId: number;
 
     if (this.activeTab === 0) {
-      buyDate = new Date(this.newExpenseForm.get('buyDate')!.value);
+      buyDate     = new Date(this.newExpenseForm.get('buyDate')!.value);
       description = this.newExpenseForm.get('description')!.value as string;
-      total = +this.newExpenseForm.get('total')!.value;
-      walletId = this.walletControl.value!.id;
+      total       = +this.newExpenseForm.get('total')!.value;
+      walletId    = this.walletControl.value!;
     } else {
-      const exp = this.selectedExisting!;
-      buyDate = new Date(exp.buyDate);
+      const exp   = this.selectedExisting!;
+      buyDate     = new Date(exp.buyDate);
       description = exp.description;
-      total = exp.total;
-      walletId = exp.walletId;
+      total       = exp.total;
+      walletId    = exp.walletId;
     }
 
     this.paymentTypeControl.setValue(this.expenseTypeControl.value);
@@ -217,10 +208,10 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
       const payDate = new Date(buyDate);
       payDate.setMonth(payDate.getMonth() + i);
       return {
-        index: i + 1,
+        index:       i + 1,
         description: `${description}\nMensualidad ${i + 1}/${months}`,
-        buyDate: payDate,
-        total: paymentTotal,
+        buyDate:     payDate,
+        total:       paymentTotal,
         walletId,
       };
     });
@@ -228,25 +219,25 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
     this.stepper.next();
   }
 
-  // ── Confirm / Cancel ──────────────────────────────────────────────────────
+  // ── Confirm ───────────────────────────────────────────────────────────────
 
   confirm(): void {
-    const card = this.selectedCard!;
-    const months = this.selectedMonths;
+    const card     = this.selectedCard!;
+    const months   = this.selectedMonths;
     const expTypeId = this.paymentTypeControl.value!.id;
-    const vendorId = this.paymentVendorControl.value!.id;
+    const vendorId  = this.paymentVendorControl.value!.id;
 
     let mainExpenseId: number | undefined;
     let mainExpense: MonthlyPaymentPayload | undefined;
 
     if (this.activeTab === 0) {
       mainExpense = {
-        walletId: this.walletControl.value!.id,
+        walletId:      this.walletControl.value!,
         expenseTypeId: this.expenseTypeControl.value!.id,
-        vendorId: this.vendorControl.value!.id,
-        total: +this.newExpenseForm.get('total')!.value,
-        buyDate: toRequestFormat(new Date(this.newExpenseForm.get('buyDate')!.value)),
-        description: `${this.newExpenseForm.get('description')!.value}\n${months} meses sin intereses`,
+        vendorId:      this.vendorControl.value!.id,
+        total:         +this.newExpenseForm.get('total')!.value,
+        buyDate:       toRequestFormat(new Date(this.newExpenseForm.get('buyDate')!.value)),
+        description:   `${this.newExpenseForm.get('description')!.value}\n${months} meses sin intereses`,
       };
     } else {
       mainExpenseId = this.selectedExisting!.id;
@@ -258,20 +249,16 @@ export class MonthlyAddWizardComponent implements OnInit, OnDestroy {
       mainExpenseId,
       mainExpense,
       payments: this.paymentRows.map((row) => ({
-        walletId: row.walletId,
+        walletId:      row.walletId,
         expenseTypeId: expTypeId,
-        vendorId: vendorId,
-        total: row.total,
-        buyDate: toRequestFormat(row.buyDate),
-        description: row.description,
+        vendorId,
+        total:         row.total,
+        buyDate:       toRequestFormat(row.buyDate),
+        description:   row.description,
       })),
     };
 
     this.data.onConfirm(payload);
-    this.dialogRef.close(true);
-  }
-
-  cancel(): void {
-    this.dialogRef.close(false);
+    this.data.close();
   }
 }

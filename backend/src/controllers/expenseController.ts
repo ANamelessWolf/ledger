@@ -232,6 +232,41 @@ export const updateExpense = asyncErrorHandler(
 );
 
 /**
+ * Deletes an expense by id.
+ * @route DELETE /expenses/:id
+ * @param {Request} req - The request object
+ * @param {Response} res - The response object
+ * @param {NextFunction} next - The next middleware function
+ * @returns {Promise<void>}
+ */
+export const deleteExpense = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = +req.params.id;
+      const expense = await AppDataSource.manager.findOne(Expense, {
+        where: { id },
+      });
+
+      if (!expense) {
+        return next(new Exception(`Expense ${id} not found`, HTTP_STATUS.NOT_FOUND));
+      }
+
+      await AppDataSource.manager.remove(expense);
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { id } }));
+    } catch (error) {
+      console.log(error);
+      return next(
+        new Exception(
+          `An error occurred deleting expense`,
+          HTTP_STATUS.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+);
+
+/**
  * Get expenses grouped by expense type for the last N months.
  * @route GET /expenses/summary/type/:frequency
  * @param {Request} req - The request object

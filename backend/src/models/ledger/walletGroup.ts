@@ -7,4 +7,7 @@ export class WalletGroup {
 
   @Column({ type: "varchar", length: 40 })
   name: string;
+
+  @Column({ type: "tinyint", name: "is_active", default: 1 })
+  isActive: number;
 }

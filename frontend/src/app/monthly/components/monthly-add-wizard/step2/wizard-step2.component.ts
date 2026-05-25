@@ -13,6 +13,7 @@ import { CatalogItemSelectComponent } from '@common/components/catalog-item-sele
 import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
 import { CatalogItem } from '@common/types/catalogTypes';
 import { WizardExpenseSearchResult } from '@moNoInt/types/monthlyAddWizard.types';
+import { WalletPickerComponent } from '@wallet/components/wallet-picker/wallet-picker.component';
 
 @Component({
   selector: 'app-wizard-step2',
@@ -31,6 +32,7 @@ import { WizardExpenseSearchResult } from '@moNoInt/types/monthlyAddWizard.types
     MatNativeDateModule,
     CatalogItemSelectComponent,
     CurrencyFormatPipe,
+    WalletPickerComponent,
   ],
   templateUrl: './wizard-step2.component.html',
   styleUrl: './wizard-step2.component.scss',
@@ -38,9 +40,9 @@ import { WizardExpenseSearchResult } from '@moNoInt/types/monthlyAddWizard.types
 export class WizardStep2Component {
   @Input() expenseTypes: CatalogItem[] = [];
   @Input() vendors: CatalogItem[] = [];
-  @Input() cardWalletItems: CatalogItem[] = [];
+  @Input() walletGroupId: number | null = null;
   @Input() newExpenseForm!: FormGroup;
-  @Input() walletControl!: FormControl<CatalogItem | null>;
+  @Input() walletControl!: FormControl;
   @Input() expenseTypeControl!: FormControl<CatalogItem | null>;
   @Input() vendorControl!: FormControl<CatalogItem | null>;
   @Input() searchControl!: FormControl<string | null>;
@@ -51,7 +53,6 @@ export class WizardStep2Component {
   @Input() selectedMonths = 0;
   @Input() descriptionHint = '';
 
-  @Output() cancel = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
   @Output() tabChange = new EventEmitter<number>();

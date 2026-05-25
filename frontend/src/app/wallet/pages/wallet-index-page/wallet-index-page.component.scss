@@ -1,38 +1,40 @@
-.expense-index-page {
+:host {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
-  .header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 16px 0px 120px;
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
 
-    h1 {
-      min-width: 200px;
-      font-size: xx-large;
-      margin-top: 16px;
-      margin-left: 4px;
-      color: black;
-      margin: 0;
-    }
+.wallet-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-    .button-group {
-      display: flex;
-      gap: 8px;
-
-      button {
-        margin: 0;
-      }
-    }
-  }
-
-  hr {
-    margin: 0px;
-  }
-
-  .table-area {
+  ::ng-deep .mat-mdc-tab-body-wrapper {
     flex: 1;
-    padding: 16px;
+    overflow: hidden;
   }
+
+  ::ng-deep .mat-mdc-tab-body-content {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 20px 32px;
+  box-sizing: border-box;
 }

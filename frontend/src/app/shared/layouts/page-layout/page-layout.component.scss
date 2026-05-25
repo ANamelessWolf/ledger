@@ -42,8 +42,9 @@
   }
 
   .widget-area {
-    padding: 16px;
-    background-color: #f5f5f5;
+    padding: 12px 16px;
+    background-color: var(--color-bg-subtle, #f8fafc);
+    overflow-x: auto;
   }
 
   .table-area {

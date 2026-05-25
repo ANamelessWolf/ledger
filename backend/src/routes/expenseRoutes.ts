@@ -122,6 +122,7 @@
 import { Router } from "express";
 import {
   createExpense,
+  deleteExpense,
   getDailyExpenses,
   getExpenses,
   getExpenseSummaryByType,
@@ -357,7 +358,7 @@ const router = Router();
  *         description: Error processing the request.
  */
 router.route("/").get(getExpenses).post(createExpense);
-router.route("/:id").put(updateExpense);
+router.route("/:id").put(updateExpense).delete(deleteExpense);
 router.route("/daily/:month/:year").get(getDailyExpenses);
 router.route("/summary/type/:frequency").get(getExpenseSummaryByType);
 router.route("/summary/vendor/:frequency").get(getExpenseSummaryByVendor);

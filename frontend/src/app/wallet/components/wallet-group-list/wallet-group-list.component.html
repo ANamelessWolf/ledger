@@ -1,0 +1,30 @@
+<div class="list-header">
+  <div class="position">
+    <p>Wallets</p>
+    <div class="btn-group">
+      <button mat-icon-button aria-label="Add wallet group" (click)="onAdd()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="divider-pad"><hr /></div>
+
+<div class="scrollable-container">
+  <mat-nav-list *ngIf="!isLoading">
+    <mat-list-item *ngFor="let group of groups" (click)="onGroupClick(group)">
+      <app-wallet-group-list-item
+        [isSelected]="group.isSelected"
+        [data]="group"
+      ></app-wallet-group-list-item>
+    </mat-list-item>
+    <div class="empty-state" *ngIf="groups.length === 0">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>No wallet yet</span>
+      <span class="hint">Click + to create your first wallet group</span>
+    </div>
+  </mat-nav-list>
+</div>
+<div class="spinner-container" *ngIf="isLoading">
+  <app-spinner></app-spinner>
+</div>

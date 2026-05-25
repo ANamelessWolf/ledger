@@ -1,5 +1,26 @@
-.wizard-content {
+.wizard-stepper {
   min-width: 600px;
-  max-width: 720px;
-  padding: 0 8px;
+
+  ::ng-deep {
+    .mat-horizontal-stepper-header-container {
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .mat-step-header {
+      padding: 12px 16px;
+      border-radius: 8px;
+
+      &:hover { background: rgba(8, 126, 139, 0.06); }
+    }
+
+    .mat-step-icon-selected,
+    .mat-step-icon-state-done {
+      background-color: #087e8b !important;
+    }
+
+    .mat-horizontal-content-container {
+      padding: 0 8px 8px;
+    }
+  }
 }

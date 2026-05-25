@@ -1,0 +1,90 @@
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.currency-section {
+  .currency-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 10px;
+  }
+}
+
+.forward-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+
+  .section-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 8px 0 0;
+  }
+}
+
+.forward-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  thead tr {
+    background: #f8fafc;
+  }
+
+  th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.currency-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  color: #334155;
+}
+
+.currency-badge {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 28px;
+  text-align: center;
+}
+
+.select-cell {
+  width: 100%;
+}
+
+.forward-select {
+  width: 100%;
+}

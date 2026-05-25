@@ -1,39 +1,34 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatSortModule, Sort } from '@angular/material/sort';
-import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
-import { PaginationEvent } from '@config/commonTypes';
-import { MatButtonModule } from '@angular/material/button';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
+import { NotificationService } from '@common/services/notification.service';
+import { PaginationEvent } from '@config/commonTypes';
 import {
   InstallmentPayment,
   NoIntMonthlyInstallment,
   Payment,
 } from '@moNoInt/types/monthlyNoInterest';
 import { MoNoIntService } from '@moNoInt/services/mo-no-int.service';
-import { NotificationService } from '@common/services/notification.service';
-import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
-import { toCurrency, toRangeCurrency } from '@common/utils/formatUtils';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-purchase-table',
   standalone: true,
   imports: [
     CommonModule,
-    MatPaginatorModule,
-    MatIconModule,
     MatTableModule,
-    LedgerIconComponent,
+    MatPaginatorModule,
     MatSortModule,
     MatButtonModule,
+    MatIconModule,
     MatMenuModule,
-    MatGridListModule,
     MatTooltipModule,
     CurrencyFormatPipe,
   ],
@@ -43,101 +38,69 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class PurchaseTableComponent {
   @Input() installments: NoIntMonthlyInstallment[] = [];
-  @Input() totalItems: number = 0;
-  @Output() pageChange = new EventEmitter<PaginationEvent>();
-  @Output() sortChange = new EventEmitter<Sort>();
+  @Input() totalItems = 0;
+  @Output() pageChange     = new EventEmitter<PaginationEvent>();
+  @Output() sortChange     = new EventEmitter<Sort>();
   @Output() refreshRequest = new EventEmitter<void>();
 
-  displayedColumns: string[] = [
-    'id',
-    'creditcard',
-    'purchase',
-    'monthly',
-    'balance',
-    'buyDate',
-    'actions',
-  ];
-  pageSizeOptions: number[] = [5, 10, 25, 100];
-  pageSize: number = 25;
-  isLoading = true;
-  error = false;
+  displayedColumns = ['creditcard', 'purchase', 'monthly', 'balance', 'buyDate', 'actions'];
+  pageSizeOptions  = [5, 10, 25, 100];
+  pageSize         = 25;
 
-  public constructor(
+  constructor(
     private moNoIntService: MoNoIntService,
-    private notifService: NotificationService
+    private notifService: NotificationService,
   ) {}
 
-  monthsPayment(row: NoIntMonthlyInstallment) {
-    const mP = [];
-    const needPayments =
-      row.payments.filter((x) => x.isPaid === false).length || 0;
-    for (let index = 1; index <= row.months - needPayments; index++) {
-      mP.push('green');
-    }
-    for (let index = 1; index <= needPayments; index++) {
-      mP.push('gray');
-    }
-    return mP;
+  monthsPayment(row: NoIntMonthlyInstallment): string[] {
+    const unpaid = row.payments.filter(x => !x.isPaid).length;
+    const paid   = row.months - unpaid;
+    return [
+      ...Array(paid).fill('green'),
+      ...Array(unpaid).fill('gray'),
+    ];
   }
 
-  monthlyPayment(row: NoIntMonthlyInstallment) {
+  monthlyPayment(row: NoIntMonthlyInstallment): number {
     try {
-      const payments = row.payments.filter((x) => x.isPaid === false);
-      if (payments.length > 0) {
-        return payments[0].value;
-      } else {
-        const totalPayments = row.payments.length;
-        return row.payments[totalPayments - 1].value;
-      }
-    } catch (error) {
-      console.log(error);
-      return 0;
-    }
+      const next = row.payments.find(x => !x.isPaid);
+      return next ? next.value : row.payments[row.payments.length - 1].value;
+    } catch { return 0; }
   }
 
-  statusTooltip(row: NoIntMonthlyInstallment) {
-    const needPayments =
-      row.payments.filter((x) => x.isPaid === false).length || 0;
-    return `Months Paid: ${row.months - needPayments} / ${row.months}`;
+  statusTooltip(row: NoIntMonthlyInstallment): string {
+    const unpaid = row.payments.filter(x => !x.isPaid).length;
+    return `Months Paid: ${row.months - unpaid} / ${row.months}`;
   }
 
-  getBalance(row: NoIntMonthlyInstallment) {
-    const sum = row.payments
-      .filter((payment: Payment) => !payment.isPaid)
-      .reduce(
-        (partialSum: number, payment: Payment) => partialSum + payment.value,
-        0
-      );
-    return sum;
+  getBalance(row: NoIntMonthlyInstallment): number {
+    return row.payments
+      .filter((p: Payment) => !p.isPaid)
+      .reduce((sum: number, p: Payment) => sum + p.value, 0);
   }
 
-  getPaidBalance(row: NoIntMonthlyInstallment) {
-    if (row.paidMonths === row.months) {
-      return row.purchase.value;
-    }
-    return row.purchase.value - this.getBalance(row);
+  getPaidBalance(row: NoIntMonthlyInstallment): number {
+    return row.paidMonths === row.months
+      ? row.purchase.value
+      : row.purchase.value - this.getBalance(row);
   }
 
-  pageChanged(event: PaginationEvent) {
-    const pageIndex = event.pageIndex + 1;
-    const pageSize = event.pageSize;
-    this.pageChange.emit({ pageIndex, pageSize });
+  pageChanged(event: PaginationEvent): void {
+    this.pageChange.emit({ pageIndex: event.pageIndex + 1, pageSize: event.pageSize });
   }
 
-  sortChanged(event: Sort) {
-    this.sortChange.emit(event);
-  }
+  sortChanged(event: Sort): void { this.sortChange.emit(event); }
 
-  editPurchase(id: number, installment: NoIntMonthlyInstallment) {}
+  editPurchase(_id: number, _installment: NoIntMonthlyInstallment): void {}
 
-  showPayments(id: number, installment: NoIntMonthlyInstallment) {
+  showPayments(id: number, _installment: NoIntMonthlyInstallment): void {
     this.moNoIntService.getPayments(id).subscribe({
       next: (response) => {
         const payments = response.data as InstallmentPayment[];
         this.moNoIntService
           .showPaymentsDialog(
             'Lista de Pagos',
-            payments.filter((x) => x.paymentId !== null),
+            payments.filter(x => x.paymentId !== null),
             id,
             () => this.refreshRequest.emit()
           )

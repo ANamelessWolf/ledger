@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { SubscriptionSummary } from '@subscription/types/subscriptionTypes';
 
@@ -13,10 +11,8 @@ import { SubscriptionSummary } from '@subscription/types/subscriptionTypes';
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatIconModule,
   ],
   templateUrl: './subscription-summary.component.html',
   styleUrl: './subscription-summary.component.scss',

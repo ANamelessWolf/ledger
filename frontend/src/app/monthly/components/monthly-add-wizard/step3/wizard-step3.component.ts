@@ -42,7 +42,6 @@ export class WizardStep3Component {
   @Input() paymentTotal = 0;
   @Input() isValid = false;
 
-  @Output() cancel = new EventEmitter<void>();
   @Output() previous = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
 

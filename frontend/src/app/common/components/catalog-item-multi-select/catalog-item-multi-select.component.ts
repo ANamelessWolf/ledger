@@ -79,11 +79,12 @@ export class CatalogItemMultiSelectComponent implements OnInit {
       if (index < 0) {
         return items;
       }
-
       items.splice(index, 1);
-      this.announcer.announce(`Removed ${items}`);
+      this.announcer.announce(`Removed ${item}`);
       return [...items];
     });
+    const names = this.selectedItems();
+    this.control.setValue(this.items.filter((x) => names.includes(x.name)));
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {

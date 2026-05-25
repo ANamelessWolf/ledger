@@ -16,7 +16,7 @@
     </div>
     <div class="summary-row">
       <span class="summary-label">Total por mensualidad</span>
-      <span class="summary-value">{{ paymentTotal | currencyFormat }}</span>
+      <span class="summary-value highlight">{{ paymentTotal | currencyFormat }}</span>
     </div>
   </div>
 
@@ -34,8 +34,7 @@
 
   <div class="step-actions">
     <button mat-button type="button" (click)="previous.emit()">Atrás</button>
-    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
-    <button mat-raised-button color="primary" type="button" (click)="confirm.emit()">
+    <button mat-flat-button class="btn-confirm" type="button" (click)="confirm.emit()">
       Confirmar
     </button>
   </div>

@@ -201,12 +201,13 @@ export const getExpensesTypesList = asyncErrorHandler(
         ExpenseType,
         sort
       );
-      let result: CatalogItem[] = [];
-      if (eTypes)
-        result = eTypes.map((ex: ExpenseType) => {
-          const catItem: CatalogItem = { id: ex.id, name: ex.description };
-          return catItem;
-        });
+      const result = eTypes
+        ? eTypes.map((ex: ExpenseType) => ({
+            id: ex.id,
+            name: ex.description,
+            icon: ex.icon,
+          }))
+        : [];
 
       // Ok Response
       res.status(HTTP_STATUS.OK).json(

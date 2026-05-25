@@ -1,13 +1,11 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
 import { NoIntMonthlyInstallment } from '@moNoInt/types/monthlyNoInterest';
 import { PurchaseTableComponent } from '../purchase-table/purchase-table.component';
 
 @Component({
   selector: 'app-interest-free-details',
   standalone: true,
-  imports: [CommonModule, MatCardModule, PurchaseTableComponent],
+  imports: [PurchaseTableComponent],
   templateUrl: './interest-free-details.component.html',
   styleUrl: './interest-free-details.component.scss',
 })
@@ -17,10 +15,10 @@ export class InterestFreeDetailsComponent {
   @Input() showPaid = false;
   @Output() refreshRequest = new EventEmitter<void>();
 
-  get displayInstallments() {
+  get displayInstallments(): NoIntMonthlyInstallment[] {
     let result = this.installments ?? [];
     if (!this.showPaid) {
-      result = result.filter((i) => i.paidMonths < i.months);
+      result = result.filter(i => i.paidMonths < i.months);
     }
     return result;
   }

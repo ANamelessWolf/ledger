@@ -1,23 +1,34 @@
-<div class="expense-index-page">
-  <div class="header-section">
-    <h1>Wallets</h1>
-    <div class="button-group">
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
-      <button
-        mat-icon-button
-        aria-label="Open filter window"
-        (click)="openFilter()"
-      >
-        <mat-icon *ngIf="hasFilter">filter_list</mat-icon>
-        <mat-icon *ngIf="!hasFilter">filter_list_off</mat-icon>
-      </button>
-      <button mat-icon-button (click)="addWallet()">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-  </div>
-  <hr />
-  <div class="table-area">
+<app-page-layout
+  title="Wallets"
+  [hasFilter]="true"
+  [hasWidget]="true"
+  (onSearch)="onSearch($event)"
+  (openFilter)="onOpenFilter()"
+  (add)="onAddRequested()">
 
+  <div widget>
+    <app-wallet-summary [summary]="summary"></app-wallet-summary>
   </div>
-</div>
+
+  <div main class="main-content">
+    <mat-tab-group animationDuration="150ms" class="wallet-tabs" (selectedIndexChange)="activeTab = $event">
+
+      <mat-tab label="Wallet Groups">
+        <div class="tab-content">
+          <app-wallet-group-table
+            [groups]="filteredGroups"
+            (refresh)="loadAll()">
+          </app-wallet-group-table>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Currencies">
+        <div class="tab-content">
+          <app-currency-list></app-currency-list>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+
+</app-page-layout>

@@ -1,38 +1,31 @@
 .filter-form {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
-  min-width: 360px;
+  gap: 8px;
+  padding-top: 4px;
+  min-width: 340px;
 }
 
-.full-width {
-  width: 100%;
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .section-label {
-  font-size: 13px;
-  color: #666;
-  margin: 8px 0 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-muted, #64748b);
 }
+
+.full-width { width: 100%; }
 
 .date-row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 
-  .flex-field {
-    flex: 1;
-  }
-
-  .year-field {
-    width: 110px;
-  }
-}
-
-mat-divider {
-  margin: 8px 0;
-}
-
-.show-paid-check {
-  margin: 8px 0;
+  .flex-field { flex: 1; }
+  .year-field { width: 110px; }
 }

@@ -11,13 +11,10 @@
               <input matInput formControlName="total" type="number" placeholder="0.00" required />
               <mat-error *ngIf="newExpenseForm.get('total')?.invalid">Monto requerido</mat-error>
             </mat-form-field>
-            <app-catalog-item-select
-              header="Wallet"
-              [items]="cardWalletItems"
+            <app-wallet-picker
               [control]="walletControl"
-              [isRequired]="true"
-              errMessage="Selecciona un wallet">
-            </app-catalog-item-select>
+              [filterGroupId]="walletGroupId">
+            </app-wallet-picker>
           </div>
           <div class="form-group">
             <app-catalog-item-select
@@ -119,8 +116,7 @@
 
   <div class="step-actions">
     <button mat-button type="button" (click)="previous.emit()">Atrás</button>
-    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
-    <button mat-raised-button color="primary" type="button" [disabled]="!isValid" (click)="next.emit()">
+    <button mat-flat-button class="btn-next" type="button" [disabled]="!isValid" (click)="next.emit()">
       Siguiente
     </button>
   </div>

@@ -1,0 +1,6 @@
+<app-catalog-manager *ngIf="config" [config]="config"></app-catalog-manager>
+
+<div class="not-found" *ngIf="notFound">
+  <mat-icon>search_off</mat-icon>
+  <p>Catalog not found.</p>
+</div>

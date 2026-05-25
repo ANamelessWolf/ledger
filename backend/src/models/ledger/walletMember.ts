@@ -13,8 +13,8 @@ export class WalletMember {
   @Column({ type: "int", name: "wallet_group_id" })
   walletGroupId: number;
 
-  @Column({ type: "int", name: "forward_wallet_id" })
-  forwardWalletId: number;
+  @Column({ type: "int", name: "forward_wallet_id", nullable: true })
+  forwardWalletId: number | null;
 
   get wallet(): Promise<Wallet | null> {
     const options = {

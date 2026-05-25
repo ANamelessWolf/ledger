@@ -1,0 +1,66 @@
+<div class="dual-list">
+
+  <!-- Added currencies -->
+  <div class="list-panel">
+    <div class="panel-header">
+      <mat-icon class="header-icon added-icon">check_circle</mat-icon>
+      <span>Added ({{ added.length }})</span>
+    </div>
+    <div class="panel-body">
+      <div class="list-empty" *ngIf="added.length === 0">
+        <mat-icon>inbox</mat-icon>
+        <span>No currencies added</span>
+      </div>
+      <div
+        *ngFor="let c of added"
+        class="list-item"
+        [class.pending-add]="isPending(c)">
+        <div class="item-info">
+          <span class="item-symbol">{{ c.symbol }}</span>
+          <span class="item-name">{{ c.name }}</span>
+          <span class="pending-badge" *ngIf="showPendingBadge && isPending(c)">new</span>
+        </div>
+        <button
+          *ngIf="added.length > 1"
+          type="button"
+          mat-icon-button
+          class="remove-btn"
+          matTooltip="Remove"
+          (click)="removeCurrency(c)">
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">
+    <mat-icon>swap_horiz</mat-icon>
+  </div>
+
+  <!-- Available currencies -->
+  <div class="list-panel">
+    <div class="panel-header">
+      <mat-icon class="header-icon available-icon">add_circle_outline</mat-icon>
+      <span>Available ({{ available.length }})</span>
+    </div>
+    <div class="panel-body">
+      <div class="list-empty" *ngIf="available.length === 0">
+        <mat-icon>done_all</mat-icon>
+        <span>All currencies added</span>
+      </div>
+      <div
+        *ngFor="let c of available"
+        class="list-item list-item-available"
+        (click)="addCurrency(c)">
+        <div class="item-info">
+          <span class="item-symbol">{{ c.symbol }}</span>
+          <span class="item-name">{{ c.name }}</span>
+        </div>
+        <button type="button" mat-icon-button class="add-btn" matTooltip="Add">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

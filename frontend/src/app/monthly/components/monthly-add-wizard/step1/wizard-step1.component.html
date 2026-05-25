@@ -16,8 +16,7 @@
     </mat-form-field>
   </div>
   <div class="step-actions">
-    <button mat-button type="button" (click)="cancel.emit()">Cancelar</button>
-    <button type="button" mat-raised-button color="primary" [disabled]="!isValid" (click)="next.emit()">
+    <button type="button" mat-flat-button class="btn-next" [disabled]="!isValid" (click)="next.emit()">
       Siguiente
     </button>
   </div>

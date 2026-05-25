@@ -1,1 +1,13 @@
-<fa-icon [icon]="[iconPrefix, iconName]" [size]="iconSize"></fa-icon>
+<mat-icon
+  *ngIf="!isCustomSvg"
+  [style.font-size]="sizePx"
+  [style.width]="sizePx"
+  [style.height]="sizePx"
+  [style.line-height]="sizePx">{{ iconName }}</mat-icon>
+
+<img
+  *ngIf="isCustomSvg"
+  [src]="svgPath"
+  [style.width]="sizePx"
+  [style.height]="sizePx"
+  alt="">

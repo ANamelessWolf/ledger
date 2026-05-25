@@ -1,28 +1,13 @@
-<div class="summary-container">
-  <div class="summary-cards">
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="card-inner">
-          <mat-icon class="card-icon monthly">calendar_month</mat-icon>
-          <div class="card-data">
-            <span class="card-label">Monthly Total</span>
-            <span class="card-value">${{ (summary?.monthlyTotal ?? 0) | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="card-inner">
-          <mat-icon class="card-icon annual">event_note</mat-icon>
-          <div class="card-data">
-            <span class="card-label">Annual Total</span>
-            <span class="card-value">${{ (summary?.annualTotal ?? 0) | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+<div class="summary-widget">
+  <div class="summary-stats">
+    <div class="stat-card stat-monthly">
+      <span class="stat-label">Monthly Total</span>
+      <span class="stat-value">${{ (summary?.monthlyTotal ?? 0) | number:'1.2-2' }}</span>
+    </div>
+    <div class="stat-card stat-annual">
+      <span class="stat-label">Annual Total</span>
+      <span class="stat-value">${{ (summary?.annualTotal ?? 0) | number:'1.2-2' }}</span>
+    </div>
   </div>
 
   <div class="period-selector">

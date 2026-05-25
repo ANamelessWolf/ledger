@@ -9,6 +9,7 @@ import { MONTHLY_NO_INT_BASE } from './monthly/mo-no-int.routes';
 import { SUBSCRIPTION_BASE } from './subscription/subscription.routes';
 import { BUDGET_BASE } from './budget/budget.routes';
 import { ACCOUNT_BASE } from '@account/account.routes';
+import { SETTINGS_BASE } from './settings/settings.routes';
 
 export const routes: Routes = [
   {
@@ -59,6 +60,11 @@ export const routes: Routes = [
         path: ACCOUNT_BASE,
         loadChildren: () =>
           import('@account/account.routes').then((mod) => mod.ACCOUNT_ROUTES),
+      },
+      {
+        path: SETTINGS_BASE,
+        loadChildren: () =>
+          import('./settings/settings.routes').then((mod) => mod.SETTINGS_ROUTES),
       },
     ],
   },

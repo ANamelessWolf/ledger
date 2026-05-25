@@ -1,20 +1,13 @@
-import { DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-
-import { MatButtonModule } from '@angular/material/button';
-import {
-  MatNativeDateModule,
-  provideNativeDateAdapter,
-} from '@angular/material/core';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -27,7 +20,16 @@ import {
   DateRange,
   ExpenseFilter,
   ExpenseFilterOptions,
+  ExpenseTypeItem,
 } from '@expense/types/expensesTypes';
+import { ExpenseTypeMultiSelectComponent } from '../expense-type-multi-select/expense-type-multi-select.component';
+
+export interface ExpenseFilterData {
+  options: ExpenseFilterOptions;
+  isValid: () => boolean;
+  getResult: () => ExpenseFilter;
+  reset: () => void;
+}
 
 @Component({
   selector: 'app-expense-filter-form',
@@ -39,123 +41,91 @@ import {
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatButtonModule,
     ReactiveFormsModule,
-    DialogModule,
     CatalogItemMultiSelectComponent,
+    ExpenseTypeMultiSelectComponent,
     RangeSliderComponent,
   ],
   templateUrl: './expense-filter-form.component.html',
   styleUrl: './expense-filter-form.component.scss',
 })
-export class ExpenseFilterFormComponent {
-  filterForm: FormGroup;
-  walletControl = new FormControl();
-  expenseTypeControl = new FormControl();
-  vendorControl = new FormControl();
-  expenseRangeControl = new FormControl();
+export class ExpenseFilterFormComponent implements OnInit {
+  data!: ExpenseFilterData;
 
-  @ViewChild('walletMultiSelect')
-  walletMultiSelect!: CatalogItemMultiSelectComponent;
-  @ViewChild('expenseTypeMultiSelect')
-  expenseTypeMultiSelect!: CatalogItemMultiSelectComponent;
-  @ViewChild('vendorMultiSelect')
-  vendorMultiSelect!: CatalogItemMultiSelectComponent;
-  @ViewChild('expenseRange') expenseRange!: RangeSliderComponent;
+  filterForm!: FormGroup;
+  walletControl       = new FormControl<CatalogItem[]>([]);
+  expenseTypeControl  = new FormControl<ExpenseTypeItem[]>([]);
+  vendorControl       = new FormControl<CatalogItem[]>([]);
+  expenseRangeControl = new FormControl<SliderRange | undefined>(undefined);
 
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<ExpenseFilterFormComponent>,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      header: string;
-      options: ExpenseFilterOptions;
-      filterSelected: (filter: ExpenseFilter) => void;
-    }
-  ) {
+  @ViewChild('walletMultiSelect')     walletMultiSelect!: CatalogItemMultiSelectComponent;
+  @ViewChild('expenseTypeMultiSelect') expenseTypeMultiSelect!: ExpenseTypeMultiSelectComponent;
+  @ViewChild('vendorMultiSelect')     vendorMultiSelect!: CatalogItemMultiSelectComponent;
+  @ViewChild('expenseRange')          expenseRange!: RangeSliderComponent;
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    const filter = this.data.options.filter;
+
     this.filterForm = this.fb.group({
-      start: [data.options.filter.period?.start],
-      end: [data.options.filter.period?.end],
+      start: [filter.period?.start ?? null],
+      end:   [filter.period?.end   ?? null],
     });
 
-    const filter = data.options.filter;
-    const wallet: CatalogItem[] = data.options.wallets.filter((x) =>
-      filter.wallet?.includes(x.id)
-    );
-    this.walletControl.setValue(wallet);
-    const exTypes: CatalogItem[] = data.options.expenseTypes.filter((x) =>
-      filter.expenseTypes?.includes(x.id)
-    );
+    const wallets = this.data.options.wallets.filter(x => filter.wallet?.includes(x.id));
+    this.walletControl.setValue(wallets);
+
+    const exTypes = this.data.options.expenseTypes.filter(x => filter.expenseTypes?.includes(x.id));
     this.expenseTypeControl.setValue(exTypes);
-    const vendors: CatalogItem[] = data.options.vendors.filter((x) =>
-      filter.vendors?.includes(x.id)
-    );
+
+    const vendors = this.data.options.vendors.filter(x => filter.vendors?.includes(x.id));
     this.vendorControl.setValue(vendors);
 
-    if (filter.expenseRange) {
-      this.expenseRangeControl.setValue(filter.expenseRange);
-    } else {
-      this.expenseRangeControl.setValue(undefined);
-    }
+    this.expenseRangeControl.setValue(filter.expenseRange ?? undefined);
+
+    this.data.isValid   = () => true;
+    this.data.getResult = () => this.buildFilter();
+    this.data.reset     = () => this.resetForm();
   }
 
-  get visibility() {
-    return this.data.options.visibility;
-  }
+  get visibility() { return this.data.options.visibility; }
 
-  onApply() {
-    let period: DateRange | undefined = undefined;
+  private buildFilter(): ExpenseFilter {
+    let period: DateRange | undefined;
     if (this.filterForm.value.start && this.filterForm.value.end) {
       period = {
         start: this.filterForm.value.start,
-        end: this.filterForm.value.end,
+        end:   this.filterForm.value.end,
       };
     }
-    let exRange: SliderRange | undefined = undefined;
-    if (this.expenseRangeControl.value) {
-      const range = this.expenseRangeControl.value as SliderRange;
-      if (range.min >= 0 && range.max > 0) {
-        exRange = {
-          min: range.min,
-          max: range.max,
-        };
-      }
+
+    let expenseRange: SliderRange | undefined;
+    const range = this.expenseRangeControl.value;
+    if (range && range.min >= 0 && range.max > 0) {
+      expenseRange = { min: range.min, max: range.max };
     }
 
-    const walletIds = toIds(this.walletControl.value);
-    const exTypesIds = toIds(this.expenseTypeControl.value);
-    const vendorIds = toIds(this.vendorControl.value);
+    const walletIds  = toIds(this.walletControl.value      ?? []);
+    const typeIds    = toIds(this.expenseTypeControl.value ?? []);
+    const vendorIds  = toIds(this.vendorControl.value      ?? []);
 
-    const filter: ExpenseFilter = {
-      wallet: walletIds.length > 0 ? walletIds : undefined,
-      expenseTypes: exTypesIds.length > 0 ? exTypesIds : undefined,
-      vendors: vendorIds.length > 0 ? vendorIds : undefined,
-      period: period,
-      expenseRange: exRange,
+    return {
+      wallet:       walletIds.length  > 0 ? walletIds  : undefined,
+      expenseTypes: typeIds.length    > 0 ? typeIds    : undefined,
+      vendors:      vendorIds.length  > 0 ? vendorIds  : undefined,
+      period,
+      expenseRange,
       description: this.data.options.filter.description,
     };
-    this.data.filterSelected(filter);
-    this.dialogRef.close();
   }
 
-  onReset() {
-    if (this.visibility.enableWallet) {
-      this.walletMultiSelect.reset();
-    }
-    if (this.visibility.enableExpenseTypes) {
-      this.expenseTypeMultiSelect.reset();
-    }
-    if (this.visibility.enableVendors) {
-      this.vendorMultiSelect.reset();
-    }
-    this.expenseRange.reset();
-    this.filterForm = this.fb.group({
-      start: [],
-      end: [],
-    });
-  }
-
-  onCancel() {
-    this.dialogRef.close();
+  private resetForm(): void {
+    this.filterForm = this.fb.group({ start: [null], end: [null] });
+    this.expenseRangeControl.setValue(undefined);
+    if (this.visibility.enableWallet)       this.walletMultiSelect.reset();
+    if (this.visibility.enableExpenseTypes) this.expenseTypeMultiSelect.reset();
+    if (this.visibility.enableVendors)      this.vendorMultiSelect.reset();
+    if (this.expenseRange)                  this.expenseRange.reset();
   }
 }

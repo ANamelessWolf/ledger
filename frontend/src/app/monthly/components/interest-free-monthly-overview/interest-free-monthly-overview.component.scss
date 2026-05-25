@@ -1,22 +1,40 @@
-.overview-card {
-  height: 250px;
+$teal: #087e8b;
+
+.overview-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-mat-card-title {
-  font-size: x-large;
-  font-weight: bold;
+.stat-card {
+  flex: 1;
+  min-width: 140px;
+  background: #fff;
+  border: 1px solid var(--color-border, #e8edf2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 3px solid transparent;
 }
-mat-grid-tile div {
-  h2 {
-    color: black;
-    font-size: large;
-    font-weight: bold;
-    margin-bottom: 0px;
-  }
 
-  p {
-    margin-top: 10px;
-    font-size: xx-large;
-    font-weight: bold;
-  }
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-muted, #64748b);
 }
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary, #1e293b);
+  white-space: nowrap;
+}
+
+.stat-balance { border-top-color: var(--color-danger, #b91c1c); .stat-value { color: var(--color-danger, #b91c1c); } }
+.stat-monthly { border-top-color: $teal;                         .stat-value { color: $teal; } }
+.stat-total   { border-top-color: #7c3aed;                       .stat-value { color: #7c3aed; } }

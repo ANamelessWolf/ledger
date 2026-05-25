@@ -1,17 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { NotificationService } from '@common/services/notification.service';
 import { CatalogItem } from '@common/types/catalogTypes';
 import { sliceByMonthRange } from '@common/utils/dateUtils';
 import { EMPTY_PAGINATION } from '@config/commonTypes';
 import { ChartData, EMPTY_CHART_DATA } from '@expense/types/chartComponent';
-import { MoNoIntFilterDialogComponent } from '@moNoInt/components/mo-no-int-filter-dialog/mo-no-int-filter-dialog.component';
 import { InterestFreeCreditCardPieChartComponent } from '@moNoInt/components/interest-free-credit-card-pie-chart/interest-free-credit-card-pie-chart.component';
 import { InterestFreeDetailsComponent } from '@moNoInt/components/interest-free-details/interest-free-details.component';
 import { InterestFreeMonthlyOverviewComponent } from '@moNoInt/components/interest-free-monthly-overview/interest-free-monthly-overview.component';
@@ -27,22 +21,18 @@ import {
   ICardValue,
   IFreeMontlyInt,
   MoNoIntFilter,
-  MoNoIntFilterDialogData,
   MoNoIntSearchOptions,
   NoIntMonthlyInstallment,
 } from '@moNoInt/types/monthlyNoInterest';
 import { mapNoIntMonthlyInstallments } from '@moNoInt/utils/moNoIntUtils';
+import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-mo-no-int-index-page',
   standalone: true,
   imports: [
     CommonModule,
-    MatIconModule,
-    MatTableModule,
-    MatButtonModule,
-    MatDialogModule,
-    SearchBarComponent,
+    PageLayoutComponent,
     InterestFreeSummaryComponent,
     InterestFreeMonthlyOverviewComponent,
     InterestFreeDetailsComponent,
@@ -57,40 +47,35 @@ export class MoNoIntIndexPageComponent implements OnInit {
   walletGroups: CatalogItem[] = [];
 
   get options(): MoNoIntSearchOptions {
-    return {
-      pagination: EMPTY_PAGINATION,
-      sorting: undefined,
-      filter: this.activeFilter,
-    };
+    return { pagination: EMPTY_PAGINATION, sorting: undefined, filter: this.activeFilter };
   }
 
   get hasFilter(): boolean {
     const f = this.activeFilter;
     const d = DEFAULT_MO_NO_INT_FILTER;
     return (
-      f.status !== d.status ||
-      f.fromMonth !== d.fromMonth ||
-      f.fromYear !== d.fromYear ||
-      f.toMonth !== d.toMonth ||
-      f.toYear !== d.toYear ||
+      f.status        !== d.status        ||
+      f.fromMonth     !== d.fromMonth     ||
+      f.fromYear      !== d.fromYear      ||
+      f.toMonth       !== d.toMonth       ||
+      f.toYear        !== d.toYear        ||
       f.walletGroupId !== d.walletGroupId ||
-      f.showPaid !== d.showPaid
+      f.showPaid      !== d.showPaid
     );
   }
 
-  isLoading = true;
-  error = false;
-  installments: NoIntMonthlyInstallment[] = [];
-  totalItems: number = 0;
-  totals: CreditCardInstallmentTotal = EMPTY_CREDIT_CARD_INST_TOT;
-  overview: IFreeMontlyInt = EMPTY_FREE_MONTHLY_INT;
-  cards: ICardValue[] = [];
-  summaryChartData: ChartData = EMPTY_CHART_DATA;
+  isLoading  = true;
+  error      = false;
+  installments: NoIntMonthlyInstallment[]  = [];
+  totalItems    = 0;
+  totals: CreditCardInstallmentTotal       = EMPTY_CREDIT_CARD_INST_TOT;
+  overview: IFreeMontlyInt                 = EMPTY_FREE_MONTHLY_INT;
+  cards: ICardValue[]                      = [];
+  summaryChartData: ChartData              = EMPTY_CHART_DATA;
 
   constructor(
     private moNoIntService: MoNoIntService,
-    private notifService: NotificationService,
-    private dialog: MatDialog
+    private notifService:   NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -106,38 +91,26 @@ export class MoNoIntIndexPageComponent implements OnInit {
       next: (response) => {
         const { installments, totalItems, totals } = mapNoIntMonthlyInstallments(response);
         this.installments = installments;
-        this.totalItems = totalItems;
-        this.totals = totals;
+        this.totalItems   = totalItems;
+        this.totals       = totals;
         this.overview = {
           current: this.totals.totals.balance,
           monthly: this.totals.totals.monthlyBalance,
-          total: this.totals.totals.total,
+          total:   this.totals.totals.total,
         };
         this.cards = this.totals.cards.map((c: CardBalance) => ({
-          card: c.card,
-          color: c.color,
-          value: c.percent,
+          card: c.card, color: c.color, value: c.percent, balance: c.value,
         }));
         const { startIndex, endIndex } = sliceByMonthRange(
           this.totals.summary.labels,
-          this.activeFilter.fromMonth,
-          this.activeFilter.fromYear,
-          this.activeFilter.toMonth,
-          this.activeFilter.toYear
+          this.activeFilter.fromMonth, this.activeFilter.fromYear,
+          this.activeFilter.toMonth,   this.activeFilter.toYear,
         );
         this.summaryChartData = {
           labels: this.totals.summary.labels.slice(startIndex, endIndex),
           datasets: [
-            {
-              data: this.totals.summary.balance.slice(startIndex, endIndex),
-              color: 'green',
-              legend: 'balance',
-            },
-            {
-              data: this.totals.summary.payment.slice(startIndex, endIndex),
-              color: 'red',
-              legend: 'payment',
-            },
+            { data: this.totals.summary.balance.slice(startIndex, endIndex), color: 'green', legend: 'balance' },
+            { data: this.totals.summary.payment.slice(startIndex, endIndex), color: 'red',   legend: 'payment' },
           ],
         };
         this.isLoading = false;
@@ -150,25 +123,20 @@ export class MoNoIntIndexPageComponent implements OnInit {
     });
   }
 
-  onSearch(_event: any) {}
+  onSearch(_event: any): void {}
 
   openFilter(): void {
-    const data: MoNoIntFilterDialogData = {
-      current: { ...this.activeFilter },
-      walletGroups: this.walletGroups,
-    };
-    this.dialog
-      .open(MoNoIntFilterDialogComponent, { width: '420px', data })
-      .afterClosed()
-      .subscribe((result: MoNoIntFilter | null) => {
-        if (result !== null && result !== undefined) {
-          this.activeFilter = result;
-          this.loadInstallments();
-        }
-      });
+    this.moNoIntService.showFilterDialog(
+      this.activeFilter,
+      this.walletGroups,
+      (filter) => {
+        this.activeFilter = filter;
+        this.loadInstallments();
+      }
+    );
   }
 
-  addWallet() {
+  addWallet(): void {
     this.moNoIntService.showAddWizardDialog(() => {
       this.notifService.showNotification('Mensualidad creada correctamente', 'success');
       this.loadInstallments();

@@ -5,12 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Sort } from '@angular/material/sort';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SearchBarComponent } from '@common/components/search-bar/search-bar.component';
 import { CatalogService } from '@common/services/catalog.service';
 import { NotificationService } from '@common/services/notification.service';
 import { toShortDate } from '@common/utils/formatUtils';
 import { EMPTY_PAGINATION, PaginationEvent } from '@config/commonTypes';
 import { ExpenseTableComponent } from '@expense/components/expense-table/expense-table.component';
+import { ExpenseTopChartComponent } from '@expense/components/expense-top-chart/expense-top-chart.component';
 import { ExpensesService } from '@expense/services/expenses.service';
 import {
   AddExpense,
@@ -29,6 +29,10 @@ import {
   validateFilter,
 } from '@expense/utils/expenseUtils';
 import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.component';
+import { CurrencyFormatPipe } from '@common/pipes/currency-format.pipe';
+import { WalletService } from '@wallet/services/wallet.service';
+import { WalletItem } from '@wallet/types/wallet.types';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-expense-index-page',
@@ -38,8 +42,9 @@ import { PageLayoutComponent } from 'app/shared/layouts/page-layout/page-layout.
     MatButtonModule,
     MatIconModule,
     ExpenseTableComponent,
-    SearchBarComponent,
+    ExpenseTopChartComponent,
     PageLayoutComponent,
+    CurrencyFormatPipe,
   ],
   templateUrl: './expense-index-page.component.html',
   styleUrl: './expense-index-page.component.scss',
@@ -57,10 +62,20 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   expenses: Expense[] = [];
   totalItems: number = 0;
+  chartExpenses: Expense[] = [];
+  walletItems: WalletItem[] = [];
+  walletGroupCardMap: Map<string, string> = new Map();
+
+  get chartTotal(): number {
+    return this.chartExpenses
+      .filter(e => e.value > 0)
+      .reduce((sum, e) => sum + e.value, 0);
+  }
 
   constructor(
     private expenseService: ExpensesService,
     private catalogService: CatalogService,
+    private walletService: WalletService,
     private notifService: NotificationService,
     private router: Router,
     private route: ActivatedRoute
@@ -78,16 +93,16 @@ export class ExpenseIndexPageComponent implements OnInit {
       return 'All Expenses';
     } else {
       const period = this.options.filter.period;
-      return `Expenses from ${toShortDate(period.start)} to ${toShortDate(
-        period.end
-      )}`;
+      return `Expenses from ${toShortDate(period.start)} to ${toShortDate(period.end)}`;
     }
   }
 
   ngOnInit(): void {
     this.applyQueryParams();
     this.getExpenses();
+    this.getChartExpenses();
     this.getCatalog();
+    this.loadWalletCardLinks();
   }
 
   private applyQueryParams(): void {
@@ -116,51 +131,41 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.getExpenses();
   }
 
-  refresh(event: number) {
+  refresh(_event: number) {
     this.getExpenses();
+    this.getChartExpenses();
   }
 
   addExpense() {
     this.expenseService
-      .showCreateExpenseDialog(
-        'Add new expense',
-        this.catalog,
-        this.expenseAdded.bind(this)
-      )
+      .showCreateExpenseDialog('Add new expense', this.catalog, this.expenseAdded.bind(this))
       .subscribe();
   }
 
-  goToDaily(){
+  goToDaily() {
     const today = new Date();
-    const month = today.getMonth() + 1; // getMonth() returns 0-11, so add 1
-    const year = today.getFullYear();
-
-    this.router.navigate([`/expenses/daily/${month}/${year}`]);
+    this.router.navigate([`/expenses/daily/${today.getMonth() + 1}/${today.getFullYear()}`]);
   }
 
   expenseAdded(newExpense: AddExpense) {
     this.expenseService.createExpense(newExpense).subscribe(
-      (response) => {
-        this.notifService.showNotification(
-          'Expense added succesfully',
-          'success'
-        );
+      (_response) => {
+        this.notifService.showNotification('Expense added succesfully', 'success');
         this.getExpenses();
+        this.getChartExpenses();
       },
       (err: HttpErrorResponse) => {
         this.error = true;
         this.notifService.showError(err);
       },
-      //Complete
-      () => {
-        this.isLoading = false;
-      }
+      () => { this.isLoading = false; }
     );
   }
 
   onSearch(searchTerm: string) {
     this.options.filter.description = searchTerm;
     this.getExpenses();
+    this.getChartExpenses();
   }
 
   openFilter() {
@@ -183,6 +188,7 @@ export class ExpenseIndexPageComponent implements OnInit {
   applyFilter(filter: ExpenseFilter) {
     this.options.filter = filter;
     this.getExpenses();
+    this.getChartExpenses();
   }
 
   get hasFilter() {
@@ -201,6 +207,44 @@ export class ExpenseIndexPageComponent implements OnInit {
     );
   }
 
+  private getChartExpenses() {
+    this.expenseService.getExpensesForChart(this.options.filter).subscribe(
+      (response) => {
+        const { expenses } = mapExpense(response);
+        this.chartExpenses = expenses;
+      }
+    );
+  }
+
+  private loadWalletCardLinks(): void {
+    forkJoin({
+      wallets: this.walletService.getAllWallets(),
+      cards: this.catalogService.getCreditCardsWithWalletGroup(),
+    }).subscribe({
+      next: ({ wallets, cards }: any) => {
+        this.walletItems = wallets.data ?? [];
+
+        const groupNameMap = new Map<number, string>();
+        for (const w of this.walletItems) {
+          if (w.walletGroupId && w.walletGroupName) {
+            groupNameMap.set(w.walletGroupId, w.walletGroupName);
+          }
+        }
+
+        const cardMap = new Map<string, string>();
+        for (const card of (cards.data ?? [])) {
+          if (card.walletGroupId) {
+            const groupName = groupNameMap.get(card.walletGroupId);
+            if (groupName && !cardMap.has(groupName)) {
+              cardMap.set(groupName, `/cards/cc/${card.id}`);
+            }
+          }
+        }
+        this.walletGroupCardMap = cardMap;
+      },
+    });
+  }
+
   private getCatalog() {
     this.getWalletCatalog();
     this.getExpenseTypeCatalog();
@@ -209,9 +253,7 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   private getWalletCatalog() {
     this.catalogService.getWallets().subscribe(
-      (response) => {
-        this.catalog.wallets = response.data;
-      },
+      (response) => { this.catalog.wallets = response.data; },
       this.errorResponse,
       this.completed
     );
@@ -219,9 +261,7 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   private getExpenseTypeCatalog() {
     this.catalogService.getExpensesTypes().subscribe(
-      (response) => {
-        this.catalog.expenseTypes = response.data;
-      },
+      (response) => { this.catalog.expenseTypes = response.data; },
       this.errorResponse,
       this.completed
     );
@@ -229,9 +269,7 @@ export class ExpenseIndexPageComponent implements OnInit {
 
   private getVendorCatalog() {
     this.catalogService.getVendors().subscribe(
-      (response) => {
-        this.catalog.vendors = response.data;
-      },
+      (response) => { this.catalog.vendors = response.data; },
       this.errorResponse,
       this.completed
     );

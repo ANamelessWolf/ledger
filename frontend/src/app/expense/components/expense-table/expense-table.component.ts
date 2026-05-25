@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatSortModule, Sort } from '@angular/material/sort';
-import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
-import { PaginationEvent } from '@config/commonTypes';
 import { MatButtonModule } from '@angular/material/button';
-import { ExpensesService } from '@expense/services/expenses.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { LedgerIconComponent } from '@common/components/ledger-icon/ledger-icon.component';
 import { NotificationService } from '@common/services/notification.service';
+import { PaginationEvent } from '@config/commonTypes';
+import { ExpensesService } from '@expense/services/expenses.service';
 import {
   EMPTY_EXPENSES,
   Expense,
@@ -17,7 +19,7 @@ import {
   ExpenseRequest,
   UpdateExpense,
 } from '@expense/types/expensesTypes';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ConfirmDialogComponent } from 'app/shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-expense-table',
@@ -58,7 +60,8 @@ export class ExpenseTableComponent {
 
   public constructor(
     private expenseService: ExpensesService,
-    private notifService: NotificationService
+    private notifService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   pageChanged(event: PaginationEvent) {
@@ -92,20 +95,35 @@ export class ExpenseTableComponent {
   }
 
   expenseUpdated(request: ExpenseRequest) {
-    console.log(request);
     this.expenseService.editExpense(request.id, request.body).subscribe(
-      (response) => {
-        this.notifService.showNotification(
-          'Expense updated succesfully',
-          'success'
-        );
+      () => {
+        this.notifService.showNotification('Expense updated successfully', 'success');
         this.expenseEdited.emit(request.id);
       },
-      (err: HttpErrorResponse) => {
-        this.notifService.showError(err);
-      },
-      //Complete
-      () => {}
+      (err: HttpErrorResponse) => { this.notifService.showError(err); }
     );
+  }
+
+  deleteExpense(expense: Expense) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '360px',
+      data: {
+        title: 'Delete expense?',
+        message: `"${expense.description}" will be permanently deleted. This action cannot be undone.`,
+        confirmLabel: 'Delete',
+        cancelLabel: 'Cancel',
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.expenseService.deleteExpense(expense.id).subscribe({
+        next: () => {
+          this.notifService.showNotification('Expense deleted', 'success');
+          this.expenseEdited.emit(expense.id);
+        },
+        error: (err: HttpErrorResponse) => { this.notifService.showError(err); },
+      });
+    });
   }
 }

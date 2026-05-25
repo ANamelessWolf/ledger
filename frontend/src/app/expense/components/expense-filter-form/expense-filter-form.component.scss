@@ -1,47 +1,35 @@
 .filter-form {
-  padding: 20px 10px;
-  margin-top: 0px;
-  mat-dialog-content {
-    width: calc(100% - 80px);
-  }
-}
-
-.form-actions {
+  padding: 4px 0;
   display: flex;
-  justify-content: end;
-  padding: 20px;
-
-  div {
-    width: 280px;
-    margin-top: 20px;
-    display: flex;
-    flex: 0 0 auto;
-    text-align: right;
-    justify-content: space-between;
-  }
+  flex-direction: column;
 }
-.form-group {
-  display: block;
-  justify-content: space-between;
-  margin: 0px 40px;
-  h2 {
-    margin: 0px 0px 10px 0px;
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+
+  &:first-child {
+    border-top: none;
+    padding-top: 4px;
   }
 }
 
-hr {
-  width: auto;
-  margin-top: 0px;
+.section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-text-subtle, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.header {
-  padding: 16px;
-  margin-bottom: 0px;
-  font-size: x-large;
-}
-.doubleFields {
-  display: grid;
-  gap: unset;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 80px;
+.form-row {
+  display: flex;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1;
+  }
 }

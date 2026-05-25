@@ -1,0 +1,189 @@
+<div class="cm-root">
+
+  <!-- ── Header — matches PageLayoutComponent style ──────────────────── -->
+  <div class="cm-header">
+    <div class="cm-title-group">
+      <mat-icon class="cm-icon">{{ config.icon }}</mat-icon>
+      <h1>{{ config.title }}</h1>
+      <span class="count-badge">{{ filteredCount }}</span>
+    </div>
+
+    <div class="cm-btn-group">
+      <mat-form-field appearance="fill" class="search-field">
+        <mat-label>{{ config.searchPlaceholder || 'Search' }}</mat-label>
+        <input matInput
+          title="Search"
+          placeholder="Type to search..."
+          [value]="searchValue"
+          (input)="onSearch($any($event.target).value)" />
+        <button type="button" mat-icon-button matSuffix *ngIf="searchValue"
+          (click)="clearSearch()" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+        <button type="button" mat-icon-button matSuffix *ngIf="!searchValue"
+          aria-label="Search">
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button type="button" mat-icon-button matTooltip="Add new" aria-label="Add new"
+        (click)="startAdd()" [disabled]="editingNew || !!editingRow">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  <hr class="cm-divider" />
+
+  <!-- ── Body ───────────────────────────────────────────────────────── -->
+  <div class="cm-body">
+
+    <!-- Loading -->
+    <div class="loading-wrap" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- TABLE -->
+    <ng-container *ngIf="!isLoading">
+      <div class="table-wrap" *ngIf="dataSource.data.length > 0; else emptyState">
+        <table mat-table [dataSource]="dataSource" matSort class="catalog-table">
+
+          <ng-container *ngFor="let col of config.columns" [matColumnDef]="col.field">
+            <th mat-header-cell *matHeaderCellDef
+                [mat-sort-header]="col.sortable ? col.field : ''"
+                [style.width]="col.width || 'auto'">
+              {{ col.header }}
+            </th>
+            <td mat-cell *matCellDef="let row" [style.width]="col.width || 'auto'">
+
+              <!-- Viewing -->
+              <ng-container *ngIf="!isRowEditing(row)">
+                <app-ledger-icon *ngIf="col.type === 'icon'"
+                  [iconName]="row[col.field]" iconSize="1x">
+                </app-ledger-icon>
+                <span *ngIf="col.type === 'select'">
+                  {{ getOptionLabel(col.field, row[col.field], col.optionValue || 'id', col.optionLabel || 'description') }}
+                </span>
+                <span *ngIf="col.type !== 'icon' && col.type !== 'select'">{{ row[col.field] }}</span>
+              </ng-container>
+
+              <!-- Editing -->
+              <ng-container *ngIf="isRowEditing(row)">
+                <!-- Readonly field → show value as-is -->
+                <span *ngIf="col.readonly" class="readonly-id">{{ row[col.field] }}</span>
+
+                <!-- Icon field → button to open picker -->
+                <button *ngIf="!col.readonly && col.type === 'icon'" type="button" mat-icon-button
+                  class="icon-pick-btn" matTooltip="Change icon" aria-label="Change icon"
+                  (click)="openIconPicker()">
+                  <app-ledger-icon
+                    [iconName]="editingIconValue || 'add_photo_alternate'"
+                    iconSize="1x">
+                  </app-ledger-icon>
+                </button>
+
+                <!-- Select field -->
+                <mat-form-field *ngIf="!col.readonly && col.type === 'select'" appearance="outline"
+                  subscriptSizing="dynamic" class="inline-field">
+                  <mat-select [formControl]="editControls[col.field]" [attr.aria-label]="col.header">
+                    <mat-option *ngFor="let opt of selectOptions[col.field]"
+                      [value]="opt[col.optionValue || 'id']">
+                      {{ opt[col.optionLabel || 'description'] }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Text / number field → inline input -->
+                <mat-form-field *ngIf="!col.readonly && col.type !== 'icon' && col.type !== 'select'" appearance="outline"
+                  subscriptSizing="dynamic" class="inline-field">
+                  <input matInput
+                    title="Edit value"
+                    [formControl]="editControls[col.field]"
+                    [placeholder]="col.header"
+                    [attr.aria-label]="col.header"
+                    (keydown.enter)="saveInline()"
+                    (keydown.escape)="cancelEdit()" />
+                </mat-form-field>
+              </ng-container>
+
+            </td>
+          </ng-container>
+
+          <!-- Actions column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-th">
+              <span class="sr-only">Actions</span>
+            </th>
+            <td mat-cell *matCellDef="let row" class="actions-cell">
+
+              <!-- Viewing -->
+              <ng-container *ngIf="!isRowEditing(row)">
+                <button type="button" mat-icon-button matTooltip="Edit" aria-label="Edit"
+                  (click)="startEdit(row); $event.stopPropagation()">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button type="button" mat-icon-button matTooltip="Delete" aria-label="Delete"
+                  class="delete-btn" *ngIf="config.allowDelete"
+                  (click)="confirmDelete(row); $event.stopPropagation()">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </ng-container>
+
+              <!-- Editing -->
+              <ng-container *ngIf="isRowEditing(row)">
+                <button type="button" mat-icon-button matTooltip="Save (Enter)" aria-label="Save"
+                  class="save-btn" (click)="saveInline(); $event.stopPropagation()">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button type="button" mat-icon-button matTooltip="Cancel (Esc)" aria-label="Cancel"
+                  (click)="cancelEdit(); $event.stopPropagation()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </ng-container>
+
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.editing-row]="isRowEditing(row)"
+              [class.new-row]="row._isNew"
+              [class.clickable-row]="!isRowEditing(row) && !row._isNew"
+              (click)="!isRowEditing(row) && !row._isNew && startEdit(row)"></tr>
+        </table>
+
+        <mat-paginator [pageSize]="25" [pageSizeOptions]="[10, 25, 50]"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </ng-container>
+
+    <!-- Empty state -->
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No {{ config.title | lowercase }} yet.</p>
+        <button type="button" mat-flat-button color="primary" (click)="startAdd()">
+          <mat-icon>add</mat-icon> Add first
+        </button>
+      </div>
+    </ng-template>
+
+  </div><!-- /cm-body -->
+
+  <!-- ── Icon Picker Drawer ──────────────────────────────────────────── -->
+  <div class="drawer-overlay" *ngIf="iconPickerOpen" (click)="closeIconPicker()"></div>
+
+  <aside class="edit-drawer" [class.open]="iconPickerOpen">
+    <div class="drawer-header">
+      <h3>Select Icon</h3>
+      <button type="button" mat-icon-button aria-label="Close" (click)="closeIconPicker()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="drawer-body">
+      <app-icon-picker [control]="iconControl" (selected)="onIconSelected($event)">
+      </app-icon-picker>
+    </div>
+  </aside>
+
+</div>

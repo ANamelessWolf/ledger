@@ -1,0 +1,27 @@
+<div class="hub">
+  <div class="hub-header">
+    <h1>Settings</h1>
+    <p>Manage catalogs and application configuration.</p>
+  </div>
+
+  <div class="hub-sections">
+    <div *ngFor="let section of sections" class="section-block">
+      <h2>{{ section.label }}</h2>
+      <div class="catalog-cards">
+        <a
+          *ngFor="let item of section.items"
+          class="catalog-card"
+          [routerLink]="['..', 'catalog', item.id]">
+          <div class="card-icon-wrap">
+            <mat-icon>{{ item.icon }}</mat-icon>
+          </div>
+          <div class="card-info">
+            <span class="card-title">{{ item.label }}</span>
+            <span class="card-desc">Manage {{ item.label | lowercase }}</span>
+          </div>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
