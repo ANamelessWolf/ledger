@@ -54,7 +54,7 @@ export class ExpenseIndexPageComponent implements OnInit {
   options: ExpenseSearchOptions = {
     pagination: EMPTY_PAGINATION,
     sorting: undefined,
-    filter: EMPTY_EXPENSE_FILTER,
+    filter: { ...EMPTY_EXPENSE_FILTER },
   };
   catalog: ExpenseOptions = EMPTY_EXPENSES;
   isLoading = true;
@@ -113,12 +113,12 @@ export class ExpenseIndexPageComponent implements OnInit {
         end: new Date(p['end'] + 'T00:00:00'),
       };
     }
-    if (p['expenseTypes']) {
-      this.options.filter.expenseTypes = p['expenseTypes'].split(',').map(Number);
-    }
-    if (p['vendors']) {
-      this.options.filter.vendors = p['vendors'].split(',').map(Number);
-    }
+    this.options.filter.expenseTypes = p['expenseTypes']
+      ? p['expenseTypes'].split(',').map(Number)
+      : undefined;
+    this.options.filter.vendors = p['vendors']
+      ? p['vendors'].split(',').map(Number)
+      : undefined;
   }
 
   loadExpenses(e: PaginationEvent) {

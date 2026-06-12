@@ -33,7 +33,7 @@
                 <app-ledger-icon [iconName]="row.expenseIcon" iconSize="1x" />
               </div>
               <div class="expense-info">
-                <span class="expense-description">{{ row.description }}</span>
+                <span class="expense-description" [innerHTML]="row.description"></span>
                 <span class="expense-meta">
                   <span class="expense-vendor">{{ row.vendor }}</span>
                   <span class="meta-dot">·</span>

@@ -23,6 +23,9 @@ export class Expense {
   @Column({ type: "double" })
   total: number;
 
+  @Column({ type: "double", name: "currency_factor" })
+  currencyFactor: number;
+
   @Column({ type: "date", name: "buy_date" })
   buyDate: Date;
 
