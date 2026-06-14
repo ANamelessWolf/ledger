@@ -1,0 +1,99 @@
+<h2 mat-dialog-title>
+  <app-ledger-icon *ngIf="currentIcon" [iconName]="currentIcon" iconSize="1x" />
+  Edit Group
+</h2>
+
+<mat-dialog-content class="edit-content">
+  <mat-tab-group animationDuration="150ms">
+
+    <!-- Tab 1: Info -->
+    <mat-tab label="Info">
+      <form [formGroup]="infoForm" class="info-form">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="Group name" title="Name" />
+          <mat-error *ngIf="infoForm.get('name')?.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="2" placeholder="Optional description" title="Description"></textarea>
+        </mat-form-field>
+
+        <div class="icon-section">
+          <span class="icon-label">Icon</span>
+          <div class="icon-preview" *ngIf="currentIcon">
+            <app-ledger-icon [iconName]="currentIcon" iconSize="2x" />
+            <span class="icon-name">{{ currentIcon }}</span>
+          </div>
+          <app-icon-select [control]="iconControl" />
+        </div>
+
+        <div class="tab-actions">
+          <button type="button" mat-flat-button color="primary" (click)="saveInfo()" [disabled]="infoForm.invalid || isSavingInfo">
+            <mat-spinner *ngIf="isSavingInfo" diameter="16" class="btn-spinner" />
+            <mat-icon *ngIf="!isSavingInfo">save</mat-icon>
+            Save Info
+          </button>
+        </div>
+
+      </form>
+    </mat-tab>
+
+    <!-- Tab 2: Expenses -->
+    <mat-tab label="Expenses">
+      <div class="expenses-tab">
+
+        <div class="section-header">
+          <span>In this group ({{ groupExpenses.length }})</span>
+        </div>
+
+        <div class="group-expenses-list" *ngIf="!isLoadingExpenses && groupExpenses.length > 0">
+          <div class="group-expense-row" *ngFor="let e of groupExpenses">
+            <app-ledger-icon [iconName]="e.expenseIcon" iconSize="1x" />
+            <div class="exp-info">
+              <span class="exp-desc">{{ e.description }}</span>
+              <span class="exp-meta">{{ e.vendor }} · {{ e.buyDate }}</span>
+            </div>
+            <span class="exp-total">{{ e.value | currencyFormat }}</span>
+            <button type="button" mat-icon-button color="warn" matTooltip="Remove from group" (click)="removeExpense(e)">
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="expenses-empty" *ngIf="!isLoadingExpenses && groupExpenses.length === 0">
+          <mat-icon>inbox</mat-icon>
+          <span>No expenses in this group</span>
+        </div>
+
+        <mat-spinner *ngIf="isLoadingExpenses" diameter="28" class="center-spinner" />
+
+        <div class="section-header add-section-header">
+          <span>Add more expenses</span>
+        </div>
+
+        <app-expense-group-expense-picker
+          #picker
+          [wallets]="wallets"
+          [excludeIds]="currentExpenseIds"
+          (selectionChange)="onPickerSelectionChange($event)"
+        />
+
+        <div class="tab-actions" *ngIf="expensesToAdd.length > 0">
+          <button type="button" mat-flat-button color="primary" (click)="addSelected()">
+            <mat-icon>add</mat-icon>
+            Add {{ expensesToAdd.length }} to Group
+          </button>
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

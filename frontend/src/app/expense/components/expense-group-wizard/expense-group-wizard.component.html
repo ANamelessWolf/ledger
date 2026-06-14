@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Create Expense Group</h2>
+
+<mat-dialog-content class="wizard-content">
+  <mat-stepper [linear]="true" orientation="horizontal" #stepper>
+
+    <!-- Step 1: Group Info -->
+    <mat-step [stepControl]="infoForm" label="Group Info">
+      <form [formGroup]="infoForm" class="info-form">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Vacation 2026" title="Name" />
+          <mat-error *ngIf="infoForm.get('name')?.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="2" placeholder="Optional..." title="Description"></textarea>
+        </mat-form-field>
+
+        <div class="icon-section">
+          <span class="icon-label">Icon</span>
+          <app-icon-select [control]="iconControl" />
+        </div>
+
+        <div class="step-actions">
+          <button type="button" mat-button (click)="cancel()">Cancel</button>
+          <button type="button" mat-flat-button color="primary" matStepperNext [disabled]="infoForm.invalid">
+            Next <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Step 2: Add Expenses -->
+    <mat-step label="Add Expenses">
+      <div class="expenses-step">
+        <p class="step-hint">Select expenses to include in this group. You can add more later.</p>
+
+        <app-expense-group-expense-picker
+          #picker
+          [wallets]="wallets"
+          (selectionChange)="onSelectionChange($event)"
+        />
+      </div>
+
+      <div class="step-actions">
+        <button type="button" mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon> Back
+        </button>
+        <button type="button" mat-flat-button color="primary" (click)="finish()" [disabled]="isSaving">
+          <mat-spinner *ngIf="isSaving" diameter="18" class="btn-spinner" />
+          <span *ngIf="!isSaving">Finish</span>
+        </button>
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>

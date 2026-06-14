@@ -22,6 +22,7 @@ export const LEDGER_API = {
   BUDGET: `${LEDGER_API_URL}/budget`,
   SUBSCRIPTION: `${LEDGER_API_URL}/subscription`,
   ACCOUNTS: `${LEDGER_API_URL}/accounts`,
+  EXPENSE_GROUPS: `${LEDGER_API_URL}/expense-groups`,
 };
 
 export const APP_CATALOGS = {

@@ -66,12 +66,19 @@ export class SavingsDetailComponent {
   }
 
   get secondarySections(): FinancingSection[] {
-    return this.detail.sections.filter((s) => s.name !== 'main');
+    return this.detail.sections.filter((s) => s.name !== 'main' && !s.isComplete);
+  }
+
+  get activeTotalBalance(): number {
+    const completedBalance = this.detail.sections
+      .filter((s) => s.isComplete)
+      .reduce((sum, s) => sum + s.balanceInDefault, 0);
+    return this.detail.totalBalance - completedBalance;
   }
 
   get totalProjectedEarnings(): number {
     return this.detail.sections
-      .filter((s) => s.isInvestment && s.investmentRate)
+      .filter((s) => s.isInvestment && s.investmentRate && !s.isComplete)
       .reduce((sum, s) => sum + (this.projectedEarnings(s) ?? 0), 0);
   }
 
@@ -216,6 +223,14 @@ export class SavingsDetailComponent {
       / (1000 * 60 * 60 * 24)
     );
     return section.balance * (section.investmentRate / 100) * (days / 365);
+  }
+
+  daysUntilEnd(section: FinancingSection): number | null {
+    if (!section.investmentEndDate) return null;
+    const days = Math.ceil(
+      (new Date(section.investmentEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    return days > 0 ? days : null;
   }
 
   formatDate(dateStr: string | null): string {

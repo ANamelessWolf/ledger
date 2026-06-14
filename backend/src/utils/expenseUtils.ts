@@ -102,6 +102,7 @@ export const getExpenseItemResponse = async (
     expenseIcon: exType.icon,
     vendor: vendor.description,
     total: formatMoney(ex.total, `${currency.symbol} $`),
+    rawTotal: ex.total,
     value: ex.total * currency.conversion,
     buyDate: formatDate(exDate),
   };

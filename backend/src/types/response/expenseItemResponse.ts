@@ -9,6 +9,7 @@ export type ExpenseItemResponse = {
   vendor: string;
   description: string;
   total: string;
+  rawTotal: number;
   value: number;
   buyDate: string;
 };

@@ -1,0 +1,103 @@
+<div class="picker-wrap">
+
+  <!-- Filters -->
+  <div class="picker-filters" [formGroup]="filterForm">
+    <mat-form-field appearance="outline" class="filter-text">
+      <mat-label>Search</mat-label>
+      <input matInput formControlName="description" placeholder="Description..." (keyup.enter)="search()" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-date">
+      <mat-label>From</mat-label>
+      <input matInput [matDatepicker]="startPicker" formControlName="start" />
+      <mat-datepicker-toggle matSuffix [for]="startPicker" />
+      <mat-datepicker #startPicker />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-date">
+      <mat-label>To</mat-label>
+      <input matInput [matDatepicker]="endPicker" formControlName="end" />
+      <mat-datepicker-toggle matSuffix [for]="endPicker" />
+      <mat-datepicker #endPicker />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-wallet">
+      <mat-label>Wallet</mat-label>
+      <mat-select formControlName="wallets" multiple>
+        <mat-option *ngFor="let w of wallets" [value]="w.id">{{ w.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button type="button" mat-flat-button color="primary" (click)="search()" [disabled]="isLoading">
+      <mat-icon>search</mat-icon> Search
+    </button>
+  </div>
+
+  <!-- Selection badge -->
+  <div class="picker-badge" *ngIf="selectedCount > 0">
+    <mat-icon>check_circle</mat-icon>
+    {{ selectedCount }} expense{{ selectedCount !== 1 ? 's' : '' }} selected
+    <button type="button" mat-icon-button matTooltip="Clear selection" (click)="clearSelection()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="picker-loading" *ngIf="isLoading">
+    <mat-spinner diameter="32" />
+  </div>
+
+  <!-- Empty state -->
+  <div class="picker-empty" *ngIf="!isLoading && hasSearched && results.length === 0">
+    <mat-icon>inbox</mat-icon>
+    <span>No expenses found</span>
+  </div>
+
+  <!-- Results table -->
+  <div class="picker-table-wrap" *ngIf="!isLoading && results.length > 0">
+    <mat-table [dataSource]="results">
+
+      <ng-container matColumnDef="select">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <mat-checkbox
+            [checked]="isSelected(row.id)"
+            (change)="toggle(row)"
+            (click)="$event.stopPropagation()"
+          />
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="expense">
+        <mat-header-cell *matHeaderCellDef>Expense</mat-header-cell>
+        <mat-cell *matCellDef="let row" (click)="toggle(row)" class="expense-cell">
+          <app-ledger-icon [iconName]="row.expenseIcon" iconSize="1x" />
+          <div class="expense-info">
+            <span class="expense-desc">{{ row.description }}</span>
+            <span class="expense-meta">{{ row.vendor }} · {{ row.expenseType }}</span>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+        <mat-cell *matCellDef="let row" (click)="toggle(row)">
+          <span class="amount">{{ row.value | currencyFormat }}</span>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
+        <mat-cell *matCellDef="let row" (click)="toggle(row)">{{ row.buyDate }}</mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns" />
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        [class.selected-row]="isSelected(row.id)"
+      />
+    </mat-table>
+  </div>
+
+</div>
