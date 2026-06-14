@@ -1,0 +1,114 @@
+.edit-content {
+  width: 660px;
+  max-width: 100%;
+  min-height: 420px;
+  padding: 0 10px;
+}
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0 8px;
+}
+
+.full-width { width: 100%; }
+
+.icon-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .icon-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.icon-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+
+  .icon-name { font-size: 13px; color: rgba(0,0,0,0.6); }
+}
+
+.expenses-tab {
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.54);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.add-section-header { margin-top: 16px; }
+
+.group-expenses-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+.group-expense-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+
+  &:last-child { border-bottom: none; }
+}
+
+.exp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  .exp-desc { font-size: 13px; font-weight: 500; }
+  .exp-meta { font-size: 11px; color: rgba(0,0,0,0.54); }
+}
+
+.exp-total {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.expenses-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(0,0,0,0.4);
+  padding: 12px;
+  font-size: 13px;
+
+  mat-icon { font-size: 18px; height: 18px; width: 18px; }
+}
+
+.center-spinner { margin: 16px auto; }
+
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+.btn-spinner { display: inline-block; margin-right: 6px; }

@@ -1,0 +1,84 @@
+<app-page-layout
+  [title]="'Expenses by groups'"
+  [hasFilter]="hasFilter"
+  [hasWidget]="true"
+  (add)="openWizard()"
+  (onSearch)="onSearch($event)"
+  (openFilter)="openFilter()">
+
+  <ng-container buttons>
+    <button mat-icon-button matTooltip="Back to Expenses" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <ng-container *ngIf="selectedGroup">
+      <button mat-icon-button matTooltip="Edit Group" (click)="openEditDialog()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Delete Group" color="warn" (click)="deleteGroup()">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </ng-container>
+  </ng-container>
+
+  <div widget class="groups-widget">
+
+    <!-- Group selector + description -->
+    <div class="group-selector-row" *ngIf="groups.length > 0">
+      <mat-select
+        [(ngModel)]="selectedGroupId"
+        (ngModelChange)="onGroupChange($event)"
+        class="group-select"
+      >
+        <mat-select-trigger>
+          <div class="group-option">
+            <app-ledger-icon *ngIf="selectedGroup?.icon" [iconName]="selectedGroup!.icon!" iconSize="1x" />
+            <span>{{ selectedGroup?.name }}</span>
+          </div>
+        </mat-select-trigger>
+        <mat-option *ngFor="let g of groups" [value]="g.id">
+          <div class="group-option">
+            <app-ledger-icon *ngIf="g.icon" [iconName]="g.icon" iconSize="1x" />
+            <span>{{ g.name }}</span>
+          </div>
+        </mat-option>
+      </mat-select>
+      <span class="group-description" *ngIf="selectedGroup?.description">
+        {{ selectedGroup!.description }}
+      </span>
+    </div>
+
+    <!-- Summary -->
+    <div class="widget-summary" *ngIf="groups.length > 0">
+      <span class="widget-period">Total</span>
+      <span class="widget-total">{{ chartTotal | currencyFormat }}</span>
+    </div>
+
+    <!-- Charts -->
+    <div class="widget-charts" *ngIf="chartExpenses.length > 0">
+      <app-expense-top-chart [expenses]="chartExpenses" [groupBy]="'expenseType'" [title]="'Top Categories'" />
+      <app-expense-top-chart [expenses]="chartExpenses" [groupBy]="'vendor'" [title]="'Top Vendors'" />
+      <app-expense-top-chart [expenses]="chartExpenses" [groupBy]="'wallet'" [title]="'Top Wallets'" />
+    </div>
+
+  </div>
+
+  <div main class="main-content">
+    <app-expense-table
+      *ngIf="groups.length > 0"
+      [header]="tableHeader"
+      [expenses]="displayedExpenses"
+      [totalItems]="filteredExpenses.length"
+      [catalog]="catalog"
+      (pageChange)="loadPage($event)"
+      (sortChange)="sortExpenses($event)"
+      (expenseEdited)="refreshExpenses($event)"
+    />
+
+    <div class="no-groups" *ngIf="groups.length === 0">
+      <mat-icon>folder_open</mat-icon>
+      <p>No groups yet.</p>
+      <button type="button" mat-flat-button color="primary" (click)="openWizard()">Create First Group</button>
+    </div>
+  </div>
+
+</app-page-layout>

@@ -17,6 +17,7 @@ import {
 } from "../types/excelTypes";
 import { WalletList } from "../models/ledger";
 import { Expense } from "../models/expenses";
+import { Currency } from "../models/settings";
 import { parseDate } from "./dateUtils";
 import { DataSource } from "typeorm";
 
@@ -179,6 +180,7 @@ export class ExcelExpenseUploader {
       currency_id: +this.currencyDict[expense.Currency],
       description: expense.Description,
       total: parseFloat(expense.Total),
+      currency_factor: expense.CurrencyFactor ? parseFloat(expense.CurrencyFactor) : 0,
       buy_date: this.excelDateToJSDate(expense.Date),
     }));
 
@@ -230,6 +232,11 @@ export class ExcelExpenseUploader {
       succed: [] as Expense[],
       failed: [] as FailedExpenseRow[],
     };
+
+    const currencies = await dataSource.manager.find(Currency);
+    const currencyConversionMap: Record<number, number> = {};
+    currencies.forEach((c) => { currencyConversionMap[c.id] = c.conversion; });
+
     console.log(`Uploading ${data.length} expenses...`)
     for (let index = 0; index < data.length; index++) {
       const row: ExpenseRow = data[index];
@@ -242,6 +249,9 @@ export class ExcelExpenseUploader {
         expense.description = row.description;
         expense.buyDate = parseDate(row.buy_date);
         expense.total = row.total;
+        expense.currencyFactor = row.currency_factor > 0
+          ? row.currency_factor
+          : (currencyConversionMap[row.currency_id] ?? 0);
         //Save
         const saveResult = await dataSource.manager.save(expense);
         result.succed.push(saveResult);

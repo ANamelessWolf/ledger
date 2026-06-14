@@ -25,7 +25,7 @@
     <div class="overview-metrics">
       <div class="metric">
         <span class="metric-label">Total Balance</span>
-        <span class="metric-value">{{ detail.defaultCurrencySymbol }} {{ detail.totalBalance | number:'1.2-2' }}</span>
+        <span class="metric-value">{{ detail.defaultCurrencySymbol }} {{ activeTotalBalance | number:'1.2-2' }}</span>
       </div>
       <div class="metric" *ngIf="mainSection">
         <span class="metric-label">Main Balance</span>
@@ -105,6 +105,9 @@
               <span class="inv-rate">{{ s.investmentRate }}% p/a · ends {{ formatDate(s.investmentEndDate) }}</span>
               <span class="inv-earnings" *ngIf="projectedEarnings(s) !== null">
                 +{{ s.currencySymbol }} {{ projectedEarnings(s) | number:'1.2-2' }} projected
+              </span>
+              <span class="inv-expiring" *ngIf="daysUntilEnd(s) !== null && daysUntilEnd(s)! <= 30">
+                <mat-icon>schedule</mat-icon> {{ daysUntilEnd(s) }} día{{ daysUntilEnd(s) !== 1 ? 's' : '' }} restante{{ daysUntilEnd(s) !== 1 ? 's' : '' }}
               </span>
             </div>
           </div>

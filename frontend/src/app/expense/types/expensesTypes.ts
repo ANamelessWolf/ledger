@@ -95,6 +95,7 @@ export type Expense = {
   description: string;
   buyDate: string;
   total: string;
+  rawTotal: number;
   value: number;
   index?: number;
 };

@@ -29,6 +29,7 @@ export type ExpenseRow = {
   currency_id: number;
   description: string;
   total: number;
+  currency_factor: number;
   buy_date: string;
 };
 

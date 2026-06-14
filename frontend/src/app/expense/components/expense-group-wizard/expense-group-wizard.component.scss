@@ -1,0 +1,62 @@
+.wizard-content {
+  width: 620px;
+  max-width: 100%;
+  padding: 0 4px;
+}
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+}
+
+.full-width { width: 100%; }
+
+.icon-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .icon-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.icon-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+
+  .icon-name { font-size: 13px; color: rgba(0,0,0,0.6); }
+}
+
+.expenses-step {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .step-hint { font-size: 13px; color: rgba(0,0,0,0.54); margin: 0; }
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  margin-top: 16px;
+}
+
+.btn-spinner {
+  display: inline-block;
+  margin-right: 4px;
+}

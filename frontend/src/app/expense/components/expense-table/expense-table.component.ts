@@ -80,7 +80,7 @@ export class ExpenseTableComponent {
       walletId: expense.walletId,
       expenseTypeId: expense.expenseTypeId,
       vendorId: expense.vendorId,
-      total: expense.value,
+      total: expense.rawTotal,
       buyDate: expense.buyDate,
       description: expense.description,
     };

@@ -5,6 +5,10 @@ export interface SvgIconEntry {
 
 export const SVG_ICON_REGISTRY: SvgIconEntry[] = [
   { name: 'entertainment/utensils',              category: 'Entertainment' },
+  { name: 'entertainment/spa',              category: 'Entertainment' },
+  { name: 'entertainment/art',              category: 'Entertainment' },
+  { name: 'entertainment/person-hiking',              category: 'Entertainment' },
+  { name: 'entertainment/baseball',              category: 'Entertainment' },
   { name: 'finance/coins',        category: 'Finance' },
   { name: 'finance/money-transfer',        category: 'Finance' },
   { name: 'health/tooth',   category: 'Health' },
@@ -19,6 +23,9 @@ export const SVG_ICON_REGISTRY: SvgIconEntry[] = [
   { name: 'shopping/shirt',             category: 'Shopping' },
   { name: 'shopping/pump-soap',           category: 'Shopping' },
   { name: 'shopping/clean-bottle',           category: 'Shopping' },
+  { name: 'shopping/bottle-water',           category: 'Shopping' },
+  { name: 'shopping/leanpub',           category: 'Shopping' },
+  { name: 'shopping/candy-cane',              category: 'shopping' },
   { name: 'other/cow',               category: 'Other' },
 
 ];

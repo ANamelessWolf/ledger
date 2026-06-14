@@ -1,0 +1,47 @@
+<button type="button" class="icon-trigger" (click)="toggle($event)">
+  <span class="trigger-value">
+    <app-ledger-icon *ngIf="selectedIcon" [iconName]="selectedIcon" iconSize="1x" />
+    <mat-icon *ngIf="!selectedIcon" class="placeholder-icon">interests</mat-icon>
+    <span class="trigger-label" [class.placeholder]="!selectedIcon">
+      {{ selectedIcon || 'Select an icon' }}
+    </span>
+  </span>
+  <mat-icon class="trigger-arrow">{{ isOpen ? 'arrow_drop_up' : 'arrow_drop_down' }}</mat-icon>
+</button>
+
+<ng-template #panelTpl>
+  <div class="icon-panel">
+    <div class="panel-search">
+      <mat-icon>search</mat-icon>
+      <input
+        #searchInput
+        [formControl]="searchControl"
+        placeholder="Search icons..."
+        autocomplete="off"
+      />
+      <button type="button" class="clear-btn" *ngIf="searchControl.value" (click)="searchControl.setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-list" *ngIf="filteredIcons.length > 0; else noResults">
+      <button
+        *ngFor="let icon of filteredIcons"
+        type="button"
+        class="icon-option"
+        [class.selected]="selectedIcon === icon.name"
+        (click)="pick(icon.name)"
+      >
+        <app-ledger-icon [iconName]="icon.name" iconSize="1x" />
+        <span class="icon-name">{{ icon.name }}</span>
+      </button>
+    </div>
+
+    <ng-template #noResults>
+      <div class="panel-empty">
+        <mat-icon>search_off</mat-icon>
+        <span>No icons found</span>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>

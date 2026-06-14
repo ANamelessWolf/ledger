@@ -147,6 +147,10 @@ export class ExpenseIndexPageComponent implements OnInit {
     this.router.navigate([`/expenses/daily/${today.getMonth() + 1}/${today.getFullYear()}`]);
   }
 
+  goToGroups() {
+    this.router.navigate(['/expenses/groups']);
+  }
+
   expenseAdded(newExpense: AddExpense) {
     this.expenseService.createExpense(newExpense).subscribe(
       (_response) => {

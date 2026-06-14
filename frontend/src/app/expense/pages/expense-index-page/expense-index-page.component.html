@@ -7,8 +7,11 @@
   (openFilter)="openFilter()">
 
   <ng-container buttons>
-    <button mat-icon-button (click)="goToDaily()">
+    <button mat-icon-button matTooltip="Daily View" (click)="goToDaily()">
       <mat-icon>calendar_month</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Expense Groups" (click)="goToGroups()">
+      <mat-icon>folder_special</mat-icon>
     </button>
   </ng-container>
 

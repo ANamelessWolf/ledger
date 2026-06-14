@@ -13,6 +13,7 @@ import budgetRoutes from './budgetRoutes';
 import subscriptionRoutes from './subscriptionRoutes';
 import accountRoutes from './accountRoutes';
 import settingsRoutes from './settingsRoutes';
+import expenseGroupRoutes from './expenseGroupRoutes';
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.use('/budget', budgetRoutes);
 router.use('/subscription', subscriptionRoutes);
 router.use('/accounts', accountRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/expense-groups', expenseGroupRoutes);
 
 // Routes error handlers
 router.all("*", unhandledRoutesHandler);

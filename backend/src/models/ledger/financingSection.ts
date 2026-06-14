@@ -37,4 +37,7 @@ export class FinancingSection {
 
   @Column({ type: "int", name: "display_currency_id", nullable: true })
   displayCurrencyId: number | null;
+
+  @Column({ type: "tinyint", name: "is_complete", default: 0 })
+  isComplete: number;
 }

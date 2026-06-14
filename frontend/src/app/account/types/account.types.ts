@@ -17,6 +17,7 @@ export interface FinancingSection {
   isInvestment: number;
   isLocked: number;
   isAvailable: number;
+  isComplete: number;
   investmentRate: number | null;
   investmentStartDate: string | null;
   investmentEndDate: string | null;
