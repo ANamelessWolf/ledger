@@ -75,6 +75,7 @@ export const getExpensesById = asyncErrorHandler(
             vendor: ex.vendor,
             description: ex.description,
             total: formatMoney(ex.total, `${ex.currency} $`),
+            rawTotal: ex.total,
             value: ex.value,
             buyDate: formatDate(ex.buyDate),
           };

@@ -27,7 +27,7 @@
       </div>
 
       <div class="row-info">
-        <span class="row-expense">{{ row.expense }}</span>
+        <span class="row-expense" [innerHTML]="row.expense"></span>
         <span class="row-meta">
           <span>{{ row.expenseType }}</span>
           <span class="meta-dot">·</span>

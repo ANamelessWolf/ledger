@@ -91,9 +91,9 @@ $teal-border: rgba(8, 126, 139, 0.2);
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-text-primary, #1e293b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .row-meta {

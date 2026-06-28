@@ -92,7 +92,8 @@ tr.mat-row {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-width: 300px;
+  width: 100%;
+  min-width: 0;
   padding: 10px 0px;
 }
 
@@ -106,9 +107,9 @@ tr.mat-row {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-text-primary, #1e293b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .purchase-meta {

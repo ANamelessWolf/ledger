@@ -134,6 +134,23 @@ export const getMonthlyInstallments = asyncErrorHandler(
         (sum, payment) => sum + payment.total,
         0
       );
+
+      // Build pie chart cards using only unpaid payments
+      const unpaidByCard: Record<number, number> = {};
+      for (const p of payments.filter((x) => x.isPaid === 0)) {
+        unpaidByCard[p.creditCardId] = (unpaidByCard[p.creditCardId] ?? 0) + p.total;
+      }
+      const unpaidTotal = Object.values(unpaidByCard).reduce((s, v) => s + v, 0);
+      const unpaidCards = currentCreditCardTotals
+        .map((c) => ({
+          ...c,
+          value: unpaidByCard[c.id] ?? 0,
+          percent: unpaidTotal > 0
+            ? Math.round(((unpaidByCard[c.id] ?? 0) / unpaidTotal) * 100)
+            : 0,
+        }))
+        .filter((c) => c.value > 0);
+
       const monthKey = getCurrentMonthlyKey();
       const currentPeriod = {
         label: formatMonthKey(monthKey),
@@ -150,7 +167,7 @@ export const getMonthlyInstallments = asyncErrorHandler(
 
       const totals = {
         currentPeriod,
-        cards: currentCreditCardTotals,
+        cards: unpaidCards,
         totals: totalValues,
         summary: { labels, balance, payment },
       };

@@ -111,6 +111,7 @@ export class ExpensesService {
 
     const dialogRef = this.dialog.open(DialogWrapperComponent, {
       width: '520px',
+      autoFocus: false,
       data: {
         header,
         component:      ExpenseEditFormComponent,
