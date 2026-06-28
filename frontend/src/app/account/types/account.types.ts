@@ -120,5 +120,11 @@ export interface MoveBalancePayload {
   newSection?: CreateSectionPayload;
 }
 
+export interface EndInvestmentPayload {
+  earnings: number;
+  destinationType: 'account' | 'section';
+  targetSectionId?: number;
+}
+
 export type AccountType = 'savings' | 'investment';
 export type SectionType = 'banking' | 'investment';

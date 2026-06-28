@@ -6,6 +6,7 @@ import {
   FinancingAccount,
   FinancingSection,
   Investment,
+  InvestmentEarning,
   Saving,
   Wallet,
   WalletMember,
@@ -566,6 +567,73 @@ export const moveBalance = asyncErrorHandler(
     } catch (error) {
       return next(
         new Exception("An error occurred moving the balance", HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      );
+    }
+  }
+);
+
+// ─── SECTION: END INVESTMENT ──────────────────────────────────────────────────
+
+export const endInvestment = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { sectionId } = req.params;
+      const sid = parseInt(sectionId, 10);
+      const { earnings, destinationType, targetSectionId } = req.body;
+
+      const sectionRepo = AppDataSource.getRepository(FinancingSection);
+
+      const source = await sectionRepo.findOne({ where: { id: sid } });
+      if (!source) {
+        return next(new Exception("Source section not found", HTTP_STATUS.NOT_FOUND));
+      }
+      if (!source.isInvestment || !source.investmentEndDate) {
+        return next(new Exception("Section is not a dated investment", HTTP_STATUS.BAD_REQUEST));
+      }
+      if (new Date(source.investmentEndDate) > new Date()) {
+        return next(new Exception("Investment period has not ended yet", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      const earningsAmount = Number(earnings);
+      if (isNaN(earningsAmount) || earningsAmount < 0) {
+        return next(new Exception("Invalid earnings amount", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      const totalToMove = source.balance + earningsAmount;
+
+      const earningRepo = AppDataSource.getRepository(InvestmentEarning);
+      const earning = earningRepo.create({
+        financingAccountId: source.financingAccountId,
+        financingSectionId: sid,
+        total: earningsAmount,
+        investmentEndDate: new Date(source.investmentEndDate),
+      });
+      await earningRepo.save(earning);
+
+      if (destinationType === "account") {
+        const main = await sectionRepo.findOne({
+          where: { financingAccountId: source.financingAccountId, name: "main" },
+        });
+        if (!main) {
+          return next(new Exception("Main section not found", HTTP_STATUS.NOT_FOUND));
+        }
+        await sectionRepo.update(main.id, { balance: main.balance + totalToMove });
+      } else if (destinationType === "section") {
+        const target = await sectionRepo.findOne({ where: { id: parseInt(targetSectionId, 10) } });
+        if (!target) {
+          return next(new Exception("Target section not found", HTTP_STATUS.NOT_FOUND));
+        }
+        await sectionRepo.update(target.id, { balance: target.balance + totalToMove });
+      } else {
+        return next(new Exception("Invalid destination type", HTTP_STATUS.BAD_REQUEST));
+      }
+
+      await sectionRepo.update(sid, { isComplete: 1, balance: 0, isLocked: 1 });
+
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: { success: true } }));
+    } catch (error) {
+      return next(
+        new Exception("An error occurred ending the investment", HTTP_STATUS.INTERNAL_SERVER_ERROR)
       );
     }
   }

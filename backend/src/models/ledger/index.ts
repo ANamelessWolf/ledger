@@ -13,3 +13,4 @@ export * from './creditcardSpendingHistory';
 export * from './walletGroup';
 export * from './walletMember';
 export * from './walletList';
+export * from './investmentEarning';

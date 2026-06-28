@@ -12,6 +12,7 @@ import { DialogData } from '@common/types/DialogData';
 import { SectionModalComponent, SectionModalData } from '../section-modal/section-modal.component';
 import { EditAccountModalComponent, EditAccountModalData } from '../edit-account-modal/edit-account-modal.component';
 import { MoveBalanceModalComponent, MoveBalanceModalData } from '../move-balance-modal/move-balance-modal.component';
+import { EndInvestmentModalComponent, EndInvestmentModalData } from '../end-investment-modal/end-investment-modal.component';
 import { AccountService } from '../../services/account.service';
 import {
   FinancingAccountDetail,
@@ -180,6 +181,38 @@ export class InvestmentDetailComponent {
         });
       },
       error: (err: HttpErrorResponse) => this.notifService.showError(err),
+    });
+  }
+
+  openEndInvestment(section: FinancingSection): void {
+    const modalData: EndInvestmentModalData = {
+      section,
+      allSections: this.detail.sections,
+      projectedEarnings: this.projectedEarnings(section) ?? 0,
+    };
+
+    const dialogData: DialogData = {
+      header: 'Terminar Inversión',
+      component: EndInvestmentModalComponent,
+      data: modalData,
+      validationData: modalData,
+      buttons: [DialogButton.SAVE, DialogButton.CANCEL],
+      validate: (d: EndInvestmentModalData) => d.onValidate ? d.onValidate() : false,
+    };
+
+    const ref = this.dialog.open(DialogWrapperComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      data: dialogData,
+    });
+
+    ref.afterClosed().subscribe((result: any) => {
+      if (result?.button === DialogButton.SAVE && modalData.result) {
+        this.accountService.endInvestment(section.id, modalData.result).subscribe({
+          next: () => this.refresh.emit(),
+          error: (err: HttpErrorResponse) => this.notifService.showError(err),
+        });
+      }
     });
   }
 

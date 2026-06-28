@@ -10,6 +10,7 @@ import {
   updateSection,
   deleteSection,
   moveBalance,
+  endInvestment,
 } from "../controllers/accountController";
 
 const router = Router();
@@ -214,5 +215,24 @@ router.delete("/sections/:sectionId", deleteSection);
  *         description: Balance moved
  */
 router.post("/sections/:sectionId/move", moveBalance);
+
+/**
+ * @swagger
+ * /accounts/sections/{sectionId}/end-investment:
+ *   post:
+ *     summary: End a completed investment section, record earnings, and move balance to destination
+ *     operationId: endInvestment
+ *     tags: [Accounts]
+ *     parameters:
+ *       - in: path
+ *         name: sectionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Investment ended
+ */
+router.post("/sections/:sectionId/end-investment", endInvestment);
 
 export default router;

@@ -1,0 +1,83 @@
+<div class="modal-body" [formGroup]="form">
+
+  <!-- Investment summary -->
+  <div class="summary-card">
+    <div class="summary-row">
+      <span class="summary-label">Sección</span>
+      <span class="summary-value">{{ section.name }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Total Invertido</span>
+      <span class="summary-value invested">{{ section.currencySymbol }} {{ section.balance | number:'1.2-2' }}</span>
+    </div>
+    <div class="summary-row" *ngIf="section.investmentEndDate">
+      <span class="summary-label">Fecha de vencimiento</span>
+      <span class="summary-value">{{ section.investmentEndDate | date:'mediumDate' }}</span>
+    </div>
+  </div>
+
+  <!-- Editable earnings -->
+  <div class="earnings-section">
+    <p class="field-label">Ganancia generada</p>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Ganancia</mat-label>
+      <span matTextPrefix>{{ section.currencySymbol }}&nbsp;</span>
+      <input matInput type="number" formControlName="earnings" placeholder="0.00" />
+      <mat-error *ngIf="form.get('earnings')?.hasError('required')">La ganancia es requerida</mat-error>
+      <mat-error *ngIf="form.get('earnings')?.hasError('min')">No puede ser negativa</mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Total preview -->
+  <div class="total-preview">
+    <mat-icon>account_balance</mat-icon>
+    <div>
+      <span class="preview-label">Total a transferir (invertido + ganancia)</span>
+      <span class="preview-value">{{ section.currencySymbol }} {{ totalToMove | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Destination -->
+  <div class="dest-section">
+    <p class="field-label">Destino</p>
+    <mat-radio-group formControlName="destinationType" class="dest-radio">
+      <mat-radio-button value="account" *ngIf="mainSection">
+        <div class="radio-option">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div>
+            <span class="radio-title">Cuenta principal</span>
+            <span class="radio-desc">Regresar a la sección main ({{ section.currencySymbol }} {{ mainSection.balance | number:'1.2-2' }})</span>
+          </div>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button value="section" *ngIf="otherSections.length > 0">
+        <div class="radio-option">
+          <mat-icon>swap_horiz</mat-icon>
+          <div>
+            <span class="radio-title">Otra sección</span>
+            <span class="radio-desc">Mover a una sección existente de la cuenta</span>
+          </div>
+        </div>
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <!-- Section selector -->
+  <div *ngIf="destinationType === 'section'" class="dest-options">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Sección destino</mat-label>
+      <mat-select formControlName="targetSectionId">
+        <mat-option *ngFor="let s of otherSections" [value]="s.id">
+          {{ s.name }} — {{ s.currencySymbol }} {{ s.balance | number:'1.2-2' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('targetSectionId')?.hasError('required')">Selecciona una sección</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="warning-note">
+    <mat-icon>info_outline</mat-icon>
+    <span>La sección quedará marcada como completada y su saldo se pondrá en cero.</span>
+  </div>
+
+</div>
