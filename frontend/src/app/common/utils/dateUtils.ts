@@ -89,7 +89,9 @@ export interface CardPeriodsResult {
 export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
   const { start, end } = period;
 
-  const keyBase = new Date(start.getFullYear(), start.getMonth(), 1);
+  // The cut day (end's day-of-month) is fixed for a card, so it alone
+  // decides whether a period is labeled by its start or end month.
+  const useEndMonth = end.getDate() >= 15;
 
   const periods = new Map<string, DateRange>();
   let currentKey = '';
@@ -97,7 +99,7 @@ export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
   for (let offset = -12; offset <= 5; offset++) {
     const newStart = shiftDateByMonths(start, offset);
     const newEnd = shiftDateByMonths(end, offset);
-    const keyDate = shiftDateByMonths(keyBase, offset);
+    const keyDate = useEndMonth ? newEnd : newStart;
     const key = `${getMonthName(keyDate)} ${keyDate.getFullYear()}`;
     if (offset === 0) currentKey = key;
     periods.set(key, { start: newStart, end: newEnd });

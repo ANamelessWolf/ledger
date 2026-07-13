@@ -32,6 +32,20 @@ export const getPeriodName = (date: Date) => {
   return `${getMonthName(date)} ${date.getFullYear()}`;
 };
 
+/**
+ * Picks which side of a billing period (start month vs. end month) should
+ * represent the period. A card's cut day is fixed, so this depends only on
+ * the cut day itself (the end date's day-of-month) rather than the number of
+ * days in any particular month — a card that cuts on the 15th or later is
+ * labeled by its closing month; otherwise by the month the period started in.
+ * @param start The billing period's start date.
+ * @param end The billing period's end date (its day-of-month is the cut day).
+ * @returns The date (start or end) whose month/year should label the period.
+ */
+export const getBillingPeriodLabelDate = (start: Date, end: Date): Date => {
+  return end.getDate() >= 15 ? end : start;
+};
+
 export const getPeriodKey = (date: Date): string => {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear().toString();
