@@ -8,14 +8,28 @@ abajo.
 
 ## Requisitos
 
-- El contenedor de MySQL corriendo (ver `docker-compose.yml` en la raíz del
-  repo, servicio `mysql`).
+- El contenedor de MySQL corriendo (ver `docker-compose.dev.yml` /
+  `docker-compose.prod.yml` en la raíz del repo, servicio `mysql`).
 - `backend/.env` con las credenciales de conexión (`DB_HOST`, `DB_PORT`,
   `DB_USER`, `DB_PASSWORD`, `DB_NAME`) — todos los scripts de este proyecto
-  se conectan usando ese archivo, no uno propio de `database/`.
+  se conectan usando ese archivo cuando corren en el host. Dentro de un
+  contenedor Docker se conectan con las variables de entorno que les pase
+  el propio `docker-compose` (no necesitan el archivo `.env` presente).
 - Dependencias instaladas: `npm install`.
 
-## Primer arranque (base de datos vacía)
+## Vía Docker (automático)
+
+Los composes de la raíz incluyen un servicio `migrate` (imagen
+`Dockerfile.migrate`, basada en Node) que espera a que `mysql` esté sano y
+corre `db:migrate` seguido de `db:seed` una sola vez; `backend` no arranca
+hasta que ese servicio termina con éxito. Es decir, con
+`npm run docker:dev` (o `docker:prod`) el esquema y los catálogos se crean
+solos, sin pasos manuales.
+
+## Primer arranque manual (base de datos vacía)
+
+Si corres MySQL suelto (sin el servicio `migrate`) o quieres aplicar algo
+puntual:
 
 ```bash
 npm run db:migrate   # crea el esquema: tablas, vistas y rutinas (migrations/)
@@ -25,7 +39,8 @@ npm run db:seed      # carga catálogos base: monedas, tipos, vendors, etc. (see
 Ambos comandos son idempotentes: `db:migrate` lleva un registro en la tabla
 `schema_migrations` y solo aplica lo que falte; `db:seed` usa
 `INSERT ... ON DUPLICATE KEY UPDATE`, así que se puede correr las veces que
-haga falta sin duplicar filas.
+haga falta sin duplicar filas. Por eso el servicio `migrate` es seguro de
+correr en cada arranque, incluso contra una base que ya tiene datos.
 
 ## Otros comandos
 

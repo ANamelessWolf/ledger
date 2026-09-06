@@ -12,7 +12,7 @@ import {
   EMPTY_PAYMENT_STATUS,
   PaymentStatus,
 } from "../types/paymentStatus";
-import { CreditCardSummaryInstallmentTotal } from "../types/response/creditCardSummaryResponse";
+import { CreditCardSummaryInstallmentTotal } from "../types/response/CreditCardSummaryResponse";
 import {
   findSurroundingPeriods,
   getPaymentStatus,

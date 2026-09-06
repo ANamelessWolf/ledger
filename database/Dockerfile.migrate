@@ -1,0 +1,13 @@
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Only package.json, not package-lock.json: lockfiles generated on a
+# different OS can miss platform-specific optional deps (npm/cli#4828).
+# Installing fresh here resolves the right binaries for this container.
+COPY package.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["sh", "-c", "npm run db:migrate && npm run db:seed"]

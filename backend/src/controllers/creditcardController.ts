@@ -18,7 +18,7 @@ import {
 } from "../utils/creditCardUtils";
 import { FinancingEntity } from "../models/banking";
 import { formatMoney } from "../utils/formatUtils";
-import { CreditCardSummary } from "../types/response/creditCardSummaryResponse";
+import { CreditCardSummary } from "../types/response/CreditCardSummaryResponse";
 import { MoreThan } from "typeorm";
 import { CardSpendingResponse } from "../types/response/cardSpendingResponse";
 import { CardSpending } from "../types/cardSpending";

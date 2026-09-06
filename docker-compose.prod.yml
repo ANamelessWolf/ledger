@@ -1,0 +1,79 @@
+name: ledger
+
+services:
+  mysql:
+    build: ./database
+    container_name: ledger-db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in database/.env}
+      MYSQL_DATABASE: ${DB_NAME:-db_ledger}
+    volumes:
+      - ledger_db_data_prod:/var/lib/mysql
+    healthcheck:
+      # --protocol=tcp forces a real network connection check. Without it,
+      # mysqladmin defaults to the local socket, which stays reachable
+      # during the image's first-boot "temporary server" init phase (run
+      # with --skip-networking) — reporting healthy before MySQL is
+      # actually listening on 3306 for other containers.
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp", "-uroot", "-p${DB_PASSWORD}", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  migrate:
+    build:
+      context: ./database
+      dockerfile: Dockerfile.migrate
+    container_name: ledger-migrate
+    restart: "no"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in database/.env}
+      DB_NAME: ${DB_NAME:-db_ledger}
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: ledger-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3002:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      # Overrides backend/.env: inside the compose network the DB is
+      # reached via the "mysql" service name on its container port (3306),
+      # not via the host-published port (3307) used for local dev.
+      DB_HOST: mysql
+      DB_PORT: 3306
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: ledger-frontend
+    restart: unless-stopped
+    ports:
+      - "4202:80"
+    depends_on:
+      - backend
+
+volumes:
+  ledger_db_data_prod:
+    name: ledger_db_data_prod

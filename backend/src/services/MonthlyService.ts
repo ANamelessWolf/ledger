@@ -1,7 +1,7 @@
 import { AppDataSource } from "..";
 import { Expense } from "../models/expenses";
 import { MonthlyNonInterest } from "../models/banking/monthlyNonInterest";
-import { MonthlyNonInterestPayment } from "../models/banking/monthlyNonInterestPayment";
+import { MonthlyNonInterestPayment } from "../models/banking/MonthlyNonInterestPayment";
 import { MonthlyPaymentPayload, MonthlyWizardPayload } from "../types/monthlyWizardPayload";
 
 const buildExpense = (data: MonthlyPaymentPayload): Expense => {

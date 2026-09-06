@@ -3,8 +3,11 @@ FROM node:20 as build
 
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Only package.json: package-lock.json was generated on Windows and doesn't
+# carry the Linux build of rollup's native binary (npm optional-deps bug,
+# https://github.com/npm/cli/issues/4828). Installing fresh here resolves
+# the right platform binaries for this container.
+COPY package.json ./
 
 # Install dependencies
 RUN npm install -g @angular/cli
