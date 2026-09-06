@@ -130,6 +130,7 @@ dist
 .pnp.*
 database/design/*.mwb.bak
 database/backup/*.sql
+database/backups/*.sql
 backend/sql/*
 Instructions/*
 .claude/settings.local.json

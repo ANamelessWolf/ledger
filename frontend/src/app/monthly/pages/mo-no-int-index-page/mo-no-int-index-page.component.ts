@@ -93,9 +93,14 @@ export class MoNoIntIndexPageComponent implements OnInit {
         this.installments = installments;
         this.totalItems   = totalItems;
         this.totals       = totals;
+        const currentMonthly = this.installments.reduce((sum, i) => {
+          if (i.paidMonths >= i.months) return sum;
+          const currentPayment = i.payments[i.paidMonths];
+          return sum + (currentPayment ? currentPayment.value : 0);
+        }, 0);
         this.overview = {
           current: this.totals.totals.balance,
-          monthly: this.totals.totals.monthlyBalance,
+          monthly: currentMonthly,
           total:   this.totals.totals.total,
         };
         this.cards = this.totals.cards.map((c: CardBalance) => ({

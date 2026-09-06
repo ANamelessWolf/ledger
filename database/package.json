@@ -9,7 +9,8 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:backup": "tsx scripts/backup.ts",
     "db:restore": "tsx scripts/restore.ts",
-    "db:rebuild": "tsx scripts/rebuild.ts"
+    "db:rebuild": "tsx scripts/rebuild.ts",
+    "db:cli": "tsx scripts/cli.ts"
   },
   "dependencies": {
     "chalk": "^5.4.1",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/glob": "^8.1.0",
     "@types/node": "^22.10.7",
+    "@types/yargs": "^17.0.35",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"

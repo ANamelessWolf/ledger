@@ -1,0 +1,3 @@
+-- Migration: create view `vw_spending_average_credit_card`
+
+CREATE OR REPLACE VIEW `vw_spending_average_credit_card` AS select `ccp`.`credit_card_id` AS `credit_card_id`,round(avg(`ccp`.`payment_total`),2) AS `avg_payment` from (`credit_card_payment` `ccp` join (select `ccp_inner`.`credit_card_id` AS `credit_card_id`,`ccp_inner`.`period_cut_date` AS `period_cut_date` from `credit_card_payment` `ccp_inner` where ((select count(0) from `credit_card_payment` `ccp_sub` where ((`ccp_sub`.`credit_card_id` = `ccp_inner`.`credit_card_id`) and (`ccp_sub`.`period_cut_date` > `ccp_inner`.`period_cut_date`))) < 12)) `last_12` on(((`ccp`.`credit_card_id` = `last_12`.`credit_card_id`) and (`ccp`.`period_cut_date` = `last_12`.`period_cut_date`)))) group by `ccp`.`credit_card_id`;

@@ -1,0 +1,3 @@
+-- Migration: create view `vw_expense_daily`
+
+CREATE OR REPLACE VIEW `vw_expense_daily` AS with `e_daily` as (select sum((`e`.`total` * `c`.`conversion`)) AS `total`,`e`.`buy_date` AS `buy_date` from (((`expense` `e` left join `wallet` `w` on((`w`.`id` = `e`.`wallet_id`))) left join `currency` `c` on((`c`.`id` = `w`.`currency_id`))) left join `monthly_with_no_interest` `mo` on((`mo`.`expense_id` = `e`.`id`))) where (`mo`.`id` is null) group by `e`.`buy_date` order by `e`.`buy_date`) select `e`.`total` AS `total`,`e`.`buy_date` AS `buyDate`,dayofmonth(`e`.`buy_date`) AS `dayId`,month(`e`.`buy_date`) AS `monthId`,year(`e`.`buy_date`) AS `yearId`,dayofweek(`e`.`buy_date`) AS `weekDay` from `e_daily` `e`;

@@ -1,0 +1,6 @@
+"id","description"
+1,VISA
+2,MASTERCARD
+3,AMEX
+4,DISCOVERY
+99,OTHER

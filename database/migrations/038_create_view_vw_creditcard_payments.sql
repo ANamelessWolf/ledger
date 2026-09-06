@@ -1,0 +1,3 @@
+-- Migration: create view `vw_creditcard_payments`
+
+CREATE OR REPLACE VIEW `vw_creditcard_payments` AS select `cc`.`id` AS `id`,`cc`.`cut_day` AS `cutDay`,`cc`.`entity_id` AS `entity_id`,`wg`.`name` AS `name`,`fe`.`name` AS `entity`,`cc`.`ending` AS `ending`,`cc`.`active` AS `active`,`ccp`.`payment_date` AS `payment_date`,`ccp`.`payment_total` AS `payment` from (((`credit_card_payment` `ccp` left join `credit_card` `cc` on((`cc`.`id` = `ccp`.`credit_card_id`))) left join `financing_entity` `fe` on((`fe`.`id` = `cc`.`entity_id`))) left join `wallet_group` `wg` on((`wg`.`id` = `cc`.`wallet_group_id`))) order by `cc`.`id`,`ccp`.`payment_date`;

@@ -5,13 +5,13 @@ import { toCurrency } from '@common/utils/formatUtils';
 import { Chart } from 'chart.js';
 
 const CHART_COLORS = [
-  '#087e8b', // teal
-  '#f59e0b', // amber
-  '#8b5cf6', // violet
   '#ef4444', // red
+  '#f59e0b', // amber
+  '#087e8b', // teal
+  '#3b82f6', // blue
+  '#8b5cf6', // violet
   '#10b981', // emerald
   '#f97316', // orange
-  '#3b82f6', // blue
   '#ec4899', // pink
   '#14b8a6', // cyan
   '#6366f1', // indigo
