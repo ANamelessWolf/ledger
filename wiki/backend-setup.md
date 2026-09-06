@@ -1,208 +1,129 @@
 # Backend setup
 
-## Step 1: Initialize the Project
+How the backend project is put together today. For day-to-day commands, see
+[../backend/README.md](../backend/README.md); this page is the deeper
+"why it's built this way" reference.
 
-Navigate to the backend directory and initialize a new Node.js project:
+## Stack
 
-```sh
-cd backend
-npm init -y
-```
+- **Express 4** for HTTP routing/middleware.
+- **TypeORM 0.3** as the ORM, connecting to MySQL via `mysql2`.
+- **Swagger** (`swagger-jsdoc` + `swagger-ui-express`) for API docs, generated
+  from JSDoc comments on route files.
+- **TypeScript**, compiled with plain `tsc` (no bundler) — `target: es2016`,
+  `module: CommonJS`.
+- **ts-node-dev** for local development (hot reload, `--transpile-only` so it
+  doesn't type-check on every save).
 
-## Step 2: Install Dependencies
-
-Install Express and its types, TypeScript, and other necessary packages:
-
-```sh
-npm init
-npm init -y
-npm install express
-npm install --save-dev typescript @types/node @types/express ts-node-dev
-npm install --save dotenv
-npm install swagger-ui-express swagger-jsdoc @types/swagger-ui-express @types/swagger-jsdoc
-npm install typeorm mysql
-
-```
-
-## Step 3: Configure TypeScript
-
-Create a tsconfig.json file in the backend directory:
+## tsconfig
 
 ```json
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
+    "target": "es2016",
+    "module": "CommonJS",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
+  },
+  "paths": {
+    "@controller/*": ["./src/controllers/*"],
+    "@model/*": ["./src/models/*"],
+    "@utils/*": ["./src/utils/*"],
+    "@common/*": ["./src/common/*"],
+    "@route/*": ["./src/routes/*"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]
 }
 ```
 
-## Step 4: Create the Project Structure
+Notes:
 
-Create the necessary directories and files:
+- `experimentalDecorators` is required by TypeORM's `@Entity`/`@Column`
+  decorators.
+- `strictPropertyInitialization` is off because TypeORM entity properties are
+  populated by the ORM, not by a constructor.
+- `paths` are resolved relative to `tsconfig.json` itself (no `baseUrl` —
+  that option is being removed in a future TypeScript version). None of the
+  current source files actually use these aliases yet, but they're wired up
+  for when they do.
+
+## Project structure
 
 ```
-ledger/
-│
-├── backend/
-│   ├── src/
-│   │   ├── common/
-│   │   ├── controllers/
-│   │   ├── middlewares/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── utils/
-│   │   └── index.ts
-│   │   └── swaggerOptions.ts
-│   ├── .env
-│   └── Dockerfile
-...
+src/
+├── index.ts             Entry point: creates the Express app and DB connection
+├── data-source.ts        TypeORM DataSource configuration
+├── routes/                One router module per resource, mounted in routes/index.ts
+├── controllers/           Request handlers
+├── services/               Business logic shared across controllers
+├── models/                 TypeORM entities
+├── middlewares/            Error handling, Swagger UI mounting, etc.
+├── types/                   Shared request/response TypeScript types
+├── common/                  Shared constants, enums, interfaces
+├── scripts/                 One-off utility scripts (run with ts-node, not part of the server)
+└── swaggerOptions.ts        Swagger/OpenAPI definition
 ```
 
-## Step 5: Set Up Express Server with TypeScript
+## Express server bootstrap
 
-Edit `src/index.ts` to include the basic Express server setup:
+`src/index.ts` starts the HTTP server first, then initializes the TypeORM
+`DataSource`:
 
 ```ts
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT || 3002;
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from the backend!');
-});
-
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-```
-
-## Step 6: Update package.json Scripts
-
-Modify the scripts section in package.json to use ts-node-dev for development and tsc for building the project:
-
-```json
-"scripts": {
-  "start": "node dist/index.js",
-  "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-  "build": "tsc",
-}
-```
-
-## Step 7: Setup swagger
-
-### Configure Swagger Options
-
-Create a new file, .src/swaggerOptions.ts, where you'll define Swagger configuration options:
-
-```ts
-import swaggerJsdoc from 'swagger-jsdoc';
-
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Ledger API',
-            version: '1.0.0',
-            description: 'API Documentation',
-        },
-    },
-    // Paths to files containing OpenAPI definitions
-    apis: ['src/routes/*.ts'],
-};
-
-export const swaggerSpec = swaggerJsdoc(options);
-
-```
-
-### Add Swagger Middleware
-
-Create a middleware file, `src\middlewares\swaggerMiddleware.ts`, to serve Swagger UI and Swagger spec:
-
-```ts
-import express from 'express';
-import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './swaggerOptions';
-
-const router = express.Router();
-
-router.use('/', swaggerUi.serve);
-router.get('/', swaggerUi.setup(swaggerSpec));
-
-export default router;
-
-```
-
-### Include Swagger middleware in the Express App
-
-In the index.ts, import and use the Swagger middleware:
-
-```ts
-import swaggerMiddleware from './swaggerMiddleware';
-
-const app = express();
-
-app.use('/api-docs', swaggerMiddleware);
-```
-
-### Add a script to generate swagger docs
-
-There might be an issue with running the swagger-jsdoc script directly in Windows due to the way the script is written. This is likely because it's using Unix-style syntax that's not compatible with Windows. To resolve this issue, there is an script in `src\utils\generateSwaggerDocs.ts` 
-
-```ts
-import fs from 'fs';
-import { swaggerSpec } from '../swaggerOptions';
-
-const outputFile = './swagger.json';
-
-fs.writeFile(outputFile, JSON.stringify(swaggerSpec, null, 2), (err) => {
-    if (err) {
-        console.error('Error writing Swagger JSON file:', err);
-    } else {
-        console.log('Swagger JSON file generated successfully.');
-    }
+process.on("unhandledRejection", (err: Error) => {
+  server.close(() => process.exit(1));
 });
+
+const connResult = await AppDataSource.initialize();
 ```
 
-###  Modify the package.json
+Anything that throws an unhandled rejection anywhere in the app brings the
+whole process down (by design, to fail fast rather than run in a half-broken
+state). This matters most at startup: if the database isn't reachable yet
+(e.g. DNS for a Docker Compose service not resolving for a moment), the
+process exits immediately rather than retrying. That's why
+`docker-compose.dev.yml`/`docker-compose.prod.yml` gate the backend on a
+MySQL healthcheck (`condition: service_healthy`) instead of just
+`depends_on: [mysql]` — the latter only waits for the container to start, not
+for MySQL to actually accept connections.
 
-To run the script to generate the Swagger documentation. Add a compile step in your package.json.
+## CORS
 
-```json
-"scripts": {
-    ...
-    "generate-docs": "tsc && node dist/utils/generateSwaggerDocs.js"
-}
-```
+Enabled globally with a permissive `origin: "*"` in `src/routes/index.ts`. If
+requests ever need credentials (cookies, `Authorization` with
+`credentials: 'include'`), this will need to change — browsers reject
+`Access-Control-Allow-Origin: *` combined with credentialed requests.
 
-## Step 8: Setup the Dockerfile for TypeScript Backend
+## Docker
 
-```Dockerfile
-FROM node:20
+- `Dockerfile` — dev image: installs deps, copies source, runs
+  `ts-node-dev --respawn --transpile-only src/index.ts`.
+- `Dockerfile.prod` — multi-stage: builds with `tsc` in a `node:20` stage,
+  then copies just `dist/` into a slim `node:20-alpine` runtime and runs
+  `node dist/index.js`.
 
-WORKDIR /usr/src/app
+Neither Dockerfile hardcodes credentials. Runtime config (`DB_HOST`,
+`DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `PORT`) comes from
+environment variables injected by `docker-compose` (`env_file: backend/.env`
+plus a couple of overrides for the in-network DB host/port).
 
-COPY package*.json ./
-RUN npm install
+## Adding a new endpoint
 
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["node", "dist/index.js"]
-
-```
+1. Add a TypeORM entity in `src/models/` if a new table is involved.
+2. Add a controller in `src/controllers/` (and a service in `src/services/`
+   if the logic is non-trivial or reused).
+3. Add a route file in `src/routes/` (or extend an existing one) and mount it
+   in `src/routes/index.ts`.
+4. Annotate the route with a `@swagger` JSDoc block (see
+   [swagger-use.md](swagger-use.md)) and run `npm run generate-docs`.

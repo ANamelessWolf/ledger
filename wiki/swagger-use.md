@@ -1,6 +1,13 @@
-# Using swagger
+# Using Swagger
 
-Annotate Your Routes: In the route files (e.g., src/routes/owner.ts), annotate your Express routes with Swagger comments:
+API docs are generated from JSDoc `@swagger` comments on the route files in
+`backend/src/routes/`, using `swagger-jsdoc`, and served with
+`swagger-ui-express` at `/api-docs`.
+
+## Annotating a route
+
+Add a `@swagger` block above the route handler, describing the endpoint in
+OpenAPI 3.0 format:
 
 ```ts
 /**
@@ -21,10 +28,21 @@ Annotate Your Routes: In the route files (e.g., src/routes/owner.ts), annotate y
  */
 ```
 
-Then run:
+## Regenerating the docs
 
 ```bash
+cd backend
 npm run generate-docs
 ```
 
-When you run your Node.js server and navigate to <BACKEND_SERVER_URL>/api-docs, you should see the Swagger UI with your API documentation. 
+This runs `tsc` (to compile `swaggerOptions.ts` and the annotated routes)
+and then writes `swagger.json` at the project root. `swaggerOptions.ts`
+points `apis` at `src/routes/*.ts`, so any file matching that glob is
+scanned for `@swagger` comments.
+
+## Viewing it
+
+With the backend running, open `<BACKEND_URL>/api-docs` — e.g.
+http://localhost:3002/api-docs for local dev, or the same path on whatever
+host/port the backend is published to (`docker-compose.dev.yml` /
+`docker-compose.prod.yml` both publish it on `3002`).
