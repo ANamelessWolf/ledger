@@ -6,7 +6,7 @@ export type WalletOptions = {
 
 }
 
-export const EMPTY_WALLET_OPTIONS: WalletOptions{
+export const EMPTY_WALLET_OPTIONS: WalletOptions = {
 
 }
 
