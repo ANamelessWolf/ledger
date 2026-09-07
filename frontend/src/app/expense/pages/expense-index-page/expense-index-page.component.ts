@@ -82,8 +82,8 @@ export class ExpenseIndexPageComponent implements OnInit {
   ) {
     const today = new Date();
     const monthlyPeriod: DateRange = {
-      start: new Date(today.getFullYear(), today.getMonth(), 1),
-      end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+      start: new Date(Date.UTC(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0)),
+      end: new Date(Date.UTC(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)),
     };
     this.options.filter.period = monthlyPeriod;
   }

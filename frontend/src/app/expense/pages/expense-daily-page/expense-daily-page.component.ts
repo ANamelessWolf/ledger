@@ -164,11 +164,12 @@ export class ExpenseDailyPageComponent implements OnInit {
 
   private getExpensesForDay(day: number): void {
     this.selectedDay = day;
-    const date       = new Date(this.year, this.month - 1, day);
+    const start = new Date(Date.UTC(this.year, this.month - 1, day, 0, 0, 0, 0));
+    const end   = new Date(Date.UTC(this.year, this.month - 1, day, 23, 59, 59, 999));
     const options: ExpenseSearchOptions = {
       pagination: { page: 1, pageSize: 100 },
       sorting:    { orderBy: 'buyDate', orderDirection: 'ASC' },
-      filter:     { period: { start: date, end: date } },
+      filter:     { period: { start, end } },
     };
     this.expenseService.getExpenses(options).subscribe(
       (response) => {
