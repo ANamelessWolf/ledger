@@ -39,6 +39,8 @@
     "docker:dev:refresh": "docker compose --env-file database/.env -f docker-compose.dev.yml up -d --build backend frontend",
     "docker:prod": "docker compose --env-file database/.env -f docker-compose.prod.yml up -d --build",
     "docker:prod:down": "docker compose --env-file database/.env -f docker-compose.prod.yml down",
+    "mobile:apk": "cd mobile && flutter build apk --release",
+    "mobile:test": "node mobile/tool/run-emulator.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

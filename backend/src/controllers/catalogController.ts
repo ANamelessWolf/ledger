@@ -346,6 +346,35 @@ export const getPaymentFrequencyList = asyncErrorHandler(
   }
 );
 
+/**
+ * Retrieves the credit cards with their wallet group and active flag.
+ * Lightweight catalog used by the mobile app to hide wallet groups whose
+ * credit card is not active (`credit_card.active !== 1`).
+ * @summary Retrieves `{ id, walletGroupId, active }` for every credit card.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<void>} The Promise that resolves when the operation is complete.
+ */
+export const getCreditCardCatalog = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cards: Creditcard[] = await AppDataSource.manager.find(Creditcard, { order: { id: "ASC" } });
+      const result = cards.map((c) => ({
+        id: c.id,
+        walletGroupId: c.walletGroupId,
+        active: Number(c.active),
+      }));
+      res.status(HTTP_STATUS.OK).json(new HttpResponse({ data: result }));
+    } catch (error) {
+      console.error(error);
+      return next(
+        new Exception("An error occurred getting the credit card catalog", HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      );
+    }
+  }
+);
+
 const getCreditCard = (
   card: CardItem,
   cc_cards: Creditcard[]

@@ -8,6 +8,7 @@ A personal finance manager: track expenses, credit/debit cards, wallets, budgets
 ledger/
 ├── backend/     Express + TypeORM API (TypeScript)
 ├── frontend/    Angular 17 SPA
+├── mobile/      Flutter Android app (offline-first expenses)
 ├── database/    MySQL schema: migrations, seeds, and admin scripts
 └── wiki/        Extra docs (Swagger usage, setup notes)
 ```
@@ -16,6 +17,7 @@ Each sub-project has its own README with details specific to it:
 
 - [backend/README.md](backend/README.md)
 - [frontend/README.md](frontend/README.md)
+- [mobile/README.md](mobile/README.md)
 - [database/README.md](database/README.md)
 
 ## Prerequisites

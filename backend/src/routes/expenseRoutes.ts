@@ -129,6 +129,7 @@ import {
   getExpenseSummaryByVendor,
   updateExpense,
 } from "../controllers/expenseController";
+import { syncMobileExpenses } from "../controllers/mobileSyncController";
 
 const router = Router();
 /**
@@ -230,6 +231,16 @@ const router = Router();
  *          type: string
  *          enum: [ASC, DESC]
  *          example: "ASC"
+ *      - name: excludeInstallmentParents
+ *        in: query
+ *        description: >
+ *          When "true", excludes the parent expense of interest-free monthly purchases
+ *          (`monthly_with_no_interest.expense_id`); their monthly installments are still returned.
+ *          Used by the mobile app. Defaults to false (unchanged behavior).
+ *        required: false
+ *        schema:
+ *          type: boolean
+ *          example: true
  *    responses:
  *      '200':
  *        description: A list of expenses
@@ -259,6 +270,63 @@ const router = Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Expense'
+ * /expenses/sync:
+ *   post:
+ *     summary: Idempotent batch upload of mobile expenses
+ *     description: >
+ *       Inserts up to 10 expenses created offline in the mobile app. Each item carries a
+ *       stable client-generated `syncKey`; resending a key that was already stored returns
+ *       the existing expense id instead of inserting a duplicate. Valid items are inserted
+ *       in a single transaction; if it fails, it is rolled back and one row per item is
+ *       written to `expense_sync_error_log`. Responds 200 whenever the batch was processed;
+ *       check each item's `success`.
+ *     tags: [Expenses]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               expenses:
+ *                 type: array
+ *                 minItems: 1
+ *                 maxItems: 10
+ *                 items:
+ *                   type: object
+ *                   required: [syncKey, walletId, expenseTypeId, vendorId, description, total, buyDate]
+ *                   properties:
+ *                     syncKey: { type: string, example: "3f0b6c2e-8a51-4b7e-9d0e-2b1d9c4a7e10" }
+ *                     walletId: { type: integer, example: 7 }
+ *                     expenseTypeId: { type: integer, example: 3 }
+ *                     vendorId: { type: integer, example: 23 }
+ *                     description: { type: string, maxLength: 120, example: "Groceries" }
+ *                     total: { type: number, example: 1250.5 }
+ *                     currencyFactor: { type: number, nullable: true, example: 17.31 }
+ *                     buyDate: { type: string, format: date, example: "2026-10-03" }
+ *     responses:
+ *       200:
+ *         description: Per-item results in request order.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       syncKey: { type: string }
+ *                       success: { type: boolean }
+ *                       remoteId: { type: integer }
+ *                       alreadySynced: { type: boolean }
+ *                       errorCode: { type: string, example: "BATCH_FAILED" }
+ *                       databaseErrorCode: { type: string, example: "ER_NO_REFERENCED_ROW_2" }
+ *                       message: { type: string }
+ *       400:
+ *         description: Invalid envelope (not an array, empty, more than 10 items or duplicate keys).
  * /expenses/daily/{month}/{year}:
  *  get:
  *    summary: Get daily expenses by month and year
@@ -358,6 +426,7 @@ const router = Router();
  *         description: Error processing the request.
  */
 router.route("/").get(getExpenses).post(createExpense);
+router.route("/sync").post(syncMobileExpenses);
 router.route("/:id").put(updateExpense).delete(deleteExpense);
 router.route("/daily/:month/:year").get(getDailyExpenses);
 router.route("/summary/type/:frequency").get(getExpenseSummaryByType);

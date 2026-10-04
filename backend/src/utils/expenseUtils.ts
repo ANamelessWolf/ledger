@@ -1,4 +1,4 @@
-import { Between, FindManyOptions, In, Like } from "typeorm";
+import { Between, FindManyOptions, In, Like, Not } from "typeorm";
 import { ExpenseFilter } from "../types/filter/expenseFilter";
 import { Expense } from "../models/expenses";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
@@ -48,6 +48,33 @@ export const getExpenseFilter = (
   }
 
   return where;
+};
+
+/**
+ * Ids of the "parent" expenses of interest-free monthly purchases: the full
+ * purchase recorded in `monthly_with_no_interest.expense_id`. Their monthly
+ * installments are separate expenses (`monthly_with_no_interest_payments`),
+ * so listing both would count the purchase twice.
+ * @returns The parent expense ids (may be empty).
+ */
+export const getInstallmentParentExpenseIds = async (): Promise<number[]> => {
+  const rows: { expenseId: number }[] = await AppDataSource.query(
+    "SELECT DISTINCT expense_id AS expenseId FROM monthly_with_no_interest"
+  );
+  return rows.map((r) => Number(r.expenseId));
+};
+
+/**
+ * Adds an exclusion of the installment parent expenses to an expense filter.
+ * @param where The filter built by {@link getExpenseFilter}.
+ * @returns The same filter, excluding the parent expense ids.
+ */
+export const excludeInstallmentParents = async (
+  where: FindManyOptions<Expense>["where"]
+): Promise<FindManyOptions<Expense>["where"]> => {
+  const parentIds = await getInstallmentParentExpenseIds();
+  if (parentIds.length === 0 || where === undefined || Array.isArray(where)) return where;
+  return { ...where, id: Not(In(parentIds)) };
 };
 
 export const getWalletExpenseFilter = (

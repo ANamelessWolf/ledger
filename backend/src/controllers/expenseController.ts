@@ -8,6 +8,7 @@ import {
 import { asyncErrorHandler } from "../middlewares";
 import { ExpenseFilter } from "../types/filter/expenseFilter";
 import {
+  excludeInstallmentParents,
   getExpenseFilter,
   getExpenseItemResponse,
 } from "../utils/expenseUtils";
@@ -33,7 +34,12 @@ export const getExpenses = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const filter = buildFilter(req.query);
-      const where = getExpenseFilter(filter);
+      let where = getExpenseFilter(filter);
+      // Opt-in (used by the mobile sync): hide the full purchase of
+      // interest-free monthly purchases, keeping only its installments.
+      if (String(req.query.excludeInstallmentParents ?? "").toLowerCase() === "true") {
+        where = await excludeInstallmentParents(where);
+      }
       const options: FindManyOptions<Expense> = { where };
 
       // Add sorting

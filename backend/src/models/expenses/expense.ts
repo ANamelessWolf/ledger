@@ -23,8 +23,13 @@ export class Expense {
   @Column({ type: "double" })
   total: number;
 
-  @Column({ type: "double", name: "currency_factor" })
-  currencyFactor: number;
+  /**
+   * Optional expense-specific conversion factor to the default currency
+   * (default-currency units per 1 unit of the wallet currency). NULL in the
+   * database when the current catalog conversion applies.
+   */
+  @Column({ type: "double", name: "currency_factor", nullable: true })
+  currencyFactor: number | null;
 
   @Column({ type: "date", name: "buy_date" })
   buyDate: Date;

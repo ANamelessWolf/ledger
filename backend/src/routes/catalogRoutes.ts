@@ -40,7 +40,7 @@
  *           description: Catalog item name
  */
 import { Router } from "express";
-import { getCardList, getCurrencyList, getExpenseYearRange, getExpensesTypesList, getFinancingEnityList, getFinancingTypeList, getPaymentFrequencyList, getVendorList, getWalletGroupList, getWalletList } from "../controllers/catalogController";
+import { getCardList, getCreditCardCatalog, getCurrencyList, getExpenseYearRange, getExpensesTypesList, getFinancingEnityList, getFinancingTypeList, getPaymentFrequencyList, getVendorList, getWalletGroupList, getWalletList } from "../controllers/catalogController";
 
 const router = Router();
 /**
@@ -136,9 +136,30 @@ const router = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/CatalogItem' 
+ * /catalog/credit-cards:
+ *   get:
+ *     summary: Credit cards with their wallet group and active flag
+ *     description: >
+ *       Lightweight list used by the mobile app to hide wallet groups whose credit card
+ *       is not active (`active` different from 1).
+ *     tags: [Catalogs]
+ *     responses:
+ *       200:
+ *         description: Successful operation.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer, example: 6 }
+ *                   walletGroupId: { type: integer, example: 5 }
+ *                   active: { type: integer, example: 1 }
  */ 
 router.route('/currencies').get(getCurrencyList);
 router.route('/cards').get(getCardList);
+router.route('/credit-cards').get(getCreditCardCatalog);
 router.route('/financing_entities').get(getFinancingEnityList);
 router.route('/wallets').get(getWalletList);
 router.route('/expenseTypes').get(getExpensesTypesList);
