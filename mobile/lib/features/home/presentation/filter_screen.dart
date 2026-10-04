@@ -35,6 +35,7 @@ class _FilterScreenState extends ConsumerState<FilterScreen> {
     final invalidRange = _draft.range.start.compareTo(_draft.range.end) > 0;
 
     final presets = <String, DateRange>{
+      'Today': DateRange.day(now),
       'This month': DateRange.month(now),
       'Last month': DateRange.month(DateTime(now.year, now.month - 1, 1)),
       'Last 3 months': window,

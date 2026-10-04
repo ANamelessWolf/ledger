@@ -39,6 +39,12 @@ class DateRange {
   final String start;
   final String end;
 
+  /// Just the calendar day of [date].
+  factory DateRange.day(DateTime date) {
+    final day = IsoDate.format(date);
+    return DateRange(day, day);
+  }
+
   /// First to last day of the month containing [date].
   factory DateRange.month(DateTime date) {
     final first = DateTime(date.year, date.month, 1);

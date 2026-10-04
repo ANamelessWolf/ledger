@@ -122,9 +122,16 @@ the group keeps the currency when the new group has it, otherwise it falls
 back to the default. The currency factor field appears only for
 non-default currencies.
 
+New expenses start with the **wallet, currency and date of the last created
+expense** (stored in shared preferences), since expenses are usually entered
+for the same account and day. A remembered wallet is ignored if it no longer
+exists or its group is now hidden. Toggle in Settings → *New expenses*
+(on by default; turning it off forgets the stored values).
+
 ### Filters and sorting
 
-Filters (date range, wallet, vendor, expense type) and the sort order are
+Filters (date range with presets Today / This month / Last month / Last 3
+months, wallet, vendor, expense type) and the sort order are
 applied locally. Sort by **Date** (default, newest first) or **Total**,
 ascending or descending; totals are compared by their normalized value in the
 default currency. Sorting only changes the list order, not the dashboard.

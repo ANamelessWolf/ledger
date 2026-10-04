@@ -94,6 +94,7 @@ class _HomeContent extends ConsumerWidget {
                 AsyncData(:final value) => _Dashboard(
                     data: value,
                     filter: filter,
+                    today: ref.watch(clockProvider)(),
                     currency: currency,
                     onExpenseTap: openExpense,
                   ),
@@ -174,10 +175,17 @@ class _HomeContent extends ConsumerWidget {
 }
 
 class _Dashboard extends StatelessWidget {
-  const _Dashboard({required this.data, required this.filter, required this.currency, required this.onExpenseTap});
+  const _Dashboard({
+    required this.data,
+    required this.filter,
+    required this.today,
+    required this.currency,
+    required this.onExpenseTap,
+  });
 
   final DashboardData data;
   final ExpenseFilter filter;
+  final DateTime today;
   final String currency;
   final void Function(ExpenseView) onExpenseTap;
 
@@ -186,7 +194,7 @@ class _Dashboard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SummaryCard(data: data, periodLabel: _periodLabel(filter.range), currency: currency),
+        SummaryCard(data: data, periodLabel: _periodLabel(filter.range, today), currency: currency),
         if (data.expenseCount > 0) ...[
           const SectionHeader(title: 'Dashboard', subtitle: 'Normalized to the default currency'),
           DashboardCard(data: data, currency: currency, onExpenseTap: onExpenseTap),
@@ -195,8 +203,10 @@ class _Dashboard extends StatelessWidget {
     );
   }
 
-  static String _periodLabel(DateRange range) {
+  static String _periodLabel(DateRange range, DateTime today) {
     final start = IsoDate.parse(range.start);
+    if (range == DateRange.day(today)) return 'Today';
+    if (range.start == range.end) return Formatters.date(range.start);
     if (range == DateRange.month(start)) return DateFormat.yMMMM().format(start);
     return 'Custom period';
   }

@@ -18,6 +18,12 @@ void main() {
       expect(DateRange.syncWindow(DateTime(2026, 1, 15)), const DateRange('2025-11-01', '2026-01-31'));
     });
 
+    test('today is a single-day range', () {
+      expect(DateRange.day(DateTime(2026, 10, 4, 18, 30)), const DateRange('2026-10-04', '2026-10-04'));
+      expect(const DateRange('2026-10-04', '2026-10-04').contains('2026-10-04'), isTrue);
+      expect(const DateRange('2026-10-04', '2026-10-04').contains('2026-10-03'), isFalse);
+    });
+
     test('leap year February', () {
       expect(DateRange.month(DateTime(2028, 2, 10)), const DateRange('2028-02-01', '2028-02-29'));
     });

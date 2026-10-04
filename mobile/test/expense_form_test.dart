@@ -16,14 +16,16 @@ import 'helpers/test_data.dart';
 void main() {
   late AppDatabase db;
 
-  Future<void> pumpForm(WidgetTester tester) async {
+  Future<void> pumpForm(WidgetTester tester, {Map<String, Object> prefsValues = const {}, bool reuseDb = false}) async {
     tester.view.physicalSize = const Size(1080, 3000);
     tester.view.devicePixelRatio = 2.5;
     addTearDown(tester.view.reset);
 
-    db = openTestDatabase();
-    await tester.runAsync(() => CatalogRepository(db).replaceAll(testSnapshot()));
-    SharedPreferences.setMockInitialValues({});
+    if (!reuseDb) {
+      db = openTestDatabase();
+      await tester.runAsync(() => CatalogRepository(db).replaceAll(testSnapshot()));
+      SharedPreferences.setMockInitialValues(prefsValues);
+    }
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(ProviderScope(
       retry: (_, _) => null,
@@ -95,6 +97,40 @@ void main() {
     expect(saved!.single.walletId, 24, reason: 'AMEX Platinum + USD → wallet 24');
     expect(saved.single.currencyFactor, 18.5);
 
+    // The next New Expense form starts with the same group, currency and date.
+    await tester.pumpWidget(const SizedBox());
+    await pumpForm(tester, reuseDb: true);
+    expect(find.text('AMEX Platinum'), findsOneWidget);
+    expect(find.text('USD · Dólar'), findsOneWidget);
+    expect(find.text('Saturday, October 3, 2026'), findsOneWidget);
+    expect(find.text('Dinner'), findsNothing, reason: 'only wallet, currency and date are remembered');
+
+    await closeDb(tester);
+  });
+
+  testWidgets('remembered date and wallet are preselected', (tester) async {
+    await pumpForm(tester, prefsValues: {'last_expense_wallet_id': 24, 'last_expense_date': '2026-09-15'});
+    expect(find.text('AMEX Platinum'), findsOneWidget);
+    expect(find.text('USD · Dólar'), findsOneWidget);
+    expect(find.text('Tuesday, September 15, 2026'), findsOneWidget);
+    await closeDb(tester);
+  });
+
+  testWidgets('a remembered wallet that no longer exists is ignored', (tester) async {
+    await pumpForm(tester, prefsValues: {'last_expense_wallet_id': 999, 'last_expense_date': '2026-09-15'});
+    expect(find.text('Select a wallet first'), findsOneWidget);
+    expect(find.text('Tuesday, September 15, 2026'), findsOneWidget);
+    await closeDb(tester);
+  });
+
+  testWidgets('nothing is preselected when the setting is off', (tester) async {
+    await pumpForm(tester, prefsValues: {
+      'remember_last_expense_selection': false,
+      'last_expense_wallet_id': 24,
+      'last_expense_date': '2026-09-15',
+    });
+    expect(find.text('Select a wallet first'), findsOneWidget);
+    expect(find.text('Saturday, October 3, 2026'), findsOneWidget, reason: 'defaults to today');
     await closeDb(tester);
   });
 }

@@ -46,6 +46,10 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   /// Selected account (`WalletAccount.key`) and the wallet resolved from it.
   String? _accountKey;
   int? _walletId;
+
+  /// Remembered wallet of the last expense; applied once catalogs are loaded
+  /// (and only if the wallet still exists and its group is selectable).
+  int? _rememberedWalletId;
   int? _expenseTypeId;
   int? _vendorId;
   late String _buyDate;
@@ -59,7 +63,13 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   void initState() {
     super.initState();
     final e = widget.expense;
-    _buyDate = e?.buyDate ?? IsoDate.format(ref.read(clockProvider)());
+    if (e == null) {
+      final initial = ref.read(expenseFormDefaultsProvider).initialValues(ref.read(clockProvider)());
+      _buyDate = initial.buyDate;
+      _rememberedWalletId = initial.walletId;
+    } else {
+      _buyDate = e.buyDate;
+    }
     if (e != null) {
       _walletId = e.walletId;
       _expenseTypeId = e.expenseTypeId;
@@ -113,7 +123,8 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
       if (_isEdit) {
         await service.update(widget.expense!.id, _draft());
       } else {
-        await service.create(_draft());
+        final created = await service.create(_draft());
+        await ref.read(expenseFormDefaultsProvider).remember(created);
       }
       if (!mounted) return;
       showAppSnackBar(context, _isEdit ? 'Expense updated' : 'Expense saved on this device. Sync to send it to Ledger.');
@@ -136,7 +147,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   }
 
   Future<void> _cancel() async {
-    if (_dirty || _walletId != null && !_isEdit) {
+    if (_dirty) {
       final discard = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -151,6 +162,20 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
       if (discard != true) return;
     }
     if (mounted) _finish();
+  }
+
+  /// Preselects the remembered wallet (group + currency) the first time the
+  /// catalogs are available. Runs during build without setState because it
+  /// only initializes values read later in the same build.
+  void _applyRememberedWallet(Catalogs catalogs) {
+    final id = _rememberedWalletId;
+    if (id == null) return;
+    _rememberedWalletId = null;
+    final account = catalogs.accountOfWallet(id);
+    if (_walletId == null && catalogs.wallets.containsKey(id) && account != null && account.isSelectable) {
+      _accountKey = account.key;
+      _walletId = id;
+    }
   }
 
   /// Applies an account + wallet selection. The factor is cleared when the
@@ -225,6 +250,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
   Widget _form(BuildContext context, Catalogs catalogs) {
     final theme = Theme.of(context);
+    _applyRememberedWallet(catalogs);
     // "Wallet" in the form is the account (wallet group); the concrete wallet
     // sent to Ledger is resolved from account + currency.
     final account = (_accountKey == null ? null : catalogs.accountByKey(_accountKey!)) ??

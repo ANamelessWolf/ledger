@@ -7,6 +7,7 @@ import '../../../core/providers.dart';
 import '../../../core/utilities/iso_date.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../../catalogs/catalog_providers.dart';
+import '../../expenses/expense_providers.dart';
 import '../../synchronization/domain/sync_models.dart';
 import '../../synchronization/sync_providers.dart';
 import '../application/api_status.dart';
@@ -139,6 +140,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         'otherwise the current catalog rate.',
               ),
               isThreeLine: defaultCurrency != null,
+            ),
+          ),
+          const SectionHeader(title: 'New expenses'),
+          Card(
+            child: SwitchListTile(
+              secondary: const Icon(Icons.history_toggle_off_rounded),
+              title: const Text('Remember last wallet, currency and date'),
+              subtitle: const Text('Preselects them in the New Expense form, since expenses are usually added '
+                  'for the same account and day. Turning it off forgets the stored values.'),
+              value: ref.watch(rememberLastExpenseProvider),
+              onChanged: (v) => ref.read(rememberLastExpenseProvider.notifier).set(v),
             ),
           ),
           const SectionHeader(title: 'Synchronization'),
