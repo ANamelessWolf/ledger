@@ -126,8 +126,8 @@ const buildFilter = (query: QueryString.ParsedQs): WalletExpenseFilter => {
     period:
       start !== undefined && end !== undefined
         ? {
-            start: new Date(start.toString()),
-            end: new Date(end.toString()),
+            start: toCalendarDate(start.toString()),
+            end: toCalendarDate(end.toString()),
           }
         : undefined,
     expenseRange:
@@ -140,6 +140,18 @@ const buildFilter = (query: QueryString.ParsedQs): WalletExpenseFilter => {
     description: description?.toString(),
   };
   return filter;
+};
+
+/**
+ * Normalizes a date query param to a `YYYY-MM-DD` calendar date so the
+ * `buy_date` (DATE) comparison includes the whole start and end days,
+ * regardless of the time or timezone the client sent.
+ */
+const toCalendarDate = (value: string): string => {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+  return new Date(value).toISOString().substring(0, 10);
 };
 
 const getPagination = (query: QueryString.ParsedQs) => {

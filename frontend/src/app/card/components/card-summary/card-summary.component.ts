@@ -34,7 +34,7 @@ import { FormControl } from '@angular/forms';
 import { CreditCardSpendingChartComponent } from '../credit-card-spending-chart/credit-card-spending-chart.component';
 import { WalletExpenseTableComponent } from 'app/wallet/components/wallet-expense-table/wallet-expense-table.component';
 import { DateRange } from '@expense/types/expensesTypes';
-import { getDateRange } from '@common/utils/dateUtils';
+import { getDateRange, toLocalCalendarDate } from '@common/utils/dateUtils';
 
 @Component({
   selector: 'app-card-summary',
@@ -129,8 +129,8 @@ export class CardSummaryComponent implements OnChanges {
         status = (this.summary as CreditCardSummary).status?.status || '';
         const filter = (this.summary as CreditCardSummary).status?.billing.filter;
         return {
-          start: new Date(filter.start),
-          end: new Date(filter.end),
+          start: toLocalCalendarDate(filter.start),
+          end: toLocalCalendarDate(filter.end),
         };
       } else {
         const today = new Date();

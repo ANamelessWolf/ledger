@@ -1,4 +1,4 @@
-import { Between, FindManyOptions, In, Like, Not } from "typeorm";
+import { Between, FindManyOptions, In, Like, Not, Raw } from "typeorm";
 import { ExpenseFilter } from "../types/filter/expenseFilter";
 import { Expense } from "../models/expenses";
 import { ExpenseItemResponse } from "../types/response/expenseItemResponse";
@@ -98,7 +98,11 @@ export const getWalletExpenseFilter = (
   }
 
   if (filter.period) {
-    where.buyDate = Between(filter.period.start, filter.period.end);
+    // Compare as calendar dates so both start and end days are included
+    where.buyDate = Raw((alias) => `${alias} BETWEEN :start AND :end`, {
+      start: filter.period.start,
+      end: filter.period.end,
+    });
   }
 
   if (filter.expenseRange) {

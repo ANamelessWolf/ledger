@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { isValidDate } from '@common/utils/dateUtils';
+import { toRequestFormat } from '@common/utils/formatUtils';
 import { Pagination, SortType } from '@config/commonTypes';
 import { LEDGER_API } from '@config/constants';
 import {
@@ -140,8 +141,8 @@ export class WalletService {
       isValidDate(filter.period.start) &&
       isValidDate(filter.period.end)
     ) {
-      query += `&start=${filter.period.start.toISOString()}`;
-      query += `&end=${filter.period.end.toISOString()}`;
+      query += `&start=${toRequestFormat(filter.period.start)}`;
+      query += `&end=${toRequestFormat(filter.period.end)}`;
     }
 
     if (filter.expenseRange) {

@@ -74,11 +74,20 @@ export const getCurrentMonthYear = (): string => {
   return currentMonthKey;
 };
 
-const shiftDateByMonths = (date: Date, months: number): Date => {
-  const totalMonths = date.getFullYear() * 12 + date.getMonth() + months;
-  const year = Math.floor(totalMonths / 12);
-  const month = totalMonths % 12;
-  return new Date(year, month, date.getDate());
+/**
+ * Converts a date serialized by the API (a calendar date at UTC midnight)
+ * into the same calendar date at local midnight, so it is not shifted to the
+ * previous day in timezones behind UTC.
+ */
+export const toLocalCalendarDate = (value: Date | string): Date => {
+  const date = new Date(value);
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+};
+
+const getCutDate = (year: number, month: number, cutDay: number): Date => {
+  // Clamp the cut day to the last day of the month (e.g. 31 -> Feb 28)
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  return new Date(year, month, Math.min(cutDay, lastDay));
 };
 
 export interface CardPeriodsResult {
@@ -86,19 +95,30 @@ export interface CardPeriodsResult {
   currentKey: string;
 }
 
+/**
+ * Generates the billing periods around the given one. Each period runs from
+ * the day after the previous cut date to the cut date (both inclusive).
+ */
 export const generateCardPeriods = (period: DateRange): CardPeriodsResult => {
-  const { start, end } = period;
+  const { end } = period;
+  const cutDay = end.getDate();
 
   // The cut day (end's day-of-month) is fixed for a card, so it alone
   // decides whether a period is labeled by its start or end month.
-  const useEndMonth = end.getDate() >= 15;
+  const useEndMonth = cutDay >= 15;
 
   const periods = new Map<string, DateRange>();
   let currentKey = '';
 
   for (let offset = -12; offset <= 5; offset++) {
-    const newStart = shiftDateByMonths(start, offset);
-    const newEnd = shiftDateByMonths(end, offset);
+    const month = end.getMonth() + offset;
+    const newEnd = getCutDate(end.getFullYear(), month, cutDay);
+    const previousCut = getCutDate(end.getFullYear(), month - 1, cutDay);
+    const newStart = new Date(
+      previousCut.getFullYear(),
+      previousCut.getMonth(),
+      previousCut.getDate() + 1
+    );
     const keyDate = useEndMonth ? newEnd : newStart;
     const key = `${getMonthName(keyDate)} ${keyDate.getFullYear()}`;
     if (offset === 0) currentKey = key;
